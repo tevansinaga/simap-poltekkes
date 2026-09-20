@@ -25,16 +25,33 @@ class Disposisi extends Model
     ];
 
     protected $casts = [
-        'batas_waktu' => 'date',
+        /*
+        |--------------------------------------------------------------------------
+        | BATAS WAKTU
+        |--------------------------------------------------------------------------
+        |
+        | Field ini adalah DATE saja, bukan DATETIME.
+        |
+        | Contoh nilai database:
+        | 2026-09-20
+        |
+        | Saat dikirim ke React, Laravel akan mempertahankan:
+        | 2026-09-20
+        |
+        | sehingga tidak berubah menjadi tanggal UTC seperti:
+        | 2026-09-19T17:00:00...
+        |
+        */
+        'batas_waktu' => 'date:Y-m-d',
+
+        /*
+        |--------------------------------------------------------------------------
+        | FIELD DATETIME
+        |--------------------------------------------------------------------------
+        */
         'tanggal_disposisi' => 'datetime',
         'selesai_at' => 'datetime',
     ];
-
-    /*
-    |--------------------------------------------------------------------------
-    | RELATION
-    |--------------------------------------------------------------------------
-    */
 
     public function suratMasuk(): BelongsTo
     {
@@ -67,12 +84,6 @@ class Disposisi extends Model
             'disposisi_id'
         )->orderBy('created_at');
     }
-
-    /*
-    |--------------------------------------------------------------------------
-    | HELPER
-    |--------------------------------------------------------------------------
-    */
 
     public function isUntukDirektur(): bool
     {

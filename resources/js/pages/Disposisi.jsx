@@ -3,10 +3,6 @@ import React, { useMemo, useState } from 'react';
 export default function Disposisi({
     disposisis = [],
 }) {
-    // =====================================================
-    // DATA
-    // =====================================================
-
     const safeDisposisis = Array.isArray(disposisis)
         ? disposisis
         : [];
@@ -33,6 +29,8 @@ export default function Disposisi({
 
         const value = String(date).trim();
 
+        // DATE-only harus dibaca sebagai tanggal kalender, bukan datetime.
+        // Jangan gunakan new Date(YYYY-MM-DD) karena bisa bergeser timezone.
         const match = value.match(
             /^(\d{4})-(\d{2})-(\d{2})/
         );
@@ -41,26 +39,54 @@ export default function Disposisi({
             return String(date);
         }
 
-        const parsedDate = new Date(
-            `${match[1]}-${match[2]}-${match[3]}T00:00:00`
-        );
+        const year = Number(match[1]);
+        const month = Number(match[2]);
+        const day = Number(match[3]);
+
+        const months = [
+            'Januari',
+            'Februari',
+            'Maret',
+            'April',
+            'Mei',
+            'Juni',
+            'Juli',
+            'Agustus',
+            'September',
+            'Oktober',
+            'November',
+            'Desember',
+        ];
+
+        const daysInMonth = [
+            31,
+            (year % 4 === 0 &&
+                (year % 100 !== 0 ||
+                    year % 400 === 0))
+                ? 29
+                : 28,
+            31,
+            30,
+            31,
+            30,
+            31,
+            31,
+            30,
+            31,
+            30,
+            31,
+        ];
 
         if (
-            Number.isNaN(
-                parsedDate.getTime()
-            )
+            month < 1 ||
+            month > 12 ||
+            day < 1 ||
+            day > daysInMonth[month - 1]
         ) {
             return String(date);
         }
 
-        return new Intl.DateTimeFormat(
-            'id-ID',
-            {
-                day: '2-digit',
-                month: 'long',
-                year: 'numeric',
-            }
-        ).format(parsedDate);
+        return `${String(day).padStart(2, '0')} ${months[month - 1]} ${year}`;
     };
 
     // =====================================================
@@ -74,11 +100,7 @@ export default function Disposisi({
 
         const parsedDate = new Date(date);
 
-        if (
-            Number.isNaN(
-                parsedDate.getTime()
-            )
-        ) {
+        if (Number.isNaN(parsedDate.getTime())) {
             return String(date);
         }
 
@@ -246,14 +268,6 @@ export default function Disposisi({
                     <path d="M20 20v-5h-5" />
                 </>
             ),
-
-            external: (
-                <>
-                    <path d="M14 5h5v5" />
-                    <path d="M10 14 19 5" />
-                    <path d="M19 13v5a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h5" />
-                </>
-            ),
         };
 
         return (
@@ -343,33 +357,29 @@ export default function Disposisi({
             return false;
         }
 
-        const today = new Date();
+        // Gunakan tanggal kalender WIT dalam format YYYY-MM-DD.
+        // Perbandingan string aman karena formatnya ISO date.
+        const todayWIT = new Intl.DateTimeFormat(
+            'en-CA',
+            {
+                timeZone: 'Asia/Jayapura',
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+            }
+        ).format(new Date());
 
-        today.setHours(
-            0,
-            0,
-            0,
-            0
-        );
+        const deadlineText = String(
+            item.batas_waktu
+        )
+            .trim()
+            .substring(0, 10);
 
-        const deadlineText =
-            String(
-                item.batas_waktu
-            ).substring(0, 10);
-
-        const deadline = new Date(
-            `${deadlineText}T00:00:00`
-        );
-
-        if (
-            Number.isNaN(
-                deadline.getTime()
-            )
-        ) {
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(deadlineText)) {
             return false;
         }
 
-        return deadline < today;
+        return deadlineText < todayWIT;
     };
 
     // =====================================================
@@ -385,10 +395,7 @@ export default function Disposisi({
         return safeDisposisis
             .filter((item) => {
 
-                // ==========================================
                 // SEARCH
-                // ==========================================
-
                 if (keyword) {
                     const searchableText = [
                         item?.surat_masuk?.nomor_surat,
@@ -399,9 +406,7 @@ export default function Disposisi({
                         item?.unit?.name,
                         item?.sifat,
                         getTujuan(item).label,
-                        getStatusLabel(
-                            item?.status
-                        ),
+                        getStatusLabel(item?.status),
                     ]
                         .filter(Boolean)
                         .join(' ')
@@ -416,10 +421,7 @@ export default function Disposisi({
                     }
                 }
 
-                // ==========================================
                 // STATUS
-                // ==========================================
-
                 if (
                     statusFilter &&
                     item?.status !==
@@ -428,10 +430,7 @@ export default function Disposisi({
                     return false;
                 }
 
-                // ==========================================
                 // TUJUAN
-                // ==========================================
-
                 if (
                     tujuanFilter &&
                     item?.tujuan_type !==
@@ -440,10 +439,7 @@ export default function Disposisi({
                     return false;
                 }
 
-                // ==========================================
                 // SIFAT
-                // ==========================================
-
                 if (
                     sifatFilter &&
                     item?.sifat !==
@@ -452,10 +448,7 @@ export default function Disposisi({
                     return false;
                 }
 
-                // ==========================================
                 // TANGGAL DARI
-                // ==========================================
-
                 if (tanggalDari) {
                     const itemDate =
                         String(
@@ -472,10 +465,7 @@ export default function Disposisi({
                     }
                 }
 
-                // ==========================================
                 // TANGGAL SAMPAI
-                // ==========================================
-
                 if (tanggalSampai) {
                     const itemDate =
                         String(
@@ -602,7 +592,7 @@ export default function Disposisi({
 
                 .disposisi-table {
                     width: 100%;
-                    min-width: 1450px;
+                    min-width: 1350px;
                     border-collapse: collapse;
                 }
 
@@ -709,37 +699,6 @@ export default function Disposisi({
                     max-width: 280px;
                 }
 
-                .surat-link {
-                    display: block;
-                    color: #0f2747;
-                    text-decoration: none;
-                    line-height: 1.5;
-                }
-
-                .surat-link:hover {
-                    color: #2563eb;
-                }
-
-                .monitoring-link {
-                    display: inline-flex;
-                    align-items: center;
-                    gap: 5px;
-                    margin-top: 8px;
-                    padding: 6px 8px;
-                    border-radius: 7px;
-                    background: #eff6ff;
-                    border: 1px solid #dbeafe;
-                    color: #2563eb;
-                    text-decoration: none;
-                    font-size: 9px;
-                    font-weight: 800;
-                    white-space: nowrap;
-                }
-
-                .monitoring-link:hover {
-                    background: #dbeafe;
-                }
-
                 @media (max-width: 1200px) {
                     .disposisi-summary {
                         grid-template-columns:
@@ -788,6 +747,7 @@ export default function Disposisi({
 
             `}</style>
 
+
             <main className="disposisi-layout">
 
                 {/* =================================================
@@ -797,10 +757,13 @@ export default function Disposisi({
                 <div
                     style={{
                         display: 'flex',
-                        alignItems: 'flex-start',
-                        justifyContent: 'space-between',
+                        alignItems:
+                            'flex-start',
+                        justifyContent:
+                            'space-between',
                         gap: '20px',
-                        marginBottom: '20px',
+                        marginBottom:
+                            '20px',
                     }}
                 >
 
@@ -808,17 +771,27 @@ export default function Disposisi({
 
                         <div
                             style={{
-                                display: 'inline-flex',
-                                alignItems: 'center',
+                                display:
+                                    'inline-flex',
+                                alignItems:
+                                    'center',
                                 gap: '7px',
-                                padding: '6px 10px',
-                                borderRadius: '999px',
-                                background: '#eff6ff',
-                                color: '#1d4ed8',
-                                border: '1px solid #dbeafe',
-                                fontSize: '10px',
-                                fontWeight: 800,
-                                marginBottom: '10px',
+                                padding:
+                                    '6px 10px',
+                                borderRadius:
+                                    '999px',
+                                background:
+                                    '#eff6ff',
+                                color:
+                                    '#1d4ed8',
+                                border:
+                                    '1px solid #dbeafe',
+                                fontSize:
+                                    '10px',
+                                fontWeight:
+                                    800,
+                                marginBottom:
+                                    '10px',
                             }}
                         >
                             <Icon
@@ -827,28 +800,40 @@ export default function Disposisi({
                             />
 
                             Monitoring Disposisi
+
                         </div>
+
 
                         <h1
                             className="disposisi-title"
                             style={{
                                 margin: 0,
-                                fontSize: '29px',
-                                lineHeight: 1.2,
-                                fontWeight: 800,
-                                color: '#0f2747',
-                                letterSpacing: '-.5px',
+                                fontSize:
+                                    '29px',
+                                lineHeight:
+                                    1.2,
+                                fontWeight:
+                                    800,
+                                color:
+                                    '#0f2747',
+                                letterSpacing:
+                                    '-.5px',
                             }}
                         >
                             Disposisi
                         </h1>
 
+
                         <p
                             style={{
-                                margin: '7px 0 0',
-                                color: '#64748b',
-                                fontSize: '12px',
-                                lineHeight: 1.6,
+                                margin:
+                                    '7px 0 0',
+                                color:
+                                    '#64748b',
+                                fontSize:
+                                    '12px',
+                                lineHeight:
+                                    1.6,
                             }}
                         >
                             Cari, filter, dan pantau
@@ -859,21 +844,33 @@ export default function Disposisi({
 
                     </div>
 
+
                     <a
                         href="/sekretaris/dashboard"
                         style={{
-                            display: 'inline-flex',
-                            alignItems: 'center',
+                            display:
+                                'inline-flex',
+                            alignItems:
+                                'center',
                             gap: '7px',
-                            padding: '10px 13px',
-                            border: '1px solid #e2e8f0',
-                            borderRadius: '10px',
-                            background: '#ffffff',
-                            color: '#475569',
-                            textDecoration: 'none',
-                            fontSize: '11px',
-                            fontWeight: 700,
-                            whiteSpace: 'nowrap',
+                            padding:
+                                '10px 13px',
+                            border:
+                                '1px solid #e2e8f0',
+                            borderRadius:
+                                '10px',
+                            background:
+                                '#ffffff',
+                            color:
+                                '#475569',
+                            textDecoration:
+                                'none',
+                            fontSize:
+                                '11px',
+                            fontWeight:
+                                700,
+                            whiteSpace:
+                                'nowrap',
                         }}
                     >
                         <Icon
@@ -882,15 +879,19 @@ export default function Disposisi({
                         />
 
                         Dashboard
+
                     </a>
 
                 </div>
+
 
                 {/* =================================================
                     SUMMARY
                 ================================================= */}
 
-                <div className="disposisi-summary">
+                <div
+                    className="disposisi-summary"
+                >
 
                     <SummaryCard
                         label="Total Disposisi"
@@ -933,17 +934,23 @@ export default function Disposisi({
 
                 </div>
 
+
                 {/* =================================================
                     FILTER
                 ================================================= */}
 
                 <section
                     style={{
-                        background: '#ffffff',
-                        border: '1px solid #e2e8f0',
-                        borderRadius: '17px',
-                        padding: '18px',
-                        marginBottom: '18px',
+                        background:
+                            '#ffffff',
+                        border:
+                            '1px solid #e2e8f0',
+                        borderRadius:
+                            '17px',
+                        padding:
+                            '18px',
+                        marginBottom:
+                            '18px',
                         boxShadow:
                             '0 8px 24px rgba(15,23,42,.03)',
                     }}
@@ -951,11 +958,16 @@ export default function Disposisi({
 
                     <div
                         style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'space-between',
-                            gap: '12px',
-                            marginBottom: '14px',
+                            display:
+                                'flex',
+                            alignItems:
+                                'center',
+                            justifyContent:
+                                'space-between',
+                            gap:
+                                '12px',
+                            marginBottom:
+                                '14px',
                         }}
                     >
 
@@ -963,12 +975,18 @@ export default function Disposisi({
 
                             <div
                                 style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '7px',
-                                    color: '#0f2747',
-                                    fontSize: '14px',
-                                    fontWeight: 800,
+                                    display:
+                                        'flex',
+                                    alignItems:
+                                        'center',
+                                    gap:
+                                        '7px',
+                                    color:
+                                        '#0f2747',
+                                    fontSize:
+                                        '14px',
+                                    fontWeight:
+                                        800,
                                 }}
                             >
                                 <Icon
@@ -977,13 +995,17 @@ export default function Disposisi({
                                 />
 
                                 Pencarian & Filter
+
                             </div>
 
                             <div
                                 style={{
-                                    marginTop: '4px',
-                                    color: '#94a3b8',
-                                    fontSize: '10px',
+                                    marginTop:
+                                        '4px',
+                                    color:
+                                        '#94a3b8',
+                                    fontSize:
+                                        '10px',
                                 }}
                             >
                                 Gunakan filter untuk
@@ -993,6 +1015,7 @@ export default function Disposisi({
 
                         </div>
 
+
                         <button
                             type="button"
                             className="reset-button"
@@ -1000,15 +1023,18 @@ export default function Disposisi({
                                 resetFilters
                             }
                         >
+
                             <Icon
                                 name="refresh"
                                 size={12}
                             />
 
                             Reset
+
                         </button>
 
                     </div>
+
 
                     <div className="filter-grid">
 
@@ -1042,6 +1068,7 @@ export default function Disposisi({
                             </div>
 
                         </div>
+
 
                         {/* TUJUAN */}
 
@@ -1078,6 +1105,7 @@ export default function Disposisi({
                             </select>
 
                         </div>
+
 
                         {/* STATUS */}
 
@@ -1118,6 +1146,7 @@ export default function Disposisi({
                             </select>
 
                         </div>
+
 
                         {/* SIFAT */}
 
@@ -1163,6 +1192,7 @@ export default function Disposisi({
 
                         </div>
 
+
                         {/* TANGGAL DARI */}
 
                         <div className="filter-field">
@@ -1185,6 +1215,7 @@ export default function Disposisi({
                             />
 
                         </div>
+
 
                         {/* TANGGAL SAMPAI */}
 
@@ -1211,13 +1242,15 @@ export default function Disposisi({
 
                     </div>
 
+
                     <div className="result-count">
 
                         Menampilkan{' '}
 
                         <strong
                             style={{
-                                color: '#475569',
+                                color:
+                                    '#475569',
                             }}
                         >
                             {filteredDisposisis.length}
@@ -1227,7 +1260,8 @@ export default function Disposisi({
 
                         <strong
                             style={{
-                                color: '#475569',
+                                color:
+                                    '#475569',
                             }}
                         >
                             {safeDisposisis.length}
@@ -1239,16 +1273,21 @@ export default function Disposisi({
 
                 </section>
 
+
                 {/* =================================================
                     TABLE
                 ================================================= */}
 
                 <section
                     style={{
-                        background: '#ffffff',
-                        border: '1px solid #e2e8f0',
-                        borderRadius: '17px',
-                        overflow: 'hidden',
+                        background:
+                            '#ffffff',
+                        border:
+                            '1px solid #e2e8f0',
+                        borderRadius:
+                            '17px',
+                        overflow:
+                            'hidden',
                         boxShadow:
                             '0 8px 24px rgba(15,23,42,.04)',
                     }}
@@ -1256,13 +1295,18 @@ export default function Disposisi({
 
                     <div
                         style={{
-                            padding: '18px 20px',
+                            padding:
+                                '18px 20px',
                             borderBottom:
                                 '1px solid #eef2f7',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'space-between',
-                            gap: '15px',
+                            display:
+                                'flex',
+                            alignItems:
+                                'center',
+                            justifyContent:
+                                'space-between',
+                            gap:
+                                '15px',
                         }}
                     >
 
@@ -1271,9 +1315,12 @@ export default function Disposisi({
                             <h2
                                 style={{
                                     margin: 0,
-                                    color: '#0f2747',
-                                    fontSize: '15px',
-                                    fontWeight: 800,
+                                    color:
+                                        '#0f2747',
+                                    fontSize:
+                                        '15px',
+                                    fontWeight:
+                                        800,
                                 }}
                             >
                                 Hasil Disposisi
@@ -1281,9 +1328,12 @@ export default function Disposisi({
 
                             <p
                                 style={{
-                                    margin: '4px 0 0',
-                                    color: '#94a3b8',
-                                    fontSize: '10px',
+                                    margin:
+                                        '4px 0 0',
+                                    color:
+                                        '#94a3b8',
+                                    fontSize:
+                                        '10px',
                                 }}
                             >
                                 Data mengikuti filter
@@ -1292,16 +1342,23 @@ export default function Disposisi({
 
                         </div>
 
+
                         <div
                             style={{
-                                padding: '6px 10px',
-                                borderRadius: '999px',
-                                background: '#f8fafc',
+                                padding:
+                                    '6px 10px',
+                                borderRadius:
+                                    '999px',
+                                background:
+                                    '#f8fafc',
                                 border:
                                     '1px solid #e2e8f0',
-                                color: '#64748b',
-                                fontSize: '10px',
-                                fontWeight: 700,
+                                color:
+                                    '#64748b',
+                                fontSize:
+                                    '10px',
+                                fontWeight:
+                                    700,
                             }}
                         >
                             {filteredDisposisis.length}
@@ -1310,28 +1367,40 @@ export default function Disposisi({
 
                     </div>
 
+
                     <div className="disposisi-table-wrapper">
 
                         {filteredDisposisis.length === 0 ? (
 
                             <div
                                 style={{
-                                    padding: '60px 20px',
-                                    textAlign: 'center',
+                                    padding:
+                                        '60px 20px',
+                                    textAlign:
+                                        'center',
                                 }}
                             >
 
                                 <div
                                     style={{
-                                        width: '60px',
-                                        height: '60px',
-                                        margin: '0 auto 14px',
-                                        borderRadius: '17px',
-                                        background: '#eff6ff',
-                                        color: '#2563eb',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
+                                        width:
+                                            '60px',
+                                        height:
+                                            '60px',
+                                        margin:
+                                            '0 auto 14px',
+                                        borderRadius:
+                                            '17px',
+                                        background:
+                                            '#eff6ff',
+                                        color:
+                                            '#2563eb',
+                                        display:
+                                            'flex',
+                                        alignItems:
+                                            'center',
+                                        justifyContent:
+                                            'center',
                                     }}
                                 >
                                     <Icon
@@ -1340,27 +1409,36 @@ export default function Disposisi({
                                     />
                                 </div>
 
+
                                 <div
                                     style={{
-                                        color: '#475569',
-                                        fontSize: '13px',
-                                        fontWeight: 700,
+                                        color:
+                                            '#475569',
+                                        fontSize:
+                                            '13px',
+                                        fontWeight:
+                                            700,
                                     }}
                                 >
                                     Tidak ada hasil
                                 </div>
 
+
                                 <div
                                     style={{
-                                        marginTop: '6px',
-                                        color: '#94a3b8',
-                                        fontSize: '10px',
+                                        marginTop:
+                                            '6px',
+                                        color:
+                                            '#94a3b8',
+                                        fontSize:
+                                            '10px',
                                     }}
                                 >
                                     Coba ubah kata
                                     pencarian atau
                                     filter yang digunakan.
                                 </div>
+
 
                                 <button
                                     type="button"
@@ -1369,14 +1447,14 @@ export default function Disposisi({
                                         resetFilters
                                     }
                                     style={{
-                                        marginTop: '14px',
+                                        marginTop:
+                                            '14px',
                                     }}
                                 >
                                     <Icon
                                         name="refresh"
                                         size={12}
                                     />
-
                                     Reset Filter
                                 </button>
 
@@ -1433,6 +1511,7 @@ export default function Disposisi({
 
                                 </thead>
 
+
                                 <tbody>
 
                                     {filteredDisposisis.map(
@@ -1465,9 +1544,7 @@ export default function Disposisi({
                                                     }}
                                                 >
 
-                                                    {/* ======================================
-                                                        SURAT
-                                                    ====================================== */}
+                                                    {/* SURAT */}
 
                                                     <td
                                                         style={
@@ -1481,7 +1558,8 @@ export default function Disposisi({
                                                                     'flex',
                                                                 alignItems:
                                                                     'flex-start',
-                                                                gap: '10px',
+                                                                gap:
+                                                                    '10px',
                                                             }}
                                                         >
 
@@ -1515,26 +1593,32 @@ export default function Disposisi({
 
                                                             </div>
 
+
                                                             <div
                                                                 style={{
-                                                                    minWidth: 0,
+                                                                    minWidth:
+                                                                        0,
                                                                 }}
                                                             >
 
-                                                                {/* =================================
-                                                                    LINK DETAIL SURAT
-                                                                ================================= */}
-
-                                                                <a
-                                                                    href={`/sekretaris/surat-masuk/${item?.surat_masuk?.id}`}
-                                                                    className="surat-link"
-                                                                    title="Buka detail surat"
+                                                                <div
+                                                                    style={{
+                                                                        fontWeight:
+                                                                            800,
+                                                                        color:
+                                                                            '#0f2747',
+                                                                        lineHeight:
+                                                                            1.5,
+                                                                    }}
                                                                 >
                                                                     {
-                                                                        item?.surat_masuk?.perihal ||
+                                                                        item
+                                                                            .surat_masuk
+                                                                            ?.perihal ||
                                                                         'Tanpa perihal'
                                                                     }
-                                                                </a>
+                                                                </div>
+
 
                                                                 <div
                                                                     style={{
@@ -1547,10 +1631,13 @@ export default function Disposisi({
                                                                     }}
                                                                 >
                                                                     {
-                                                                        item?.surat_masuk?.nomor_surat ||
+                                                                        item
+                                                                            .surat_masuk
+                                                                            ?.nomor_surat ||
                                                                         '-'
                                                                     }
                                                                 </div>
+
 
                                                                 <div
                                                                     style={{
@@ -1563,26 +1650,12 @@ export default function Disposisi({
                                                                     }}
                                                                 >
                                                                     {
-                                                                        item?.surat_masuk?.pengirim ||
+                                                                        item
+                                                                            .surat_masuk
+                                                                            ?.pengirim ||
                                                                         '-'
                                                                     }
                                                                 </div>
-
-                                                                {/* =================================
-                                                                    LINK MONITORING
-                                                                ================================= */}
-
-                                                                <a
-                                                                    href={`/sekretaris/disposisi/${item.id}/detail`}
-                                                                    className="monitoring-link"
-                                                                >
-                                                                    <Icon
-                                                                        name="clipboard"
-                                                                        size={10}
-                                                                    />
-
-                                                                    Lihat Monitoring
-                                                                </a>
 
                                                             </div>
 
@@ -1590,9 +1663,8 @@ export default function Disposisi({
 
                                                     </td>
 
-                                                    {/* ======================================
-                                                        TUJUAN
-                                                    ====================================== */}
+
+                                                    {/* TUJUAN */}
 
                                                     <td
                                                         style={
@@ -1606,7 +1678,8 @@ export default function Disposisi({
                                                                     'inline-flex',
                                                                 alignItems:
                                                                     'center',
-                                                                gap: '7px',
+                                                                gap:
+                                                                    '7px',
                                                                 padding:
                                                                     '7px 9px',
                                                                 borderRadius:
@@ -1649,9 +1722,8 @@ export default function Disposisi({
 
                                                     </td>
 
-                                                    {/* ======================================
-                                                        INSTRUKSI
-                                                    ====================================== */}
+
+                                                    {/* INSTRUKSI */}
 
                                                     <td
                                                         style={
@@ -1677,9 +1749,8 @@ export default function Disposisi({
 
                                                     </td>
 
-                                                    {/* ======================================
-                                                        SIFAT
-                                                    ====================================== */}
+
+                                                    {/* SIFAT */}
 
                                                     <td
                                                         style={
@@ -1733,9 +1804,8 @@ export default function Disposisi({
 
                                                     </td>
 
-                                                    {/* ======================================
-                                                        BATAS WAKTU
-                                                    ====================================== */}
+
+                                                    {/* BATAS WAKTU */}
 
                                                     <td
                                                         style={
@@ -1749,7 +1819,8 @@ export default function Disposisi({
                                                                     'flex',
                                                                 flexDirection:
                                                                     'column',
-                                                                gap: '5px',
+                                                                gap:
+                                                                    '5px',
                                                             }}
                                                         >
 
@@ -1759,9 +1830,8 @@ export default function Disposisi({
                                                                         'flex',
                                                                     alignItems:
                                                                         'flex-start',
-                                                                    gap: '6px',
-                                                                    color:
-                                                                        '#475569',
+                                                                    gap:
+                                                                        '6px',
                                                                 }}
                                                             >
 
@@ -1778,6 +1848,7 @@ export default function Disposisi({
 
                                                             </div>
 
+
                                                             {terlambat && (
 
                                                                 <span
@@ -1788,7 +1859,8 @@ export default function Disposisi({
                                                                             'fit-content',
                                                                         alignItems:
                                                                             'center',
-                                                                        gap: '4px',
+                                                                        gap:
+                                                                            '4px',
                                                                         padding:
                                                                             '4px 7px',
                                                                         borderRadius:
@@ -1821,9 +1893,8 @@ export default function Disposisi({
 
                                                     </td>
 
-                                                    {/* ======================================
-                                                        STATUS
-                                                    ====================================== */}
+
+                                                    {/* STATUS */}
 
                                                     <td
                                                         style={
@@ -1837,7 +1908,8 @@ export default function Disposisi({
                                                                     'inline-flex',
                                                                 alignItems:
                                                                     'center',
-                                                                gap: '5px',
+                                                                gap:
+                                                                    '5px',
                                                                 padding:
                                                                     '5px 8px',
                                                                 borderRadius:
@@ -1878,6 +1950,7 @@ export default function Disposisi({
 
                                                         </span>
 
+
                                                         {item.status ===
                                                             'selesai' &&
                                                             item.selesai_at && (
@@ -1903,9 +1976,8 @@ export default function Disposisi({
 
                                                     </td>
 
-                                                    {/* ======================================
-                                                        CATATAN
-                                                    ====================================== */}
+
+                                                    {/* CATATAN */}
 
                                                     <td
                                                         style={
@@ -1935,7 +2007,8 @@ export default function Disposisi({
                                                                             'flex',
                                                                         alignItems:
                                                                             'center',
-                                                                        gap: '5px',
+                                                                        gap:
+                                                                            '5px',
                                                                         color:
                                                                             '#15803d',
                                                                         fontSize:
@@ -1955,6 +2028,7 @@ export default function Disposisi({
                                                                     Tindak lanjut
 
                                                                 </div>
+
 
                                                                 <div
                                                                     style={{
@@ -1983,7 +2057,8 @@ export default function Disposisi({
                                                                         'inline-flex',
                                                                     alignItems:
                                                                         'center',
-                                                                    gap: '5px',
+                                                                    gap:
+                                                                        '5px',
                                                                     padding:
                                                                         '6px 8px',
                                                                     borderRadius:
@@ -2012,9 +2087,8 @@ export default function Disposisi({
 
                                                     </td>
 
-                                                    {/* ======================================
-                                                        TANGGAL
-                                                    ====================================== */}
+
+                                                    {/* TANGGAL */}
 
                                                     <td
                                                         style={
@@ -2028,7 +2102,8 @@ export default function Disposisi({
                                                                     'flex',
                                                                 alignItems:
                                                                     'flex-start',
-                                                                gap: '6px',
+                                                                gap:
+                                                                    '6px',
                                                                 color:
                                                                     '#64748b',
                                                                 whiteSpace:
@@ -2067,34 +2142,52 @@ export default function Disposisi({
 
                 </section>
 
+
                 {/* =================================================
                     INFO
                 ================================================= */}
 
                 <div
                     style={{
-                        marginTop: '16px',
-                        padding: '14px 16px',
-                        background: '#ffffff',
-                        border: '1px solid #e2e8f0',
-                        borderRadius: '13px',
-                        display: 'flex',
-                        alignItems: 'flex-start',
-                        gap: '10px',
+                        marginTop:
+                            '16px',
+                        padding:
+                            '14px 16px',
+                        background:
+                            '#ffffff',
+                        border:
+                            '1px solid #e2e8f0',
+                        borderRadius:
+                            '13px',
+                        display:
+                            'flex',
+                        alignItems:
+                            'flex-start',
+                        gap:
+                            '10px',
                     }}
                 >
 
                     <div
                         style={{
-                            width: '32px',
-                            height: '32px',
-                            borderRadius: '8px',
-                            background: '#eff6ff',
-                            color: '#2563eb',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            flexShrink: 0,
+                            width:
+                                '32px',
+                            height:
+                                '32px',
+                            borderRadius:
+                                '8px',
+                            background:
+                                '#eff6ff',
+                            color:
+                                '#2563eb',
+                            display:
+                                'flex',
+                            alignItems:
+                                'center',
+                            justifyContent:
+                                'center',
+                            flexShrink:
+                                0,
                         }}
                     >
 
@@ -2105,13 +2198,17 @@ export default function Disposisi({
 
                     </div>
 
+
                     <div>
 
                         <div
                             style={{
-                                color: '#334155',
-                                fontSize: '11px',
-                                fontWeight: 800,
+                                color:
+                                    '#334155',
+                                fontSize:
+                                    '11px',
+                                fontWeight:
+                                    800,
                             }}
                         >
                             Monitoring Disposisi
@@ -2119,10 +2216,14 @@ export default function Disposisi({
 
                         <div
                             style={{
-                                marginTop: '4px',
-                                color: '#64748b',
-                                fontSize: '10px',
-                                lineHeight: 1.7,
+                                marginTop:
+                                    '4px',
+                                color:
+                                    '#64748b',
+                                fontSize:
+                                    '10px',
+                                lineHeight:
+                                    1.7,
                             }}
                         >
                             Gunakan pencarian dan filter
@@ -2138,16 +2239,21 @@ export default function Disposisi({
 
                 </div>
 
+
                 {/* =================================================
                     FOOTER
                 ================================================= */}
 
                 <div
                     style={{
-                        textAlign: 'center',
-                        padding: '25px 0 10px',
-                        color: '#94a3b8',
-                        fontSize: '10px',
+                        textAlign:
+                            'center',
+                        padding:
+                            '25px 0 10px',
+                        color:
+                            '#94a3b8',
+                        fontSize:
+                            '10px',
                     }}
                 >
                     SIMAP Poltekkes Maluku
@@ -2173,18 +2279,25 @@ function SummaryCard({
     return (
         <div
             style={{
-                background: '#ffffff',
-                border: '1px solid #e2e8f0',
-                borderRadius: '15px',
-                padding: '17px',
+                background:
+                    '#ffffff',
+                border:
+                    '1px solid #e2e8f0',
+                borderRadius:
+                    '15px',
+                padding:
+                    '17px',
             }}
         >
 
             <div
                 style={{
-                    color: '#64748b',
-                    fontSize: '10px',
-                    fontWeight: 700,
+                    color:
+                        '#64748b',
+                    fontSize:
+                        '10px',
+                    fontWeight:
+                        700,
                 }}
             >
                 {label}
@@ -2192,10 +2305,14 @@ function SummaryCard({
 
             <div
                 style={{
-                    marginTop: '6px',
-                    fontSize: '27px',
-                    lineHeight: 1,
-                    fontWeight: 800,
+                    marginTop:
+                        '6px',
+                    fontSize:
+                        '27px',
+                    lineHeight:
+                        1,
+                    fontWeight:
+                        800,
                     color,
                 }}
             >
@@ -2204,9 +2321,12 @@ function SummaryCard({
 
             <div
                 style={{
-                    marginTop: '6px',
-                    color: '#94a3b8',
-                    fontSize: '9px',
+                    marginTop:
+                        '6px',
+                    color:
+                        '#94a3b8',
+                    fontSize:
+                        '9px',
                 }}
             >
                 {description}

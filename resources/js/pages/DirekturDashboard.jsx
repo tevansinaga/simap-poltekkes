@@ -51,11 +51,13 @@ export default function DirekturDashboard({
     // =====================================================
 
     const csrfToken =
-        document
-            .querySelector(
-                'meta[name="csrf-token"]'
-            )
-            ?.getAttribute('content') || '';
+        typeof document !== 'undefined'
+            ? document
+                  .querySelector(
+                      'meta[name="csrf-token"]'
+                  )
+                  ?.getAttribute('content') || ''
+            : '';
 
     // =====================================================
     // TANGGAL HARI INI - WIT
@@ -167,6 +169,20 @@ export default function DirekturDashboard({
                     <path d="M14 2.5H6a2 2 0 0 0-2 2v15a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8.5Z" />
                     <path d="M14 2.5v6h6" />
                     <path d="M8 13h8M8 17h5" />
+                </>
+            ),
+
+            briefcase: (
+                <>
+                    <rect
+                        x="3"
+                        y="7"
+                        width="18"
+                        height="13"
+                        rx="2"
+                    />
+                    <path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                    <path d="M3 12h18" />
                 </>
             ),
 
@@ -335,6 +351,27 @@ export default function DirekturDashboard({
     };
 
     // =====================================================
+    // AGENDA HELPER
+    // =====================================================
+
+    const getAgendaSource = (item) => {
+        if (
+            item?.surat_masuk
+                ?.nomor_surat
+        ) {
+            return {
+                label: `Surat ${item.surat_masuk.nomor_surat}`,
+                type: 'surat',
+            };
+        }
+
+        return {
+            label: 'Agenda manual',
+            type: 'manual',
+        };
+    };
+
+    // =====================================================
     // RENDER
     // =====================================================
 
@@ -346,8 +383,14 @@ export default function DirekturDashboard({
                     box-sizing: border-box;
                 }
 
+                html {
+                    overflow-x: hidden;
+                }
+
                 body {
                     margin: 0;
+                    overflow-x: hidden;
+                    background: #f4f7fb;
                 }
 
                 .direktur-page {
@@ -355,10 +398,10 @@ export default function DirekturDashboard({
                     background:
                         radial-gradient(
                             circle at 0% 0%,
-                            rgba(37,99,235,.045),
-                            transparent 23%
+                            rgba(37,99,235,.055),
+                            transparent 24%
                         ),
-                        #f5f7fb;
+                        #f4f7fb;
                     color: #0f172a;
                     font-family:
                         Inter,
@@ -375,37 +418,58 @@ export default function DirekturDashboard({
                 ===================================================== */
 
                 .direktur-header {
-                    height: 74px;
+                    height: 72px;
                     position: sticky;
                     top: 0;
                     z-index: 60;
+
                     display: flex;
                     align-items: center;
                     justify-content: space-between;
-                    padding: 0 26px;
-                    background: rgba(255,255,255,.94);
-                    backdrop-filter: blur(14px);
-                    border-bottom: 1px solid #e5eaf1;
+
+                    padding: 0 24px;
+
+                    background: rgba(
+                        255,
+                        255,
+                        255,
+                        .94
+                    );
+
+                    backdrop-filter: blur(16px);
+
+                    border-bottom:
+                        1px solid #e5eaf1;
                 }
 
                 .direktur-header-brand {
                     display: flex;
                     align-items: center;
                     gap: 11px;
+
                     text-decoration: none;
+                    min-width: 0;
                 }
 
                 .direktur-logo-box {
-                    width: 43px;
-                    height: 43px;
+                    width: 42px;
+                    height: 42px;
+
                     padding: 5px;
+
+                    flex-shrink: 0;
+
                     border-radius: 11px;
+
                     background: #ffffff;
                     border: 1px solid #e2e8f0;
+
                     display: flex;
                     align-items: center;
                     justify-content: center;
+
                     overflow: hidden;
+
                     box-shadow:
                         0 5px 14px
                         rgba(15,39,71,.055);
@@ -414,7 +478,9 @@ export default function DirekturDashboard({
                 .direktur-logo-box img {
                     width: 100%;
                     height: 100%;
+
                     object-fit: contain;
+
                     display: block;
                 }
 
@@ -428,6 +494,7 @@ export default function DirekturDashboard({
 
                 .direktur-brand-subtitle {
                     margin-top: 5px;
+
                     color: #64748b;
                     font-size: 9px;
                 }
@@ -435,17 +502,24 @@ export default function DirekturDashboard({
                 .direktur-header-user {
                     display: flex;
                     align-items: center;
-                    gap: 10px;
+                    gap: 9px;
+                    flex-shrink: 0;
                 }
 
                 .direktur-user-copy {
                     text-align: right;
+                    min-width: 0;
                 }
 
                 .direktur-user-name {
                     color: #172033;
                     font-size: 12px;
                     font-weight: 800;
+
+                    max-width: 170px;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
                 }
 
                 .direktur-user-role {
@@ -457,17 +531,24 @@ export default function DirekturDashboard({
                 .direktur-avatar {
                     width: 39px;
                     height: 39px;
+
+                    flex-shrink: 0;
+
                     border-radius: 50%;
+
                     background:
                         linear-gradient(
                             135deg,
                             #dbeafe,
                             #bfdbfe
                         );
+
                     color: #174a7e;
+
                     display: flex;
                     align-items: center;
                     justify-content: center;
+
                     font-size: 11px;
                     font-weight: 850;
                 }
@@ -475,18 +556,26 @@ export default function DirekturDashboard({
                 .direktur-logout {
                     height: 39px;
                     min-width: 39px;
+
                     padding: 0 12px;
+
                     display: inline-flex;
                     align-items: center;
                     justify-content: center;
                     gap: 6px;
+
                     border-radius: 9px;
+
                     border: 1px solid #fecaca;
                     background: #fff7f7;
+
                     color: #dc2626;
+
                     font-size: 10px;
                     font-weight: 750;
+
                     cursor: pointer;
+
                     transition: .16s ease;
                 }
 
@@ -502,22 +591,28 @@ export default function DirekturDashboard({
                 .direktur-shell {
                     display: flex;
                     min-height:
-                        calc(100vh - 74px);
+                        calc(100vh - 72px);
                 }
 
                 .direktur-sidebar {
-                    width: 230px;
+                    width: 228px;
                     flex-shrink: 0;
+
                     background: #ffffff;
-                    border-right: 1px solid #e5eaf1;
+
+                    border-right:
+                        1px solid #e5eaf1;
+
                     padding: 20px 13px;
                 }
 
                 .direktur-side-label {
                     padding: 0 11px 9px;
+
                     color: #a0a9b8;
                     font-size: 9px;
                     font-weight: 850;
+
                     text-transform: uppercase;
                     letter-spacing: 1px;
                 }
@@ -532,12 +627,17 @@ export default function DirekturDashboard({
                     display: flex;
                     align-items: center;
                     gap: 9px;
+
                     padding: 10px 11px;
+
                     border-radius: 9px;
+
                     color: #64748b;
                     text-decoration: none;
+
                     font-size: 11px;
                     font-weight: 650;
+
                     transition: .15s ease;
                 }
 
@@ -549,6 +649,7 @@ export default function DirekturDashboard({
                 .direktur-nav-link.active {
                     background: #0f2747;
                     color: #ffffff;
+
                     box-shadow:
                         0 7px 15px
                         rgba(15,39,71,.11);
@@ -556,8 +657,11 @@ export default function DirekturDashboard({
 
                 .direktur-info-card {
                     margin: 20px 3px 0;
+
                     padding: 13px;
+
                     border-radius: 11px;
+
                     background: #f8fafc;
                     border: 1px solid #e6ebf2;
                 }
@@ -566,14 +670,18 @@ export default function DirekturDashboard({
                     display: flex;
                     align-items: center;
                     gap: 7px;
+
                     color: #0f2747;
+
                     font-size: 10px;
                     font-weight: 800;
                 }
 
                 .direktur-info-card-text {
                     margin-top: 7px;
+
                     color: #64748b;
+
                     font-size: 9px;
                     line-height: 1.65;
                 }
@@ -585,11 +693,13 @@ export default function DirekturDashboard({
                 .direktur-main {
                     flex: 1;
                     min-width: 0;
-                    padding: 25px;
+
+                    padding: 24px;
                 }
 
                 .direktur-container {
-                    max-width: 1370px;
+                    width: 100%;
+                    max-width: 1380px;
                     margin: 0 auto;
                 }
 
@@ -600,9 +710,11 @@ export default function DirekturDashboard({
                 .direktur-welcome {
                     position: relative;
                     overflow: hidden;
-                    min-height: 195px;
-                    padding: 26px 28px;
+
+                    padding: 27px 28px;
+
                     border-radius: 20px;
+
                     background:
                         linear-gradient(
                             135deg,
@@ -610,6 +722,7 @@ export default function DirekturDashboard({
                             #153f69 58%,
                             #1d557f 100%
                         );
+
                     box-shadow:
                         0 16px 35px
                         rgba(15,39,71,.15);
@@ -617,22 +730,30 @@ export default function DirekturDashboard({
 
                 .direktur-welcome-circle-1 {
                     position: absolute;
+
                     width: 230px;
                     height: 230px;
+
                     right: -90px;
                     top: -110px;
+
                     border-radius: 50%;
+
                     background:
                         rgba(255,255,255,.05);
                 }
 
                 .direktur-welcome-circle-2 {
                     position: absolute;
+
                     width: 115px;
                     height: 115px;
+
                     right: 115px;
                     bottom: -80px;
+
                     border-radius: 50%;
+
                     background:
                         rgba(125,211,252,.06);
                 }
@@ -640,43 +761,59 @@ export default function DirekturDashboard({
                 .direktur-welcome-content {
                     position: relative;
                     z-index: 1;
-                    max-width: 760px;
+
+                    max-width: 780px;
                 }
 
                 .direktur-welcome-badge {
                     display: inline-flex;
                     align-items: center;
                     gap: 6px;
+
                     padding: 6px 10px;
+
                     border-radius: 999px;
+
                     background:
                         rgba(255,255,255,.10);
+
                     border:
                         1px solid
                         rgba(255,255,255,.10);
+
                     color: #dbeafe;
+
                     font-size: 9px;
                     font-weight: 750;
                 }
 
                 .direktur-welcome-title {
                     margin: 15px 0 0;
+
                     color: #ffffff;
+
                     font-size: 30px;
                     line-height: 1.15;
+
                     font-weight: 850;
+
                     letter-spacing: -.7px;
                 }
 
                 .direktur-welcome-date {
-                    margin-top: 8px;
+                    margin-top: 9px;
+
                     color: #bfdbfe;
+
                     font-size: 10px;
+                    font-weight: 600;
                 }
 
                 .direktur-welcome-text {
                     margin: 11px 0 0;
+
                     color: #dbeafe;
+
                     font-size: 11px;
                     line-height: 1.75;
                 }
@@ -687,19 +824,30 @@ export default function DirekturDashboard({
 
                 .direktur-summary {
                     display: grid;
+
                     grid-template-columns:
-                        repeat(3,minmax(0,1fr));
+                        repeat(
+                            3,
+                            minmax(0, 1fr)
+                        );
+
                     gap: 13px;
+
                     margin-top: 15px;
                 }
 
                 .direktur-summary-card {
                     position: relative;
                     overflow: hidden;
+
                     padding: 17px;
+
                     border-radius: 14px;
+
                     background: #ffffff;
-                    border: 1px solid #e2e8f0;
+                    border:
+                        1px solid #e2e8f0;
+
                     box-shadow:
                         0 5px 18px
                         rgba(15,23,42,.025);
@@ -709,6 +857,7 @@ export default function DirekturDashboard({
                     display: flex;
                     justify-content: space-between;
                     align-items: flex-start;
+
                     gap: 10px;
                 }
 
@@ -720,21 +869,29 @@ export default function DirekturDashboard({
 
                 .direktur-summary-value {
                     margin-top: 7px;
+
                     font-size: 29px;
                     line-height: 1;
+
                     font-weight: 850;
                 }
 
                 .direktur-summary-description {
                     margin-top: 7px;
+
                     color: #94a3b8;
                     font-size: 9px;
+                    line-height: 1.5;
                 }
 
                 .direktur-summary-icon {
                     width: 39px;
                     height: 39px;
+
+                    flex-shrink: 0;
+
                     border-radius: 10px;
+
                     display: flex;
                     align-items: center;
                     justify-content: center;
@@ -774,23 +931,33 @@ export default function DirekturDashboard({
                 }
 
                 /* =====================================================
-                   GRID
+                   CONTENT GRID
                 ===================================================== */
 
                 .direktur-content-grid {
                     display: grid;
+
                     grid-template-columns:
-                        minmax(0,1.45fr)
-                        minmax(290px,.65fr);
+                        minmax(0, 1.5fr)
+                        minmax(290px, .65fr);
+
                     gap: 15px;
+
                     margin-top: 15px;
+
+                    align-items: start;
                 }
 
                 .direktur-panel {
                     background: #ffffff;
-                    border: 1px solid #e2e8f0;
+
+                    border:
+                        1px solid #e2e8f0;
+
                     border-radius: 17px;
+
                     overflow: hidden;
+
                     box-shadow:
                         0 5px 18px
                         rgba(15,23,42,.025);
@@ -798,22 +965,29 @@ export default function DirekturDashboard({
 
                 .direktur-panel-header {
                     padding: 17px 19px;
-                    border-bottom: 1px solid #eef2f7;
+
+                    border-bottom:
+                        1px solid #eef2f7;
+
                     display: flex;
                     align-items: center;
                     justify-content: space-between;
+
                     gap: 12px;
                 }
 
                 .direktur-panel-title {
                     color: #0f2747;
+
                     font-size: 14px;
                     font-weight: 820;
                 }
 
                 .direktur-panel-subtitle {
                     margin-top: 4px;
+
                     color: #94a3b8;
+
                     font-size: 9px;
                     line-height: 1.5;
                 }
@@ -822,163 +996,335 @@ export default function DirekturDashboard({
                     display: inline-flex;
                     align-items: center;
                     justify-content: center;
-                    padding: 5px 9px;
+
+                    min-width: 58px;
+
+                    padding: 6px 9px;
+
                     border-radius: 999px;
+
                     background: #eff6ff;
-                    border: 1px solid #dbeafe;
+                    border:
+                        1px solid #dbeafe;
+
                     color: #1d4ed8;
+
                     font-size: 9px;
                     font-weight: 800;
+
                     white-space: nowrap;
                 }
 
                 /* =====================================================
-                   AGENDA TIMELINE
+                   AGENDA HARI INI - REDESIGN
                 ===================================================== */
 
-                .direktur-agenda-list {
-                    padding: 5px 18px 2px;
+                .agenda-today-wrapper {
+                    padding: 10px 18px 5px;
                 }
 
-                .direktur-agenda-row {
+                .agenda-timeline {
                     position: relative;
+                }
+
+                .agenda-timeline::before {
+                    content: "";
+
+                    position: absolute;
+
+                    left: 79px;
+                    top: 25px;
+                    bottom: 25px;
+
+                    width: 1px;
+
+                    background:
+                        linear-gradient(
+                            to bottom,
+                            #dbeafe,
+                            #e2e8f0,
+                            #dbeafe
+                        );
+                }
+
+                .agenda-item {
+                    position: relative;
+
                     display: grid;
+
                     grid-template-columns:
-                        88px
-                        1fr
-                        22px;
-                    gap: 13px;
-                    align-items: stretch;
-                    padding: 15px 0;
+                        64px
+                        32px
+                        minmax(0, 1fr);
+
+                    gap: 0;
+
+                    padding: 10px 0;
+                }
+
+                .agenda-time-column {
+                    padding-top: 4px;
+
+                    text-align: right;
+                }
+
+                .agenda-time-main {
+                    color: #0f2747;
+
+                    font-size: 14px;
+                    line-height: 1;
+
+                    font-weight: 850;
+                }
+
+                .agenda-time-end {
+                    margin-top: 5px;
+
+                    color: #94a3b8;
+
+                    font-size: 8px;
+                    font-weight: 700;
+                }
+
+                .agenda-time-zone {
+                    margin-top: 3px;
+
+                    color: #cbd5e1;
+
+                    font-size: 7px;
+                    font-weight: 800;
+                }
+
+                .agenda-dot-column {
+                    position: relative;
+
+                    display: flex;
+                    align-items: flex-start;
+                    justify-content: center;
+                }
+
+                .agenda-dot {
+                    position: relative;
+                    z-index: 2;
+
+                    width: 12px;
+                    height: 12px;
+
+                    margin-top: 4px;
+
+                    border-radius: 50%;
+
+                    background: #2563eb;
+
+                    border:
+                        3px solid #dbeafe;
+
+                    box-shadow:
+                        0 0 0 3px #ffffff;
+                }
+
+                .agenda-card-link {
+                    display: block;
+
+                    min-width: 0;
+
+                    padding: 14px 15px;
+
+                    border-radius: 13px;
+
+                    background: #ffffff;
+
+                    border:
+                        1px solid #edf1f6;
+
                     text-decoration: none;
                     color: inherit;
+
+                    transition:
+                        transform .16s ease,
+                        border-color .16s ease,
+                        box-shadow .16s ease,
+                        background .16s ease;
                 }
 
-                .direktur-agenda-row:not(:last-child) {
-                    border-bottom:
-                        1px solid #f1f5f9;
-                }
+                .agenda-card-link:hover {
+                    transform:
+                        translateY(-1px);
 
-                .direktur-agenda-row:hover
-                    .direktur-agenda-card {
                     background: #fbfdff;
-                    border-color: #dbeafe;
+
+                    border-color: #bfdbfe;
+
+                    box-shadow:
+                        0 8px 22px
+                        rgba(37,99,235,.07);
                 }
 
-                .direktur-agenda-time {
-                    align-self: start;
-                    padding: 10px 7px;
-                    border-radius: 11px;
-                    background: #eff6ff;
-                    border: 1px solid #dbeafe;
-                    text-align: center;
-                }
-
-                .direktur-agenda-time-main {
-                    color: #1d4ed8;
-                    font-size: 15px;
-                    font-weight: 850;
-                    line-height: 1;
-                }
-
-                .direktur-agenda-time-end {
-                    margin-top: 4px;
-                    color: #64748b;
-                    font-size: 8px;
-                }
-
-                .direktur-agenda-time-zone {
-                    margin-top: 4px;
-                    color: #94a3b8;
-                    font-size: 8px;
-                    font-weight: 750;
-                }
-
-                .direktur-agenda-card {
-                    min-width: 0;
-                    padding: 12px 13px;
-                    border-radius: 11px;
-                    border: 1px solid transparent;
-                    transition: .16s ease;
-                }
-
-                .direktur-agenda-title-line {
+                .agenda-card-top {
                     display: flex;
-                    align-items: center;
-                    gap: 7px;
-                    flex-wrap: wrap;
+                    align-items: flex-start;
+                    justify-content: space-between;
+
+                    gap: 12px;
                 }
 
-                .direktur-agenda-title {
-                    color: #1e293b;
+                .agenda-title-group {
+                    min-width: 0;
+                }
+
+                .agenda-title {
+                    color: #182236;
+
                     font-size: 12px;
-                    font-weight: 800;
-                    line-height: 1.45;
+                    line-height: 1.5;
+
+                    font-weight: 820;
+
                     word-break: break-word;
                 }
 
-                .direktur-agenda-type {
+                .agenda-type-badge {
                     display: inline-flex;
                     align-items: center;
+
+                    margin-top: 7px;
+
                     padding: 4px 7px;
+
                     border-radius: 999px;
+
                     background: #f8fafc;
-                    border: 1px solid #e2e8f0;
+
+                    border:
+                        1px solid #e2e8f0;
+
                     color: #64748b;
+
                     font-size: 8px;
                     font-weight: 750;
                 }
 
-                .direktur-agenda-meta {
-                    margin-top: 7px;
+                .agenda-open-icon {
+                    width: 29px;
+                    height: 29px;
+
+                    flex-shrink: 0;
+
                     display: flex;
                     align-items: center;
-                    gap: 5px;
-                    color: #64748b;
-                    font-size: 9px;
+                    justify-content: center;
+
+                    border-radius: 9px;
+
+                    background: #f8fafc;
+
+                    color: #94a3b8;
+
+                    transition: .16s ease;
                 }
 
-                .direktur-agenda-source {
-                    margin-top: 6px;
+                .agenda-card-link:hover
+                    .agenda-open-icon {
+                    background: #eff6ff;
+                    color: #2563eb;
+                }
+
+                .agenda-meta-row {
+                    display: flex;
+                    flex-wrap: wrap;
+
+                    gap: 7px 14px;
+
+                    margin-top: 12px;
+                }
+
+                .agenda-meta-item {
+                    min-width: 0;
+
                     display: inline-flex;
                     align-items: center;
+
                     gap: 5px;
+
+                    color: #64748b;
+
+                    font-size: 9px;
+                    line-height: 1.5;
+                }
+
+                .agenda-meta-item svg {
+                    flex-shrink: 0;
                     color: #94a3b8;
+                }
+
+                .agenda-source {
+                    display: flex;
+                    align-items: center;
+
+                    gap: 5px;
+
+                    margin-top: 10px;
+
+                    padding-top: 9px;
+
+                    border-top:
+                        1px dashed #e7edf4;
+
+                    font-size: 8px;
+                    line-height: 1.4;
+
+                    font-weight: 700;
+                }
+
+                .agenda-source.surat {
+                    color: #2563eb;
+                }
+
+                .agenda-source.manual {
+                    color: #94a3b8;
+                }
+
+                .agenda-list-more {
+                    margin:
+                        8px 0 2px;
+
+                    padding:
+                        13px 0 2px;
+
+                    border-top:
+                        1px solid #eef2f7;
+
+                    text-align: center;
+                }
+
+                .agenda-count-note {
+                    color: #94a3b8;
+
                     font-size: 8px;
                 }
 
-                .direktur-agenda-source.manual {
-                    color: #94a3b8;
-                }
-
-                .direktur-agenda-source.surat {
-                    color: #2563eb;
-                }
-
-                .direktur-agenda-arrow {
-                    align-self: center;
-                    color: #a8b1bf;
-                    transition: transform .16s ease;
-                }
-
-                .direktur-agenda-row:hover
-                    .direktur-agenda-arrow {
-                    transform: translateX(3px);
-                    color: #2563eb;
-                }
+                /* =====================================================
+                   EMPTY
+                ===================================================== */
 
                 .direktur-empty {
-                    padding: 55px 22px;
+                    padding: 58px 22px;
+
                     text-align: center;
                 }
 
                 .direktur-empty-icon {
                     width: 58px;
                     height: 58px;
+
                     margin: 0 auto 13px;
+
                     border-radius: 16px;
+
                     background: #eff6ff;
+
                     color: #2563eb;
+
                     display: flex;
                     align-items: center;
                     justify-content: center;
@@ -986,45 +1332,69 @@ export default function DirekturDashboard({
 
                 .direktur-empty-title {
                     color: #475569;
+
                     font-size: 13px;
                     font-weight: 800;
                 }
 
                 .direktur-empty-text {
                     margin-top: 5px;
+
                     color: #94a3b8;
+
                     font-size: 10px;
+                    line-height: 1.6;
                 }
 
+                /* =====================================================
+                   BUTTON
+                ===================================================== */
+
                 .direktur-all-button {
-                    margin-top: 12px;
-                    padding: 12px 17px;
+                    padding:
+                        11px 16px;
+
                     display: inline-flex;
                     align-items: center;
                     justify-content: center;
+
                     gap: 7px;
+
                     border-radius: 10px;
+
                     background: #0f2747;
                     color: #ffffff;
+
                     text-decoration: none;
+
                     font-size: 10px;
                     font-weight: 800;
+
                     transition: .16s ease;
                 }
 
                 .direktur-all-button:hover {
                     background: #174a7e;
+                    transform: translateY(-1px);
+                }
+
+                .direktur-empty .direktur-all-button {
+                    margin-top: 13px;
                 }
 
                 .direktur-panel-footer {
-                    padding: 13px 18px;
-                    border-top: 1px solid #eef2f7;
+                    padding:
+                        13px 18px;
+
+                    border-top:
+                        1px solid #eef2f7;
+
                     background: #f8fafc;
                 }
 
-                .direktur-panel-footer .direktur-all-button {
+                .direktur-panel-footer
+                    .direktur-all-button {
                     width: 100%;
-                    margin-top: 0;
                 }
 
                 /* =====================================================
@@ -1036,29 +1406,38 @@ export default function DirekturDashboard({
                 }
 
                 .direktur-today-box {
-                    padding: 14px;
+                    padding: 15px;
+
                     border-radius: 13px;
+
                     background:
                         linear-gradient(
                             135deg,
                             #eff6ff,
                             #f8fbff
                         );
-                    border: 1px solid #dbeafe;
+
+                    border:
+                        1px solid #dbeafe;
                 }
 
                 .direktur-side-heading {
                     display: flex;
                     align-items: center;
+
                     gap: 7px;
+
                     color: #1d4ed8;
+
                     font-size: 10px;
                     font-weight: 820;
                 }
 
                 .direktur-side-date {
                     margin-top: 8px;
+
                     color: #334155;
+
                     font-size: 11px;
                     font-weight: 750;
                     line-height: 1.5;
@@ -1066,20 +1445,28 @@ export default function DirekturDashboard({
 
                 .direktur-side-count {
                     margin-top: 4px;
+
                     color: #64748b;
+
                     font-size: 9px;
                 }
 
                 .direktur-types {
                     margin-top: 11px;
+
                     padding: 13px;
+
                     border-radius: 12px;
+
                     background: #ffffff;
-                    border: 1px solid #e5eaf1;
+
+                    border:
+                        1px solid #e5eaf1;
                 }
 
                 .direktur-types-title {
                     color: #334155;
+
                     font-size: 10px;
                     font-weight: 800;
                 }
@@ -1088,28 +1475,37 @@ export default function DirekturDashboard({
                     display: flex;
                     align-items: center;
                     justify-content: space-between;
+
                     gap: 10px;
+
                     margin-top: 9px;
                 }
 
                 .direktur-type-left {
                     display: flex;
                     align-items: center;
+
                     gap: 7px;
+
                     min-width: 0;
                 }
 
                 .direktur-type-dot {
                     width: 7px;
                     height: 7px;
-                    border-radius: 50%;
-                    background: #2563eb;
+
                     flex-shrink: 0;
+
+                    border-radius: 50%;
+
+                    background: #2563eb;
                 }
 
                 .direktur-type-name {
                     color: #64748b;
+
                     font-size: 9px;
+
                     overflow: hidden;
                     text-overflow: ellipsis;
                     white-space: nowrap;
@@ -1117,32 +1513,51 @@ export default function DirekturDashboard({
 
                 .direktur-type-count {
                     color: #334155;
+
                     font-size: 9px;
                     font-weight: 800;
                 }
 
                 .direktur-access-box {
                     margin-top: 11px;
+
                     padding: 13px;
+
                     border-radius: 12px;
+
                     background: #f8fafc;
-                    border: 1px solid #e5eaf1;
+
+                    border:
+                        1px solid #e5eaf1;
                 }
 
                 .direktur-access-title {
                     display: flex;
                     align-items: center;
+
                     gap: 7px;
+
                     color: #0f2747;
+
                     font-size: 10px;
                     font-weight: 820;
                 }
 
                 .direktur-access-text {
                     margin-top: 6px;
+
                     color: #64748b;
+
                     font-size: 9px;
                     line-height: 1.7;
+                }
+
+                /* =====================================================
+                   MOBILE BOTTOM NAV
+                ===================================================== */
+
+                .direktur-mobile-nav {
+                    display: none;
                 }
 
                 /* =====================================================
@@ -1150,9 +1565,13 @@ export default function DirekturDashboard({
                 ===================================================== */
 
                 .direktur-footer {
-                    padding: 22px 0 5px;
+                    padding:
+                        22px 0 5px;
+
                     text-align: center;
+
                     color: #a0a9b8;
+
                     font-size: 9px;
                 }
 
@@ -1160,111 +1579,462 @@ export default function DirekturDashboard({
                    RESPONSIVE
                 ===================================================== */
 
-                @media (max-width: 1100px) {
+                @media (max-width: 1120px) {
 
                     .direktur-content-grid {
                         grid-template-columns: 1fr;
                     }
 
-                    .direktur-summary {
+                    .direktur-side-content {
+                        display: grid;
+
                         grid-template-columns:
-                            repeat(3,minmax(0,1fr));
+                            repeat(
+                                3,
+                                minmax(0, 1fr)
+                            );
+
+                        gap: 11px;
                     }
 
+                    .direktur-today-box,
+                    .direktur-types,
+                    .direktur-access-box {
+                        margin: 0;
+                    }
+
+                    .direktur-access-box {
+                        height: 100%;
+                    }
+
+                    .direktur-side-content
+                        > .direktur-all-button {
+                        grid-column: 1 / -1;
+                    }
                 }
 
-                @media (max-width: 820px) {
+                @media (max-width: 900px) {
+
+                    .direktur-sidebar {
+                        width: 205px;
+                    }
+
+                    .direktur-main {
+                        padding: 19px;
+                    }
+
+                    .direktur-side-content {
+                        grid-template-columns:
+                            1fr 1fr;
+                    }
+
+                    .direktur-access-box {
+                        grid-column: 1 / -1;
+                    }
+                }
+
+                @media (max-width: 760px) {
+
+                    .direktur-header {
+                        height: 66px;
+                        padding: 0 14px;
+                    }
+
+                    .direktur-shell {
+                        min-height:
+                            calc(100vh - 66px);
+                    }
 
                     .direktur-sidebar {
                         display: none;
                     }
 
+                    .direktur-main {
+                        padding:
+                            14px 12px 88px;
+                    }
+
                     .direktur-summary {
                         grid-template-columns:
-                            repeat(2,minmax(0,1fr));
+                            repeat(
+                                3,
+                                minmax(0, 1fr)
+                            );
+
+                        gap: 8px;
                     }
 
-                    .direktur-main {
-                        padding: 19px 15px 35px;
+                    .direktur-summary-card {
+                        padding: 13px;
                     }
 
+                    .direktur-summary-value {
+                        font-size: 23px;
+                    }
+
+                    .direktur-summary-description {
+                        display: none;
+                    }
+
+                    .direktur-summary-icon {
+                        width: 33px;
+                        height: 33px;
+                    }
+
+                    .direktur-welcome {
+                        padding: 21px;
+                        border-radius: 17px;
+                    }
+
+                    .direktur-welcome-title {
+                        font-size: 24px;
+                    }
+
+                    .direktur-welcome-text {
+                        font-size: 10px;
+                    }
+
+                    .direktur-panel-header {
+                        padding:
+                            15px 14px;
+                    }
+
+                    .agenda-today-wrapper {
+                        padding:
+                            8px 12px 6px;
+                    }
+
+                    .agenda-timeline::before {
+                        display: none;
+                    }
+
+                    .agenda-item {
+                        display: block;
+                        padding: 7px 0;
+                    }
+
+                    .agenda-time-column {
+                        display: flex;
+                        align-items: center;
+                        gap: 7px;
+
+                        padding: 0 0 7px;
+
+                        text-align: left;
+                    }
+
+                    .agenda-time-main {
+                        font-size: 13px;
+                    }
+
+                    .agenda-time-end {
+                        margin-top: 0;
+                        font-size: 8px;
+                    }
+
+                    .agenda-time-zone {
+                        margin-top: 0;
+                        font-size: 7px;
+                    }
+
+                    .agenda-dot-column {
+                        display: none;
+                    }
+
+                    .agenda-card-link {
+                        padding:
+                            13px;
+
+                        border-radius: 12px;
+                    }
+
+                    .agenda-title {
+                        font-size: 11px;
+                    }
+
+                    .agenda-meta-row {
+                        gap:
+                            7px 11px;
+                    }
+
+                    .agenda-meta-item {
+                        font-size: 8px;
+                    }
+
+                    .agenda-source {
+                        font-size: 8px;
+                    }
+
+                    .direktur-side-content {
+                        display: block;
+                        padding: 12px;
+                    }
+
+                    .direktur-today-box,
+                    .direktur-types,
+                    .direktur-access-box {
+                        margin-top: 0;
+                    }
+
+                    .direktur-types,
+                    .direktur-access-box {
+                        margin-top: 9px;
+                    }
+
+                    .direktur-side-content
+                        > .direktur-all-button {
+                        margin-top: 10px !important;
+                    }
+
+                    /* -----------------------------------------
+                       MOBILE NAV
+                    ----------------------------------------- */
+
+                    .direktur-mobile-nav {
+                        position: fixed;
+
+                        left: 10px;
+                        right: 10px;
+                        bottom: 10px;
+
+                        z-index: 100;
+
+                        height: 60px;
+
+                        display: grid;
+
+                        grid-template-columns:
+                            repeat(2, 1fr);
+
+                        gap: 6px;
+
+                        padding: 6px;
+
+                        background:
+                            rgba(
+                                255,
+                                255,
+                                255,
+                                .94
+                            );
+
+                        backdrop-filter:
+                            blur(16px);
+
+                        border:
+                            1px solid #e2e8f0;
+
+                        border-radius: 16px;
+
+                        box-shadow:
+                            0 15px 35px
+                            rgba(
+                                15,
+                                23,
+                                42,
+                                .12
+                            );
+                    }
+
+                    .direktur-mobile-nav-link {
+                        min-width: 0;
+
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+
+                        gap: 7px;
+
+                        border-radius: 11px;
+
+                        color: #64748b;
+
+                        text-decoration: none;
+
+                        font-size: 9px;
+                        font-weight: 750;
+
+                        transition: .15s ease;
+                    }
+
+                    .direktur-mobile-nav-link.active {
+                        background: #0f2747;
+                        color: #ffffff;
+                    }
                 }
 
-                @media (max-width: 620px) {
+                @media (max-width: 520px) {
 
                     .direktur-header {
-                        padding: 0 15px;
+                        padding: 0 11px;
                     }
 
-                    .direktur-brand-copy,
+                    .direktur-logo-box {
+                        width: 38px;
+                        height: 38px;
+                    }
+
+                    .direktur-brand-title {
+                        font-size: 15px;
+                    }
+
+                    .direktur-header-user {
+                        gap: 6px;
+                    }
+
                     .direktur-user-copy {
                         display: none;
                     }
 
-                    .direktur-summary {
-                        grid-template-columns: 1fr;
+                    .direktur-avatar {
+                        width: 35px;
+                        height: 35px;
                     }
 
-                    .direktur-welcome {
-                        min-height: auto;
-                        padding: 21px;
-                    }
-
-                    .direktur-welcome-title {
-                        font-size: 25px;
-                    }
-
-                    .direktur-agenda-row {
-                        grid-template-columns:
-                            70px
-                            minmax(0,1fr)
-                            16px;
-                        gap: 9px;
-                    }
-
-                    .direktur-agenda-title {
-                        font-size: 11px;
+                    .direktur-logout {
+                        width: 35px;
+                        min-width: 35px;
+                        height: 35px;
+                        padding: 0;
                     }
 
                     .direktur-logout-text {
                         display: none;
                     }
 
-                    .direktur-logout {
-                        width: 39px;
-                        padding: 0;
+                    .direktur-main {
+                        padding:
+                            11px 9px 84px;
                     }
 
-                }
-
-                @media (max-width: 440px) {
-
-                    .direktur-panel-header {
-                        align-items: flex-start;
-                    }
-
-                    .direktur-agenda-row {
+                    .direktur-summary {
                         grid-template-columns:
-                            1fr;
+                            repeat(
+                                3,
+                                minmax(0, 1fr)
+                            );
+
+                        gap: 6px;
                     }
 
-                    .direktur-agenda-time {
-                        width: 100px;
+                    .direktur-summary-card {
+                        padding: 11px 9px;
                     }
 
-                    .direktur-agenda-arrow {
+                    .direktur-summary-top {
+                        display: block;
+                    }
+
+                    .direktur-summary-label {
+                        font-size: 8px;
+                    }
+
+                    .direktur-summary-value {
+                        margin-top: 6px;
+                        font-size: 21px;
+                    }
+
+                    .direktur-summary-icon {
                         display: none;
                     }
 
+                    .direktur-welcome {
+                        padding: 18px;
+                    }
+
+                    .direktur-welcome-badge {
+                        font-size: 8px;
+                    }
+
+                    .direktur-welcome-title {
+                        margin-top: 12px;
+                        font-size: 21px;
+                    }
+
+                    .direktur-welcome-date {
+                        font-size: 8px;
+                    }
+
+                    .direktur-welcome-text {
+                        margin-top: 9px;
+                        font-size: 9px;
+                    }
+
+                    .direktur-panel-title {
+                        font-size: 12px;
+                    }
+
+                    .direktur-panel-subtitle {
+                        font-size: 8px;
+                    }
+
+                    .direktur-pill {
+                        min-width: auto;
+                        padding:
+                            5px 8px;
+
+                        font-size: 8px;
+                    }
+
+                    .agenda-card-top {
+                        gap: 8px;
+                    }
+
+                    .agenda-title {
+                        font-size: 10px;
+                    }
+
+                    .agenda-type-badge {
+                        font-size: 7px;
+                    }
+
+                    .agenda-open-icon {
+                        width: 26px;
+                        height: 26px;
+                    }
+
+                    .agenda-meta-row {
+                        display: grid;
+
+                        grid-template-columns:
+                            1fr;
+
+                        gap: 6px;
+
+                        margin-top: 10px;
+                    }
+
+                    .agenda-meta-item {
+                        font-size: 8px;
+                    }
+
+                    .direktur-empty {
+                        padding:
+                            48px 15px;
+                    }
+
+                    .direktur-side-date {
+                        font-size: 10px;
+                    }
+
+                    .direktur-side-count {
+                        font-size: 8px;
+                    }
+
+                    .direktur-mobile-nav {
+                        left: 8px;
+                        right: 8px;
+                        bottom: 8px;
+                    }
                 }
 
             `}</style>
 
             <div className="direktur-page">
 
-                {/* =====================================================
+                {/* =================================================
                     HEADER
-                ===================================================== */}
+                ================================================= */}
 
                 <header className="direktur-header">
 
@@ -1281,7 +2051,6 @@ export default function DirekturDashboard({
                         </div>
 
                         <div className="direktur-brand-copy">
-
                             <div className="direktur-brand-title">
                                 SIMAP
                             </div>
@@ -1289,7 +2058,6 @@ export default function DirekturDashboard({
                             <div className="direktur-brand-subtitle">
                                 Poltekkes Maluku
                             </div>
-
                         </div>
 
                     </a>
@@ -1297,7 +2065,6 @@ export default function DirekturDashboard({
                     <div className="direktur-header-user">
 
                         <div className="direktur-user-copy">
-
                             <div className="direktur-user-name">
                                 {userName}
                             </div>
@@ -1305,7 +2072,6 @@ export default function DirekturDashboard({
                             <div className="direktur-user-role">
                                 Direktur
                             </div>
-
                         </div>
 
                         <div className="direktur-avatar">
@@ -1332,7 +2098,6 @@ export default function DirekturDashboard({
                                 className="direktur-logout"
                                 title="Keluar dari SIMAP"
                             >
-
                                 <Icon
                                     name="logout"
                                     size={15}
@@ -1341,7 +2106,6 @@ export default function DirekturDashboard({
                                 <span className="direktur-logout-text">
                                     Keluar
                                 </span>
-
                             </button>
 
                         </form>
@@ -1349,7 +2113,6 @@ export default function DirekturDashboard({
                     </div>
 
                 </header>
-
 
                 <div className="direktur-shell">
 
@@ -1369,38 +2132,32 @@ export default function DirekturDashboard({
                                 href="/direktur/dashboard"
                                 className="direktur-nav-link active"
                             >
-
                                 <Icon
                                     name="home"
                                     size={16}
                                 />
 
                                 Dashboard
-
                             </a>
 
                             <a
                                 href="/direktur/agenda"
                                 className="direktur-nav-link"
                             >
-
                                 <Icon
                                     name="calendar"
                                     size={16}
                                 />
 
                                 Agenda Direktur
-
                             </a>
 
                         </nav>
 
-
                         <div
                             className="direktur-side-label"
                             style={{
-                                marginTop:
-                                    '25px',
+                                marginTop: '25px',
                             }}
                         >
                             Informasi
@@ -1420,19 +2177,16 @@ export default function DirekturDashboard({
                             </div>
 
                             <div className="direktur-info-card-text">
-
                                 Agenda disiapkan dan
                                 dikelola oleh Sekretaris
                                 Direktur. Direktur dapat
                                 melihat informasi dan
                                 membuka detail agenda.
-
                             </div>
 
                         </div>
 
                     </aside>
-
 
                     {/* =================================================
                         MAIN
@@ -1485,7 +2239,6 @@ export default function DirekturDashboard({
 
                             </section>
 
-
                             {/* =================================================
                                 SUMMARY
                             ================================================= */}
@@ -1501,20 +2254,19 @@ export default function DirekturDashboard({
 
                                 <SummaryCard
                                     type="today"
-                                    label="Agenda Hari Ini"
+                                    label="Hari Ini"
                                     value={agendaHariIniCount}
-                                    description="Kegiatan yang dijadwalkan hari ini"
+                                    description="Agenda kegiatan hari ini"
                                 />
 
                                 <SummaryCard
                                     type="upcoming"
-                                    label="Agenda Mendatang"
+                                    label="Mendatang"
                                     value={agendaMendatang}
-                                    description="Kegiatan setelah hari ini"
+                                    description="Agenda setelah hari ini"
                                 />
 
                             </section>
-
 
                             {/* =================================================
                                 CONTENT
@@ -1523,7 +2275,7 @@ export default function DirekturDashboard({
                             <div className="direktur-content-grid">
 
                                 {/* =========================================
-                                    LEFT
+                                    AGENDA HARI INI
                                 ========================================= */}
 
                                 <section className="direktur-panel">
@@ -1531,24 +2283,22 @@ export default function DirekturDashboard({
                                     <div className="direktur-panel-header">
 
                                         <div>
-
                                             <div className="direktur-panel-title">
                                                 Agenda Hari Ini
                                             </div>
 
                                             <div className="direktur-panel-subtitle">
                                                 Jadwal kegiatan Direktur
-                                                yang berlangsung hari ini.
+                                                berdasarkan waktu pelaksanaan.
                                             </div>
-
                                         </div>
 
                                         <div className="direktur-pill">
-                                            {agendaHariIniCount} agenda
+                                            {agendaHariIniCount}{' '}
+                                            agenda
                                         </div>
 
                                     </div>
-
 
                                     {sortedAgendaHariIni.length === 0 ? (
 
@@ -1569,7 +2319,8 @@ export default function DirekturDashboard({
 
                                             <div className="direktur-empty-text">
                                                 Belum ada kegiatan
-                                                yang dijadwalkan.
+                                                yang dijadwalkan
+                                                untuk hari ini.
                                             </div>
 
                                             <a
@@ -1582,143 +2333,177 @@ export default function DirekturDashboard({
                                                     name="arrow"
                                                     size={13}
                                                 />
-
                                             </a>
 
                                         </div>
 
                                     ) : (
 
-                                        <div className="direktur-agenda-list">
+                                        <div className="agenda-today-wrapper">
 
-                                            {sortedAgendaHariIni
-                                                .slice(0, 10)
-                                                .map(
-                                                    (item) => {
+                                            <div className="agenda-timeline">
 
-                                                        const startTime =
-                                                            formatTime(
-                                                                item?.waktu_mulai
-                                                            );
+                                                {sortedAgendaHariIni
+                                                    .slice(0, 10)
+                                                    .map(
+                                                        (item) => {
 
-                                                        const endTime =
-                                                            item?.waktu_selesai
-                                                                ? formatTime(
-                                                                      item.waktu_selesai
-                                                                  )
-                                                                : null;
+                                                            const startTime =
+                                                                formatTime(
+                                                                    item?.waktu_mulai
+                                                                );
 
-                                                        const sourceText =
-                                                            item?.surat_masuk
-                                                                ?.nomor_surat
-                                                                ? `Surat ${item.surat_masuk.nomor_surat}`
-                                                                : 'Agenda manual';
+                                                            const endTime =
+                                                                item?.waktu_selesai
+                                                                    ? formatTime(
+                                                                          item.waktu_selesai
+                                                                      )
+                                                                    : null;
 
-                                                        const sourceClass =
-                                                            item?.surat_masuk
-                                                                ?.nomor_surat
-                                                                ? 'surat'
-                                                                : 'manual';
+                                                            const source =
+                                                                getAgendaSource(
+                                                                    item
+                                                                );
 
-                                                        return (
-                                                            <a
-                                                                key={
-                                                                    item.id
-                                                                }
-                                                                href={`/direktur/agenda/${item.id}`}
-                                                                className="direktur-agenda-row"
-                                                            >
+                                                            return (
+                                                                <div
+                                                                    key={
+                                                                        item.id
+                                                                    }
+                                                                    className="agenda-item"
+                                                                >
 
-                                                                <div className="direktur-agenda-time">
+                                                                    {/* WAKTU */}
+                                                                    <div className="agenda-time-column">
 
-                                                                    <div className="direktur-agenda-time-main">
-                                                                        {startTime}
-                                                                    </div>
-
-                                                                    {endTime && (
-                                                                        <div className="direktur-agenda-time-end">
-                                                                            s/d {endTime}
-                                                                        </div>
-                                                                    )}
-
-                                                                    <div className="direktur-agenda-time-zone">
-                                                                        WIT
-                                                                    </div>
-
-                                                                </div>
-
-
-                                                                <div className="direktur-agenda-card">
-
-                                                                    <div className="direktur-agenda-title-line">
-
-                                                                        <div className="direktur-agenda-title">
-                                                                            {item.judul ||
-                                                                                'Tanpa judul'}
+                                                                        <div className="agenda-time-main">
+                                                                            {startTime}
                                                                         </div>
 
-                                                                        <span className="direktur-agenda-type">
-                                                                            {item.jenis ||
-                                                                                'Agenda'}
-                                                                        </span>
+                                                                        {endTime && (
+                                                                            <div className="agenda-time-end">
+                                                                                s/d{' '}
+                                                                                {endTime}
+                                                                            </div>
+                                                                        )}
+
+                                                                        <div className="agenda-time-zone">
+                                                                            WIT
+                                                                        </div>
 
                                                                     </div>
 
-
-                                                                    <div className="direktur-agenda-meta">
-
-                                                                        <Icon
-                                                                            name="location"
-                                                                            size={12}
-                                                                        />
-
-                                                                        <span>
-                                                                            {item.lokasi ||
-                                                                                'Lokasi belum ditentukan'}
-                                                                        </span>
-
+                                                                    {/* DOT TIMELINE */}
+                                                                    <div className="agenda-dot-column">
+                                                                        <div className="agenda-dot" />
                                                                     </div>
 
-
-                                                                    <div
-                                                                        className={`direktur-agenda-source ${sourceClass}`}
+                                                                    {/* CARD */}
+                                                                    <a
+                                                                        href={`/direktur/agenda/${item.id}`}
+                                                                        className="agenda-card-link"
                                                                     >
 
-                                                                        <Icon
-                                                                            name={
-                                                                                sourceClass ===
-                                                                                'surat'
-                                                                                    ? 'file'
-                                                                                    : 'calendar'
-                                                                            }
-                                                                            size={11}
-                                                                        />
+                                                                        <div className="agenda-card-top">
 
-                                                                        {sourceText}
+                                                                            <div className="agenda-title-group">
 
-                                                                    </div>
+                                                                                <div className="agenda-title">
+                                                                                    {item.judul ||
+                                                                                        'Tanpa judul agenda'}
+                                                                                </div>
+
+                                                                                <span className="agenda-type-badge">
+                                                                                    {item.jenis ||
+                                                                                        'Agenda'}
+                                                                                </span>
+
+                                                                            </div>
+
+                                                                            <div className="agenda-open-icon">
+                                                                                <Icon
+                                                                                    name="arrowUpRight"
+                                                                                    size={13}
+                                                                                />
+                                                                            </div>
+
+                                                                        </div>
+
+                                                                        <div className="agenda-meta-row">
+
+                                                                            <div className="agenda-meta-item">
+                                                                                <Icon
+                                                                                    name="location"
+                                                                                    size={12}
+                                                                                />
+
+                                                                                <span>
+                                                                                    {item.lokasi ||
+                                                                                        'Lokasi belum ditentukan'}
+                                                                                </span>
+                                                                            </div>
+
+                                                                            {endTime && (
+                                                                                <div className="agenda-meta-item">
+                                                                                    <Icon
+                                                                                        name="clock"
+                                                                                        size={12}
+                                                                                    />
+
+                                                                                    <span>
+                                                                                        {startTime}
+                                                                                        {' '}
+                                                                                        –
+                                                                                        {' '}
+                                                                                        {endTime}
+                                                                                        {' '}
+                                                                                        WIT
+                                                                                    </span>
+                                                                                </div>
+                                                                            )}
+
+                                                                        </div>
+
+                                                                        <div
+                                                                            className={`agenda-source ${source.type}`}
+                                                                        >
+                                                                            <Icon
+                                                                                name={
+                                                                                    source.type ===
+                                                                                    'surat'
+                                                                                        ? 'file'
+                                                                                        : 'calendar'
+                                                                                }
+                                                                                size={11}
+                                                                            />
+
+                                                                            <span>
+                                                                                {source.label}
+                                                                            </span>
+                                                                        </div>
+
+                                                                    </a>
 
                                                                 </div>
+                                                            );
+                                                        }
+                                                    )}
 
+                                            </div>
 
-                                                                <div className="direktur-agenda-arrow">
-
-                                                                    <Icon
-                                                                        name="arrowUpRight"
-                                                                        size={15}
-                                                                    />
-
-                                                                </div>
-
-                                                            </a>
-                                                        );
-                                                    }
-                                                )}
+                                            {agendaHariIniCount > 10 && (
+                                                <div className="agenda-list-more">
+                                                    <div className="agenda-count-note">
+                                                        Menampilkan 10 dari{' '}
+                                                        {agendaHariIniCount}{' '}
+                                                        agenda hari ini
+                                                    </div>
+                                                </div>
+                                            )}
 
                                         </div>
 
                                     )}
-
 
                                     {agendaHariIniCount > 0 && (
                                         <div className="direktur-panel-footer">
@@ -1727,21 +2512,18 @@ export default function DirekturDashboard({
                                                 href="/direktur/agenda"
                                                 className="direktur-all-button"
                                             >
-
                                                 Lihat Semua Agenda
 
                                                 <Icon
                                                     name="arrow"
                                                     size={13}
                                                 />
-
                                             </a>
 
                                         </div>
                                     )}
 
                                 </section>
-
 
                                 {/* =========================================
                                     RIGHT
@@ -1752,7 +2534,6 @@ export default function DirekturDashboard({
                                     <div className="direktur-panel-header">
 
                                         <div>
-
                                             <div className="direktur-panel-title">
                                                 Ringkasan Hari Ini
                                             </div>
@@ -1761,11 +2542,9 @@ export default function DirekturDashboard({
                                                 Informasi singkat agenda
                                                 Direktur.
                                             </div>
-
                                         </div>
 
                                     </div>
-
 
                                     <div className="direktur-side-content">
 
@@ -1794,11 +2573,10 @@ export default function DirekturDashboard({
 
                                         </div>
 
-
                                         <div className="direktur-types">
 
                                             <div className="direktur-types-title">
-                                                Komposisi Agenda
+                                                Jenis Agenda
                                             </div>
 
                                             {jenisCount.length === 0 ? (
@@ -1813,8 +2591,8 @@ export default function DirekturDashboard({
                                                             '9px',
                                                     }}
                                                 >
-                                                    Belum ada agenda hari
-                                                    ini.
+                                                    Belum ada agenda
+                                                    hari ini.
                                                 </div>
 
                                             ) : (
@@ -1822,9 +2600,7 @@ export default function DirekturDashboard({
                                                 jenisCount.map(
                                                     ([jenis, jumlah]) => (
                                                         <div
-                                                            key={
-                                                                jenis
-                                                            }
+                                                            key={jenis}
                                                             className="direktur-type-row"
                                                         >
 
@@ -1850,7 +2626,6 @@ export default function DirekturDashboard({
 
                                         </div>
 
-
                                         <div className="direktur-access-box">
 
                                             <div className="direktur-access-title">
@@ -1874,25 +2649,20 @@ export default function DirekturDashboard({
 
                                         </div>
 
-
                                         <a
                                             href="/direktur/agenda"
                                             className="direktur-all-button"
                                             style={{
-                                                width:
-                                                    '100%',
-                                                marginTop:
-                                                    '11px',
+                                                width: '100%',
+                                                marginTop: '11px',
                                             }}
                                         >
-
                                             Buka Agenda Direktur
 
                                             <Icon
                                                 name="arrow"
                                                 size={13}
                                             />
-
                                         </a>
 
                                     </div>
@@ -1900,7 +2670,6 @@ export default function DirekturDashboard({
                                 </aside>
 
                             </div>
-
 
                             <div className="direktur-footer">
                                 SIMAP Poltekkes Maluku
@@ -1912,15 +2681,47 @@ export default function DirekturDashboard({
 
                 </div>
 
+                {/* =================================================
+                    MOBILE NAV
+                ================================================= */}
+
+                <nav className="direktur-mobile-nav">
+
+                    <a
+                        href="/direktur/dashboard"
+                        className="direktur-mobile-nav-link active"
+                    >
+                        <Icon
+                            name="home"
+                            size={16}
+                        />
+
+                        Dashboard
+                    </a>
+
+                    <a
+                        href="/direktur/agenda"
+                        className="direktur-mobile-nav-link"
+                    >
+                        <Icon
+                            name="calendar"
+                            size={16}
+                        />
+
+                        Agenda
+                    </a>
+
+                </nav>
+
             </div>
         </>
     );
 }
 
 
-// =====================================================
-// SUMMARY CARD
-// =====================================================
+/* =====================================================
+   SUMMARY CARD
+===================================================== */
 
 function SummaryCard({
     type,

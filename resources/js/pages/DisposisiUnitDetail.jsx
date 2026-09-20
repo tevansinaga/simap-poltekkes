@@ -178,58 +178,46 @@ export default function DisposisiUnitDetail({
     };
 
     const formatTanggal = (value) => {
-        const dateKey =
-            getDateKey(value);
-
-        if (!dateKey) {
+        if (!value) {
             return '-';
         }
 
-        const match =
-            dateKey.match(
-                /^(\d{4})-(\d{2})-(\d{2})$/
-            );
+        const text = String(value).trim();
+        const match = text.match(
+            /^(\d{4})-(\d{2})-(\d{2})/
+        );
 
         if (!match) {
-            return dateKey;
+            return String(value);
         }
 
-        const year =
-            Number(match[1]);
-
-        const month =
-            Number(match[2]);
-
-        const day =
-            Number(match[3]);
+        const year = Number(match[1]);
+        const month = Number(match[2]);
+        const day = Number(match[3]);
 
         const months = [
-            'Januari',
-            'Februari',
-            'Maret',
-            'April',
-            'Mei',
-            'Juni',
-            'Juli',
-            'Agustus',
-            'September',
-            'Oktober',
-            'November',
-            'Desember',
+            'Januari','Februari','Maret','April','Mei','Juni',
+            'Juli','Agustus','September','Oktober','November','Desember',
+        ];
+
+        const daysInMonth = [
+            31,
+            (year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0)) ? 29 : 28,
+            31,30,31,30,31,31,30,31,30,31,
         ];
 
         if (
             month < 1 ||
             month > 12 ||
             day < 1 ||
-            day > 31
+            day > daysInMonth[month - 1]
         ) {
-            return dateKey;
+            return String(value);
         }
 
-        return `${String(day).padStart(2, '0')} ${
-            months[month - 1]
-        } ${year}`;
+        // DATE-only: tampilkan persis tanggal kalender yang disimpan.
+        // Tidak ada konversi timezone dan tidak ada new Date(value).
+        return `${String(day).padStart(2, '0')} ${months[month - 1]} ${year}`;
     };
 
     // =====================================================
