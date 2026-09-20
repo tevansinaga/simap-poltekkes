@@ -18,6 +18,7 @@
         Detail Agenda - SIMAP Poltekkes Maluku
     </title>
 
+    @include('partials.pwa')
     @viteReactRefresh
     @vite([
         'resources/js/app.jsx'

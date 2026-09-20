@@ -17,6 +17,7 @@
         Detail Disposisi - SIMAP Poltekkes Maluku
     </title>
 
+    @include('partials.pwa')
     @viteReactRefresh
 
     @vite([

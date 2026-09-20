@@ -47,6 +47,8 @@
 
     </title>
 
+
+    @include('partials.pwa')
     @viteReactRefresh
 
     @vite([

@@ -7,7 +7,8 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>Dashboard Direktur - SIMAP Poltekkes Maluku</title>
-
+    
+    @include('partials.pwa')
     @viteReactRefresh
 
     @vite([

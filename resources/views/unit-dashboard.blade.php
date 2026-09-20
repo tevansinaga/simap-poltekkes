@@ -16,6 +16,7 @@
         Dashboard Unit - SIMAP Poltekkes Maluku
     </title>
 
+    @include('partials.pwa')
     @viteReactRefresh
 
     @vite([
