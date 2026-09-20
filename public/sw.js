@@ -1,85 +1,42 @@
-const CACHE_NAME =
-    'simap-poltekkes-v1';
+const CACHE_NAME = 'simap-poltekkes-v3';
 
-self.addEventListener(
-    'install',
-    function (event) {
-        self.skipWaiting();
-    }
-);
+self.addEventListener('install', (event) => {
+    self.skipWaiting();
+});
 
-self.addEventListener(
-    'activate',
-    function (event) {
-        event.waitUntil(
-            (async function () {
-                const cacheNames =
-                    await caches.keys();
+self.addEventListener('activate', (event) => {
+    event.waitUntil(
+        caches.keys().then((cacheNames) => {
+            return Promise.all(
+                cacheNames
+                    .filter((name) => name !== CACHE_NAME)
+                    .map((name) => caches.delete(name))
+            );
+        }).then(() => self.clients.claim())
+    );
+});
 
-                await Promise.all(
-                    cacheNames
-                        .filter(
-                            function (name) {
-                                return (
-                                    name !==
-                                    CACHE_NAME
-                                );
-                            }
-                        )
-                        .map(
-                            function (name) {
-                                return caches.delete(
-                                    name
-                                );
-                            }
-                        )
-                );
+// Fetch handler sengaja tidak melakukan caching halaman dinamis/login.
+// Handler ini juga membuat service worker memenuhi pola PWA lama yang
+// memerlukan adanya fetch handler untuk mendeteksi kemampuan offline.
+self.addEventListener('fetch', (event) => {
+    const request = event.request;
 
-                await self.clients.claim();
-            })()
-        );
-    }
-);
-
-self.addEventListener(
-    'fetch',
-    function (event) {
-        const request =
-            event.request;
-
-        if (
-            request.method !== 'GET'
-        ) {
-            return;
-        }
-
-        const url =
-            new URL(request.url);
-
-        /*
-        |--------------------------------------------------------------------------
-        | Hanya untuk domain SIMAP.
-        |--------------------------------------------------------------------------
-        */
-
-        if (
-            url.origin !==
-            self.location.origin
-        ) {
-            return;
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | Jangan cache halaman/data aplikasi.
-        |--------------------------------------------------------------------------
-        |
-        | SIMAP menggunakan login/session dan data dinamis.
-        | Kita tidak mau cache lama menyebabkan dashboard,
-        | disposisi, agenda, atau logout menjadi aneh.
-        |--------------------------------------------------------------------------
-        */
-
+    if (request.method !== 'GET') {
         return;
     }
-);
+
+    const url = new URL(request.url);
+
+    if (url.origin !== self.location.origin) {
+        return;
+    }
+
+    event.respondWith(
+        fetch(request).catch(() => {
+            return caches.match(request).then((cached) => {
+                return cached || Response.error();
+            });
+        })
+    );
+});
