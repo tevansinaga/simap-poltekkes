@@ -1,5 +1,5 @@
 {{-- =========================================================
-    PWA META
+    SIMAP PWA
 ========================================================= --}}
 
 <link
@@ -37,29 +37,82 @@
     href="{{ asset('images/pwa-192.png') }}"
 >
 
-{{-- =========================================================
-    SERVICE WORKER
-========================================================= --}}
-
 <script>
-    window.addEventListener('load', function () {
-        if (!('serviceWorker' in navigator)) {
-            return;
+    (function () {
+        /*
+         * Tangkap beforeinstallprompt sedini mungkin.
+         * Partial ini dimuat sebelum app.jsx / React.
+         * Event disimpan di window agar tidak hilang karena
+         * urutan loading, React mount, atau HMR.
+         */
+        window.__SIMAP_PWA__ = window.__SIMAP_PWA__ || {
+            installPrompt: null,
+            installed: false,
+        };
+
+        const isStandalone =
+            window.matchMedia('(display-mode: standalone)').matches ||
+            window.navigator.standalone === true;
+
+        if (isStandalone) {
+            window.__SIMAP_PWA__.installed = true;
         }
 
-        navigator.serviceWorker
-            .register('/sw.js', { scope: '/' })
-            .then(function (registration) {
-                console.log(
-                    'SIMAP Service Worker aktif:',
-                    registration.scope
+        window.addEventListener(
+            'beforeinstallprompt',
+            function (event) {
+                event.preventDefault();
+
+                window.__SIMAP_PWA__.installPrompt = event;
+
+                console.info(
+                    'SIMAP PWA: beforeinstallprompt diterima.'
                 );
-            })
-            .catch(function (error) {
-                console.error(
-                    'SIMAP Service Worker gagal:',
-                    error
+
+                window.dispatchEvent(
+                    new Event('simap:pwa-install-available')
                 );
+            }
+        );
+
+        window.addEventListener(
+            'appinstalled',
+            function () {
+                window.__SIMAP_PWA__.installPrompt = null;
+                window.__SIMAP_PWA__.installed = true;
+
+                console.info(
+                    'SIMAP PWA: aplikasi berhasil diinstall.'
+                );
+
+                window.dispatchEvent(
+                    new Event('simap:pwa-installed')
+                );
+            }
+        );
+
+        /*
+         * Service Worker
+         */
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function () {
+                navigator.serviceWorker
+                    .register('/sw.js', {
+                        scope: '/',
+                    })
+                    .then(function (registration) {
+                        console.info(
+                            'SIMAP PWA: Service Worker aktif.',
+                            registration.scope
+                        );
+                    })
+                    .catch(function (error) {
+                        console.error(
+                            'SIMAP PWA: Service Worker gagal.',
+                            error
+                        );
+                    });
             });
-    });
+        }
+    })();
 </script>

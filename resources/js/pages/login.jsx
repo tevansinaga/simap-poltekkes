@@ -1,23 +1,11 @@
 import React, { useEffect, useState } from 'react';
 
 // =====================================================
-// PWA INSTALL PROMPT
-// Disimpan di level module agar event tidak terlewat
-// sebelum komponen LoginPage selesai mount.
+// PWA INSTALL
+// Event beforeinstallprompt ditangkap oleh partial PWA yang
+// dimuat lebih dahulu dari React. Event disimpan di window
+// agar tidak hilang karena urutan loading / HMR.
 // =====================================================
-
-let deferredInstallPrompt = null;
-
-if (typeof window !== 'undefined' && !window.__SIMAP_PWA_LISTENER__) {
-    window.__SIMAP_PWA_LISTENER__ = true;
-
-    window.addEventListener('beforeinstallprompt', (event) => {
-        event.preventDefault();
-        deferredInstallPrompt = event;
-
-    });
-
-}
 
 const formatErrorMessage = (msg) => {
     if (!msg) {
@@ -49,6 +37,7 @@ export default function LoginPage() {
     const [passwordValue, setPasswordValue] = useState('');
     const [remember, setRemember] = useState(false);
     const [isInstalled, setIsInstalled] = useState(false);
+    const [installAvailable, setInstallAvailable] = useState(false);
     const [installHelp, setInstallHelp] = useState(false);
     const [installing, setInstalling] = useState(false);
 
@@ -79,24 +68,63 @@ export default function LoginPage() {
     // =====================================================
 
     useEffect(() => {
-        const mediaQuery = window.matchMedia('(display-mode: standalone)');
-        const standalone =
-            mediaQuery.matches ||
-            window.navigator.standalone === true;
+        const getPwaState = () => {
+            const mediaQuery = window.matchMedia('(display-mode: standalone)');
 
-        setIsInstalled(standalone);
+            return {
+                installed:
+                    mediaQuery.matches ||
+                    window.navigator.standalone === true ||
+                    Boolean(window.__SIMAP_PWA__?.installed),
 
-        const handleInstalled = () => {
-            deferredInstallPrompt = null;
-            setIsInstalled(true);
-            setInstalling(false);
-            setInstallHelp(false);
+                prompt:
+                    window.__SIMAP_PWA__?.installPrompt || null,
+            };
         };
 
-        window.addEventListener('appinstalled', handleInstalled);
+        const syncPwaState = () => {
+            const state = getPwaState();
+
+            setIsInstalled(state.installed);
+            setInstallAvailable(Boolean(state.prompt));
+
+            if (state.installed) {
+                setInstallHelp(false);
+            }
+        };
+
+        syncPwaState();
+
+        window.addEventListener(
+            'simap:pwa-install-available',
+            syncPwaState
+        );
+
+        window.addEventListener(
+            'simap:pwa-installed',
+            syncPwaState
+        );
+
+        window.addEventListener(
+            'visibilitychange',
+            syncPwaState
+        );
 
         return () => {
-            window.removeEventListener('appinstalled', handleInstalled);
+            window.removeEventListener(
+                'simap:pwa-install-available',
+                syncPwaState
+            );
+
+            window.removeEventListener(
+                'simap:pwa-installed',
+                syncPwaState
+            );
+
+            window.removeEventListener(
+                'visibilitychange',
+                syncPwaState
+            );
         };
     }, []);
 
@@ -107,9 +135,15 @@ export default function LoginPage() {
             return;
         }
 
-        if (!deferredInstallPrompt) {
-            // Browser tidak menyediakan beforeinstallprompt.
-            // Tetap tampilkan tombol dan berikan panduan manual.
+        const promptEvent =
+            window.__SIMAP_PWA__?.installPrompt || null;
+
+        if (!promptEvent) {
+            console.info(
+                'SIMAP PWA: beforeinstallprompt belum tersedia.'
+            );
+
+            setInstallAvailable(false);
             setInstallHelp(true);
             return;
         }
@@ -117,20 +151,32 @@ export default function LoginPage() {
         try {
             setInstalling(true);
 
-            const promptEvent = deferredInstallPrompt;
-            deferredInstallPrompt = null;
+            // beforeinstallprompt hanya boleh dipakai sekali.
+            window.__SIMAP_PWA__.installPrompt = null;
+            setInstallAvailable(false);
 
-            const result = await promptEvent.prompt();
+            await promptEvent.prompt();
 
-            if (result?.outcome === 'accepted') {
+            const choice = await promptEvent.userChoice;
+
+            console.log(
+                'SIMAP PWA install result:',
+                choice?.outcome
+            );
+
+            if (choice?.outcome === 'accepted') {
                 setIsInstalled(true);
-            } else {
-                setInstalling(false);
+                setInstallHelp(false);
             }
         } catch (error) {
-            console.error('Gagal membuka prompt instalasi PWA:', error);
-            setInstalling(false);
+            console.error(
+                'Gagal membuka prompt instalasi PWA:',
+                error
+            );
+
             setInstallHelp(true);
+        } finally {
+            setInstalling(false);
         }
     };
 
@@ -667,6 +713,10 @@ export default function LoginPage() {
                     opacity: 0.72;
                 }
 
+                .install-button:not(:disabled) {
+                    box-shadow: 0 6px 18px rgba(8, 27, 40, 0.06);
+                }
+
                 .install-icon {
                     display: flex;
                     align-items: center;
@@ -1065,7 +1115,11 @@ export default function LoginPage() {
                                     className="install-button"
                                     onClick={handleInstallApp}
                                     disabled={isInstalled || installing}
-                                    aria-label={isInstalled ? 'SIMAP sudah terpasang' : 'Instal SIMAP'}
+                                    aria-label={
+                                        isInstalled
+                                            ? 'SIMAP sudah terpasang'
+                                            : 'Instal Aplikasi SIMAP'
+                                    }
                                 >
                                     <span className="install-icon">
                                         <Icon name="install" size={16} />
@@ -1081,17 +1135,23 @@ export default function LoginPage() {
                                 </button>
 
                                 {installHelp && !isInstalled && (
-                                    <div className="install-note" role="status">
+                                    <div
+                                        className="install-note"
+                                        role="status"
+                                    >
                                         <p>
-                                            <strong>Menu instalasi belum tersedia otomatis.</strong>
+                                            <strong>
+                                                Instalasi otomatis belum tersedia.
+                                            </strong>
                                         </p>
+
                                         <p>
-                                            Chrome/Edge: buka menu <strong>⋮</strong> lalu pilih
-                                            <strong> Instal SIMAP</strong> atau <strong>Install app</strong>.
-                                        </p>
-                                        <p>
-                                            Android: buka menu browser lalu pilih <strong>Instal aplikasi</strong>
-                                            atau <strong>Tambahkan ke layar utama</strong>.
+                                            Chrome belum memberikan izin
+                                            instalasi langsung untuk halaman
+                                            ini. Periksa menu <strong>⋮</strong>
+                                            di kanan atas Chrome. Jika tersedia,
+                                            pilih <strong>Instal SIMAP</strong>
+                                            atau <strong>Install app</strong>.
                                         </p>
                                     </div>
                                 )}

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'simap-poltekkes-v3';
+const CACHE_NAME = 'simap-poltekkes-v4';
 
 self.addEventListener('install', (event) => {
     self.skipWaiting();
@@ -12,13 +12,12 @@ self.addEventListener('activate', (event) => {
                     .filter((name) => name !== CACHE_NAME)
                     .map((name) => caches.delete(name))
             );
-        }).then(() => self.clients.claim())
+        }).then(() => {
+            return self.clients.claim();
+        })
     );
 });
 
-// Fetch handler sengaja tidak melakukan caching halaman dinamis/login.
-// Handler ini juga membuat service worker memenuhi pola PWA lama yang
-// memerlukan adanya fetch handler untuk mendeteksi kemampuan offline.
 self.addEventListener('fetch', (event) => {
     const request = event.request;
 
@@ -33,10 +32,14 @@ self.addEventListener('fetch', (event) => {
     }
 
     event.respondWith(
-        fetch(request).catch(() => {
-            return caches.match(request).then((cached) => {
-                return cached || Response.error();
-            });
-        })
+        fetch(request)
+            .then((response) => {
+                return response;
+            })
+            .catch(() => {
+                return caches.match(request).then((cachedResponse) => {
+                    return cachedResponse || Response.error();
+                });
+            })
     );
 });

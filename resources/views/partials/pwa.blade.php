@@ -1,5 +1,5 @@
 {{-- =========================================================
-    PWA META
+    SIMAP PWA
 ========================================================= --}}
 
 <link
@@ -37,31 +37,30 @@
     href="{{ asset('images/pwa-192.png') }}"
 >
 
-{{-- =========================================================
-    SERVICE WORKER
-========================================================= --}}
-
 <script>
-    window.addEventListener('load', function () {
+    (function () {
         if (!('serviceWorker' in navigator)) {
+            console.warn('SIMAP PWA: Service Worker tidak didukung.');
             return;
         }
 
-        navigator.serviceWorker
-            .register('/sw.js', {
-                scope: '/',
-            })
-            .then(function (registration) {
-                console.log(
-                    'SIMAP Service Worker aktif:',
-                    registration.scope
-                );
-            })
-            .catch(function (error) {
-                console.error(
-                    'SIMAP Service Worker gagal:',
-                    error
-                );
-            });
-    });
+        window.addEventListener('load', function () {
+            navigator.serviceWorker
+                .register('/sw.js', {
+                    scope: '/',
+                })
+                .then(function (registration) {
+                    console.log(
+                        'SIMAP PWA: Service Worker aktif',
+                        registration.scope
+                    );
+                })
+                .catch(function (error) {
+                    console.error(
+                        'SIMAP PWA: Service Worker gagal',
+                        error
+                    );
+                });
+        });
+    })();
 </script>
