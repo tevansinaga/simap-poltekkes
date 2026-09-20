@@ -1,5 +1,24 @@
 import React, { useEffect, useState } from 'react';
 
+// =====================================================
+// PWA INSTALL PROMPT
+// Disimpan di level module agar event tidak terlewat
+// sebelum komponen LoginPage selesai mount.
+// =====================================================
+
+let deferredInstallPrompt = null;
+
+if (typeof window !== 'undefined' && !window.__SIMAP_PWA_LISTENER__) {
+    window.__SIMAP_PWA_LISTENER__ = true;
+
+    window.addEventListener('beforeinstallprompt', (event) => {
+        event.preventDefault();
+        deferredInstallPrompt = event;
+
+    });
+
+}
+
 const formatErrorMessage = (msg) => {
     if (!msg) {
         return '';
@@ -29,6 +48,9 @@ export default function LoginPage() {
     const [emailValue, setEmailValue] = useState('');
     const [passwordValue, setPasswordValue] = useState('');
     const [remember, setRemember] = useState(false);
+    const [isInstalled, setIsInstalled] = useState(false);
+    const [installHelp, setInstallHelp] = useState(false);
+    const [installing, setInstalling] = useState(false);
 
     // =====================================================
     // DATA DARI LARAVEL
@@ -51,6 +73,66 @@ export default function LoginPage() {
             app.dataset.email || ''
         );
     }, []);
+
+    // =====================================================
+    // PWA INSTALL
+    // =====================================================
+
+    useEffect(() => {
+        const mediaQuery = window.matchMedia('(display-mode: standalone)');
+        const standalone =
+            mediaQuery.matches ||
+            window.navigator.standalone === true;
+
+        setIsInstalled(standalone);
+
+        const handleInstalled = () => {
+            deferredInstallPrompt = null;
+            setIsInstalled(true);
+            setInstalling(false);
+            setInstallHelp(false);
+        };
+
+        window.addEventListener('appinstalled', handleInstalled);
+
+        return () => {
+            window.removeEventListener('appinstalled', handleInstalled);
+        };
+    }, []);
+
+    const handleInstallApp = async () => {
+        setInstallHelp(false);
+
+        if (isInstalled) {
+            return;
+        }
+
+        if (!deferredInstallPrompt) {
+            // Browser tidak menyediakan beforeinstallprompt.
+            // Tetap tampilkan tombol dan berikan panduan manual.
+            setInstallHelp(true);
+            return;
+        }
+
+        try {
+            setInstalling(true);
+
+            const promptEvent = deferredInstallPrompt;
+            deferredInstallPrompt = null;
+
+            const result = await promptEvent.prompt();
+
+            if (result?.outcome === 'accepted') {
+                setIsInstalled(true);
+            } else {
+                setInstalling(false);
+            }
+        } catch (error) {
+            console.error('Gagal membuka prompt instalasi PWA:', error);
+            setInstalling(false);
+            setInstallHelp(true);
+        }
+    };
 
     // =====================================================
     // CSRF
@@ -155,6 +237,14 @@ export default function LoginPage() {
                 <>
                     <path d="M5 4.5A1.5 1.5 0 0 1 6.5 3H18a1 1 0 0 1 1 1v15.5a1 1 0 0 1-1 1H6.5A1.5 1.5 0 0 1 5 19V4.5Z" />
                     <path d="M8 3v17" />
+                </>
+            ),
+
+            install: (
+                <>
+                    <path d="M12 3v11" />
+                    <path d="m7 9 5 5 5-5" />
+                    <path d="M5 20h14" />
                 </>
             ),
         };
@@ -540,6 +630,73 @@ export default function LoginPage() {
                     align-items: center;
                 }
 
+                /* =================================================
+                   PWA INSTALL
+                ================================================= */
+
+                .install-wrap {
+                    margin-top: 12px;
+                }
+
+                .install-button {
+                    width: 100%;
+                    min-height: 44px;
+                    padding: 10px 14px;
+                    border: 1px solid var(--paper-line);
+                    border-radius: 5px;
+                    background: #ffffff;
+                    color: var(--navy-deep);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 9px;
+                    font-size: 12.5px;
+                    font-family: inherit;
+                    font-weight: 600;
+                    cursor: pointer;
+                    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, opacity 0.15s ease;
+                }
+
+                .install-button:hover:not(:disabled) {
+                    background: #f7f2e8;
+                    border-color: #d3c7ac;
+                }
+
+                .install-button:disabled {
+                    cursor: default;
+                    opacity: 0.72;
+                }
+
+                .install-icon {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+
+                .install-note {
+                    margin-top: 8px;
+                    padding: 9px 11px;
+                    border-radius: 5px;
+                    background: #f5f1e8;
+                    border: 1px solid var(--paper-line);
+                    color: var(--slate);
+                    font-size: 11px;
+                    line-height: 1.6;
+                }
+
+                .install-note strong {
+                    color: var(--navy-deep);
+                    font-weight: 700;
+                }
+
+                .install-note p {
+                    margin: 0 0 5px;
+                }
+
+                .install-note p:last-child {
+                    margin-bottom: 0;
+                }
+
                 .spinner {
                     width: 14px;
                     height: 14px;
@@ -899,6 +1056,46 @@ export default function LoginPage() {
                                     </>
                                 )}
                             </button>
+
+                            {/* INSTALL PWA */}
+
+                            <div className="install-wrap">
+                                <button
+                                    type="button"
+                                    className="install-button"
+                                    onClick={handleInstallApp}
+                                    disabled={isInstalled || installing}
+                                    aria-label={isInstalled ? 'SIMAP sudah terpasang' : 'Instal SIMAP'}
+                                >
+                                    <span className="install-icon">
+                                        <Icon name="install" size={16} />
+                                    </span>
+
+                                    <span>
+                                        {isInstalled
+                                            ? 'SIMAP sudah terpasang'
+                                            : installing
+                                                ? 'Membuka instalasi...'
+                                                : 'Instal Aplikasi SIMAP'}
+                                    </span>
+                                </button>
+
+                                {installHelp && !isInstalled && (
+                                    <div className="install-note" role="status">
+                                        <p>
+                                            <strong>Menu instalasi belum tersedia otomatis.</strong>
+                                        </p>
+                                        <p>
+                                            Chrome/Edge: buka menu <strong>⋮</strong> lalu pilih
+                                            <strong> Instal SIMAP</strong> atau <strong>Install app</strong>.
+                                        </p>
+                                        <p>
+                                            Android: buka menu browser lalu pilih <strong>Instal aplikasi</strong>
+                                            atau <strong>Tambahkan ke layar utama</strong>.
+                                        </p>
+                                    </div>
+                                )}
+                            </div>
 
                             {/* ERROR */}
 
