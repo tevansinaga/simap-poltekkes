@@ -11,96 +11,7 @@ export default function DisposisiDetail({
     // DATA KOSONG
     // =====================================================
 
-    if (!disposisi) {
-        return (
-            <div
-                style={{
-                    minHeight: '100vh',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    background: '#f4f7fb',
-                    padding: '20px',
-                    fontFamily:
-                        'Inter, ui-sans-serif, system-ui, sans-serif',
-                }}
-            >
-                <div
-                    style={{
-                        width: '100%',
-                        maxWidth: '520px',
-                        background: '#ffffff',
-                        border: '1px solid #e2e8f0',
-                        borderRadius: '18px',
-                        padding: '38px',
-                        textAlign: 'center',
-                        boxShadow:
-                            '0 15px 35px rgba(15,23,42,.06)',
-                    }}
-                >
-                    <div
-                        style={{
-                            width: '60px',
-                            height: '60px',
-                            margin: '0 auto 16px',
-                            borderRadius: '16px',
-                            background: '#fef2f2',
-                            color: '#dc2626',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            fontSize: '25px',
-                            fontWeight: 850,
-                        }}
-                    >
-                        !
-                    </div>
-
-                    <h2
-                        style={{
-                            margin: 0,
-                            color: '#0f2747',
-                            fontSize: '21px',
-                            fontWeight: 800,
-                        }}
-                    >
-                        Data disposisi tidak ditemukan
-                    </h2>
-
-                    <p
-                        style={{
-                            margin: '8px 0 0',
-                            color: '#64748b',
-                            fontSize: '12px',
-                            lineHeight: 1.6,
-                        }}
-                    >
-                        Data disposisi yang ingin dilihat
-                        tidak tersedia.
-                    </p>
-
-                    <a
-                        href="/sekretaris/disposisi"
-                        style={{
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            marginTop: '18px',
-                            padding: '11px 15px',
-                            borderRadius: '10px',
-                            background: '#0f2747',
-                            color: '#ffffff',
-                            textDecoration: 'none',
-                            fontSize: '11px',
-                            fontWeight: 750,
-                        }}
-                    >
-                        Kembali ke Disposisi
-                    </a>
-                </div>
-            </div>
-        );
-    }
+    const hasDisposisi = Boolean(disposisi);
 
     // =====================================================
     // DATA RELASI
@@ -114,6 +25,12 @@ export default function DisposisiDetail({
             ? 'Direktur'
             : disposisi?.unit?.name ||
               'Unit belum ditentukan';
+
+    const isForDirector =
+        disposisi?.tujuan_type === 'direktur';
+
+    const isForUnit =
+        disposisi?.tujuan_type === 'unit';
 
     const pesanList = Array.isArray(
         disposisi?.pesans
@@ -163,9 +80,8 @@ export default function DisposisiDetail({
     // =====================================================
 
     const errorMessage =
-        Array.isArray(
-            window?.laravelErrors
-        )
+        typeof window !== 'undefined' &&
+        Array.isArray(window.laravelErrors)
             ? window.laravelErrors?.[0] || ''
             : '';
 
@@ -194,46 +110,58 @@ export default function DisposisiDetail({
     };
 
     const formatDate = (value) => {
-        if (!value) {
+        const dateKey =
+            getDateKey(value);
+
+        if (!dateKey) {
             return '-';
         }
 
-        const text = String(value).trim();
-        const match = text.match(
-            /^(\d{4})-(\d{2})-(\d{2})/
-        );
+        const match =
+            dateKey.match(
+                /^(\d{4})-(\d{2})-(\d{2})$/
+            );
 
         if (!match) {
-            return String(value);
+            return dateKey;
         }
 
-        const year = Number(match[1]);
-        const month = Number(match[2]);
-        const day = Number(match[3]);
+        const year =
+            Number(match[1]);
+
+        const month =
+            Number(match[2]);
+
+        const day =
+            Number(match[3]);
 
         const months = [
-            'Januari','Februari','Maret','April','Mei','Juni',
-            'Juli','Agustus','September','Oktober','November','Desember',
-        ];
-
-        const daysInMonth = [
-            31,
-            (year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0)) ? 29 : 28,
-            31,30,31,30,31,31,30,31,30,31,
+            'Januari',
+            'Februari',
+            'Maret',
+            'April',
+            'Mei',
+            'Juni',
+            'Juli',
+            'Agustus',
+            'September',
+            'Oktober',
+            'November',
+            'Desember',
         ];
 
         if (
             month < 1 ||
             month > 12 ||
             day < 1 ||
-            day > daysInMonth[month - 1]
+            day > 31
         ) {
-            return String(value);
+            return dateKey;
         }
 
-        // DATE-only: tampilkan persis tanggal kalender yang disimpan.
-        // Tidak ada konversi timezone dan tidak ada new Date(value).
-        return `${String(day).padStart(2, '0')} ${months[month - 1]} ${year}`;
+        return `${String(day).padStart(2, '0')} ${
+            months[month - 1]
+        } ${year}`;
     };
 
     // =====================================================
@@ -277,8 +205,17 @@ export default function DisposisiDetail({
     // =====================================================
 
     const status = useMemo(() => {
+        if (isForDirector) {
+            return {
+                label: 'Diteruskan',
+                background: '#f5f3ff',
+                color: '#6d28d9',
+                border: '#ddd6fe',
+            };
+        }
+
         if (
-            disposisi.status ===
+            disposisi?.status ===
             'selesai'
         ) {
             return {
@@ -291,7 +228,7 @@ export default function DisposisiDetail({
         }
 
         if (
-            disposisi.status ===
+            disposisi?.status ===
             'in_progress'
         ) {
             return {
@@ -312,7 +249,8 @@ export default function DisposisiDetail({
             border: '#dbeafe',
         };
     }, [
-        disposisi.status,
+        disposisi?.status,
+        isForDirector,
     ]);
 
     // =====================================================
@@ -635,6 +573,97 @@ export default function DisposisiDetail({
     // =====================================================
     // RENDER
     // =====================================================
+
+    if (!hasDisposisi) {
+        return (
+            <div
+                style={{
+                    minHeight: '100vh',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    background: '#f4f7fb',
+                    padding: '20px',
+                    fontFamily:
+                        'Inter, ui-sans-serif, system-ui, sans-serif',
+                }}
+            >
+                <div
+                    style={{
+                        width: '100%',
+                        maxWidth: '520px',
+                        background: '#ffffff',
+                        border: '1px solid #e2e8f0',
+                        borderRadius: '18px',
+                        padding: '38px',
+                        textAlign: 'center',
+                        boxShadow:
+                            '0 15px 35px rgba(15,23,42,.06)',
+                    }}
+                >
+                    <div
+                        style={{
+                            width: '60px',
+                            height: '60px',
+                            margin: '0 auto 16px',
+                            borderRadius: '16px',
+                            background: '#fef2f2',
+                            color: '#dc2626',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontSize: '25px',
+                            fontWeight: 850,
+                        }}
+                    >
+                        !
+                    </div>
+
+                    <h2
+                        style={{
+                            margin: 0,
+                            color: '#0f2747',
+                            fontSize: '21px',
+                            fontWeight: 800,
+                        }}
+                    >
+                        Data disposisi tidak ditemukan
+                    </h2>
+
+                    <p
+                        style={{
+                            margin: '8px 0 0',
+                            color: '#64748b',
+                            fontSize: '12px',
+                            lineHeight: 1.6,
+                        }}
+                    >
+                        Data disposisi yang ingin dilihat
+                        tidak tersedia.
+                    </p>
+
+                    <a
+                        href="/sekretaris/disposisi"
+                        style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            marginTop: '18px',
+                            padding: '11px 15px',
+                            borderRadius: '10px',
+                            background: '#0f2747',
+                            color: '#ffffff',
+                            textDecoration: 'none',
+                            fontSize: '11px',
+                            fontWeight: 750,
+                        }}
+                    >
+                        Kembali ke Disposisi
+                    </a>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="disposisi-detail-page">
@@ -1481,9 +1510,9 @@ export default function DisposisiDetail({
                         </h1>
 
                         <p className="dd-subtitle">
-                            Informasi lengkap,
-                            percakapan, dan
-                            tindak lanjut disposisi.
+                            {isForUnit
+                                ? 'Informasi lengkap, percakapan, dan tindak lanjut disposisi.'
+                                : 'Informasi lengkap disposisi yang diteruskan kepada Direktur.'}
                         </p>
 
                     </div>
@@ -1542,10 +1571,11 @@ export default function DisposisiDetail({
                             >
                                 <Icon
                                     name={
-                                        disposisi.status ===
-                                        'selesai'
-                                            ? 'check'
-                                            : 'clock'
+                                        isForDirector
+                                            ? 'send'
+                                            : disposisi.status === 'selesai'
+                                                ? 'check'
+                                                : 'clock'
                                     }
                                     size={12}
                                 />
@@ -1691,9 +1721,11 @@ export default function DisposisiDetail({
 
                         </section>
 
-                        {/* =============================================
-                            CHAT
-                        ============================================= */}
+                        {isForUnit && (
+                        <>
+                            {/* =============================================
+                                CHAT
+                            ============================================= */}
 
                         <section className="dd-card">
 
@@ -2071,6 +2103,8 @@ export default function DisposisiDetail({
                             )}
 
                         </section>
+                        </>
+                        )}
 
                         {/* =============================================
                             DOKUMEN SURAT
@@ -2235,7 +2269,8 @@ export default function DisposisiDetail({
                                         )}
                                     />
 
-                                    {disposisi.status ===
+                                    {isForUnit &&
+                                    disposisi.status ===
                                         'selesai' && (
 
                                         <Info
@@ -2253,9 +2288,11 @@ export default function DisposisiDetail({
 
                         </section>
 
-                        {/* =============================================
-                            STATUS
-                        ============================================= */}
+                        {isForUnit && (
+                        <>
+                            {/* =============================================
+                                STATUS
+                            ============================================= */}
 
                         <section className="dd-card">
 
@@ -2312,6 +2349,8 @@ export default function DisposisiDetail({
                             </div>
 
                         </section>
+                        </>
+                        )}
 
                         {/* =============================================
                             DEADLINE
