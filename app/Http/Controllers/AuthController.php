@@ -7,8 +7,16 @@ use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
+    /**
+     * Proses login pengguna.
+     */
     public function login(Request $request)
     {
+        /*
+        |--------------------------------------------------------------------------
+        | VALIDASI LOGIN
+        |--------------------------------------------------------------------------
+        */
         $credentials = $request->validate(
             [
                 'email' => ['required', 'email'],
@@ -25,19 +33,23 @@ class AuthController extends Controller
         |--------------------------------------------------------------------------
         | REMEMBER LOGIN
         |--------------------------------------------------------------------------
-        | Default true agar pengguna tetap login ketika PWA/browser ditutup
+        | Default true agar pengguna tetap login ketika browser/PWA ditutup
         | kemudian dibuka kembali.
         |
-        | Checkbox "Ingat saya" dari Login.jsx tetap bisa digunakan.
+        | Checkbox "Ingat saya" dari Login.jsx tetap dapat digunakan.
         |--------------------------------------------------------------------------
         */
         $remember = $request->boolean('remember', true);
 
+        /*
+        |--------------------------------------------------------------------------
+        | ATTEMPT LOGIN
+        |--------------------------------------------------------------------------
+        */
         if (!Auth::attempt($credentials, $remember)) {
             return back()
                 ->withErrors([
-                    'email' =>
-                        'Email atau password yang Anda masukkan salah.',
+                    'email' => 'Email atau password yang Anda masukkan salah.',
                 ])
                 ->withInput(
                     $request->only('email')
@@ -67,18 +79,26 @@ class AuthController extends Controller
 
             return back()
                 ->withErrors([
-                    'email' =>
-                        'Akun Anda tidak aktif.',
+                    'email' => 'Akun Anda tidak aktif.',
                 ])
                 ->withInput(
                     $request->only('email')
                 );
         }
 
+        /*
+        |--------------------------------------------------------------------------
+        | AMBIL ROLE
+        |--------------------------------------------------------------------------
+        */
         $roleSlug = $user->role?->slug;
+
         /*
         |--------------------------------------------------------------------------
         | SUPER ADMIN
+        |--------------------------------------------------------------------------
+        | Super Admin selalu diarahkan ke dashboard Super Admin.
+        | Tidak peduli apakah user memiliki unit_id atau tidak.
         |--------------------------------------------------------------------------
         */
         if ($roleSlug === 'super-admin') {
@@ -108,23 +128,79 @@ class AuthController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | USER UNIT
+        | KEPALA UNIT
         |--------------------------------------------------------------------------
         */
-        if ($user->unit_id) {
+        if ($roleSlug === 'kepala-unit') {
+            if (!$user->unit_id) {
+                Auth::logout();
+
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+
+                return back()
+                    ->withErrors([
+                        'email' =>
+                            'Akun Kepala Unit belum terhubung dengan unit.',
+                    ])
+                    ->withInput(
+                        $request->only('email')
+                    );
+            }
+
             return redirect()
                 ->route('unit.dashboard');
         }
 
         /*
         |--------------------------------------------------------------------------
-        | FALLBACK
+        | STAF
         |--------------------------------------------------------------------------
         */
-        return redirect()
-            ->intended(route('dashboard'));
+        if ($roleSlug === 'staf') {
+            if (!$user->unit_id) {
+                Auth::logout();
+
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+
+                return back()
+                    ->withErrors([
+                        'email' =>
+                            'Akun staf belum terhubung dengan unit.',
+                    ])
+                    ->withInput(
+                        $request->only('email')
+                    );
+            }
+
+            return redirect()
+                ->route('unit.dashboard');
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | ROLE TIDAK DIKENALI
+        |--------------------------------------------------------------------------
+        */
+        Auth::logout();
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return back()
+            ->withErrors([
+                'email' =>
+                    'Role akun tidak dikenali. Silakan hubungi Super Admin.',
+            ])
+            ->withInput(
+                $request->only('email')
+            );
     }
 
+    /**
+     * Logout pengguna.
+     */
     public function logout(Request $request)
     {
         /*
@@ -134,9 +210,21 @@ class AuthController extends Controller
         */
         Auth::logout();
 
+        /*
+        |--------------------------------------------------------------------------
+        | INVALIDATE SESSION
+        |--------------------------------------------------------------------------
+        */
         $request->session()->invalidate();
+
+        /*
+        |--------------------------------------------------------------------------
+        | REGENERATE CSRF TOKEN
+        |--------------------------------------------------------------------------
+        */
         $request->session()->regenerateToken();
 
-        return redirect('/login');
+        return redirect()
+            ->route('login');
     }
 }

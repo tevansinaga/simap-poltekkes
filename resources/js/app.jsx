@@ -12,6 +12,7 @@ import Dashboard from './pages/Dashboard';
 import DirekturDashboard from './pages/DirekturDashboard';
 import SekretarisDashboard from './pages/SekretarisDashboard';
 import SuperAdminDashboard from './pages/SuperAdminDashboard';
+import SuperAdminPengguna from './pages/SuperAdminPengguna';
 
 // =====================================================
 // UNIT
@@ -98,6 +99,77 @@ if (app) {
                     usersTerbaru={
                         window.superAdminDashboardData
                             ?.usersTerbaru ||
+                        []
+                    }
+                />
+
+            </React.StrictMode>
+        );
+
+    }
+
+
+    // =====================================================
+    // SUPER ADMIN PENGGUNA
+    // =====================================================
+
+    else if (page === 'super-admin-pengguna') {
+
+        createRoot(app).render(
+            <React.StrictMode>
+
+                <SuperAdminPengguna
+                    user={
+                        window.superAdminPenggunaData
+                            ?.user ||
+                        null
+                    }
+
+                    users={
+                        window.superAdminPenggunaData
+                            ?.users ||
+                        []
+                    }
+
+                    roles={
+                        window.superAdminPenggunaData
+                            ?.roles ||
+                        []
+                    }
+
+                    units={
+                        window.superAdminPenggunaData
+                            ?.units ||
+                        []
+                    }
+
+                    filters={
+                        window.superAdminPenggunaData
+                            ?.filters ||
+                        {}
+                    }
+
+                    pagination={
+                        window.superAdminPenggunaData
+                            ?.pagination ||
+                        {}
+                    }
+
+                    csrfToken={
+                        window.superAdminPenggunaData
+                            ?.csrfToken ||
+                        ''
+                    }
+
+                    flash={
+                        window.superAdminPenggunaData
+                            ?.flash ||
+                        {}
+                    }
+
+                    errors={
+                        window.superAdminPenggunaData
+                            ?.errors ||
                         []
                     }
                 />

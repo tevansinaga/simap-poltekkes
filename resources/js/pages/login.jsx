@@ -1793,7 +1793,7 @@ export default function LoginPage() {
                     <p className="security-note">
                         <Icon name="shield" size={15} />
                         <span>
-                            Autentikasi dan sesi pengguna dilindungi oleh
+                            Autentikasi dilindungi oleh
                             mekanisme keamanan Laravel.
                         </span>
                     </p>
