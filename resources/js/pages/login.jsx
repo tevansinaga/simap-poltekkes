@@ -38,7 +38,6 @@ export default function LoginPage() {
     const [remember, setRemember] = useState(true);
     const [isInstalled, setIsInstalled] = useState(false);
     const [installAvailable, setInstallAvailable] = useState(false);
-    const [installHelp, setInstallHelp] = useState(false);
     const [installing, setInstalling] = useState(false);
 
     // =====================================================
@@ -88,9 +87,6 @@ export default function LoginPage() {
             setIsInstalled(state.installed);
             setInstallAvailable(Boolean(state.prompt));
 
-            if (state.installed) {
-                setInstallHelp(false);
-            }
         };
 
         syncPwaState();
@@ -129,8 +125,6 @@ export default function LoginPage() {
     }, []);
 
     const handleInstallApp = async () => {
-        setInstallHelp(false);
-
         if (isInstalled) {
             return;
         }
@@ -144,7 +138,6 @@ export default function LoginPage() {
             );
 
             setInstallAvailable(false);
-            setInstallHelp(true);
             return;
         }
 
@@ -155,7 +148,7 @@ export default function LoginPage() {
             window.__SIMAP_PWA__.installPrompt = null;
             setInstallAvailable(false);
 
-            await promptEvent.prompt();
+            promptEvent.prompt();
 
             const choice = await promptEvent.userChoice;
 
@@ -166,7 +159,6 @@ export default function LoginPage() {
 
             if (choice?.outcome === 'accepted') {
                 setIsInstalled(true);
-                setInstallHelp(false);
             }
         } catch (error) {
             console.error(
@@ -174,7 +166,6 @@ export default function LoginPage() {
                 error
             );
 
-            setInstallHelp(true);
         } finally {
             setInstalling(false);
         }
@@ -723,30 +714,6 @@ export default function LoginPage() {
                     justify-content: center;
                 }
 
-                .install-note {
-                    margin-top: 8px;
-                    padding: 9px 11px;
-                    border-radius: 5px;
-                    background: #f5f1e8;
-                    border: 1px solid var(--paper-line);
-                    color: var(--slate);
-                    font-size: 11px;
-                    line-height: 1.6;
-                }
-
-                .install-note strong {
-                    color: var(--navy-deep);
-                    font-weight: 700;
-                }
-
-                .install-note p {
-                    margin: 0 0 5px;
-                }
-
-                .install-note p:last-child {
-                    margin-bottom: 0;
-                }
-
                 .spinner {
                     width: 14px;
                     height: 14px;
@@ -1114,11 +1081,13 @@ export default function LoginPage() {
                                     type="button"
                                     className="install-button"
                                     onClick={handleInstallApp}
-                                    disabled={isInstalled || installing}
+                                    disabled={isInstalled || installing || !installAvailable}
                                     aria-label={
                                         isInstalled
                                             ? 'SIMAP sudah terpasang'
-                                            : 'Instal Aplikasi SIMAP'
+                                            : installAvailable
+                                                ? 'Instal Aplikasi SIMAP'
+                                                : 'Instal Aplikasi SIMAP'
                                     }
                                 >
                                     <span className="install-icon">
@@ -1134,27 +1103,6 @@ export default function LoginPage() {
                                     </span>
                                 </button>
 
-                                {installHelp && !isInstalled && (
-                                    <div
-                                        className="install-note"
-                                        role="status"
-                                    >
-                                        <p>
-                                            <strong>
-                                                Instalasi otomatis belum tersedia.
-                                            </strong>
-                                        </p>
-
-                                        <p>
-                                            Chrome belum memberikan izin
-                                            instalasi langsung untuk halaman
-                                            ini. Periksa menu <strong>⋮</strong>
-                                            di kanan atas Chrome. Jika tersedia,
-                                            pilih <strong>Instal SIMAP</strong>
-                                            atau <strong>Install app</strong>.
-                                        </p>
-                                    </div>
-                                )}
                             </div>
 
                             {/* ERROR */}
