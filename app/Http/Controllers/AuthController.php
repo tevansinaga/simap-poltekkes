@@ -21,7 +21,17 @@ class AuthController extends Controller
             ]
         );
 
-        $remember = $request->boolean('remember');
+        /*
+        |--------------------------------------------------------------------------
+        | REMEMBER LOGIN
+        |--------------------------------------------------------------------------
+        | Default true agar pengguna tetap login ketika PWA/browser ditutup
+        | kemudian dibuka kembali.
+        |
+        | Checkbox "Ingat saya" dari Login.jsx tetap bisa digunakan.
+        |--------------------------------------------------------------------------
+        */
+        $remember = $request->boolean('remember', true);
 
         if (!Auth::attempt($credentials, $remember)) {
             return back()
@@ -34,11 +44,21 @@ class AuthController extends Controller
                 );
         }
 
+        /*
+        |--------------------------------------------------------------------------
+        | REGENERATE SESSION
+        |--------------------------------------------------------------------------
+        */
         $request->session()->regenerate();
 
         /** @var \App\Models\User $user */
         $user = Auth::user();
 
+        /*
+        |--------------------------------------------------------------------------
+        | CEK AKUN AKTIF
+        |--------------------------------------------------------------------------
+        */
         if (!$user->is_active) {
             Auth::logout();
 
@@ -98,6 +118,11 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
+        /*
+        |--------------------------------------------------------------------------
+        | LOGOUT
+        |--------------------------------------------------------------------------
+        */
         Auth::logout();
 
         $request->session()->invalidate();

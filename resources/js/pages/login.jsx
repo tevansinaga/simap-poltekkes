@@ -35,7 +35,7 @@ export default function LoginPage() {
     const [errorMsg, setErrorMsg] = useState('');
     const [emailValue, setEmailValue] = useState('');
     const [passwordValue, setPasswordValue] = useState('');
-    const [remember, setRemember] = useState(false);
+    const [remember, setRemember] = useState(true);
     const [isInstalled, setIsInstalled] = useState(false);
     const [installAvailable, setInstallAvailable] = useState(false);
     const [installHelp, setInstallHelp] = useState(false);
