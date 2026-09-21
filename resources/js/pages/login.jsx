@@ -36,9 +36,12 @@ export default function LoginPage() {
     const [emailValue, setEmailValue] = useState('');
     const [passwordValue, setPasswordValue] = useState('');
     const [remember, setRemember] = useState(true);
+    
+    // Perbaikan state PWA
     const [isInstalled, setIsInstalled] = useState(false);
     const [installAvailable, setInstallAvailable] = useState(false);
     const [installing, setInstalling] = useState(false);
+    const [deferredPrompt, setDeferredPrompt] = useState(null);
 
     // =====================================================
     // DATA DARI LARAVEL
@@ -63,109 +66,92 @@ export default function LoginPage() {
     }, []);
 
     // =====================================================
-    // PWA INSTALL
+    // PWA INSTALL LOGIC (DIPERBAIKI)
     // =====================================================
 
     useEffect(() => {
-        const getPwaState = () => {
-            const mediaQuery = window.matchMedia('(display-mode: standalone)');
-
-            return {
-                installed:
-                    mediaQuery.matches ||
-                    window.navigator.standalone === true ||
-                    Boolean(window.__SIMAP_PWA__?.installed),
-
-                prompt:
-                    window.__SIMAP_PWA__?.installPrompt || null,
-            };
+        // Cek apakah aplikasi sudah terinstal (berjalan di mode standalone)
+        const checkIsInstalled = () => {
+            return window.matchMedia('(display-mode: standalone)').matches || 
+                   window.navigator.standalone === true;
         };
 
-        const syncPwaState = () => {
-            const state = getPwaState();
+        setIsInstalled(checkIsInstalled());
 
-            setIsInstalled(state.installed);
-            setInstallAvailable(Boolean(state.prompt));
-
+        // 1. Tangkap jika event datang langsung dari native browser
+        const handleBeforeInstallPrompt = (e) => {
+            e.preventDefault(); // Mencegah prompt muncul otomatis
+            setDeferredPrompt(e);
+            setInstallAvailable(true);
         };
 
-        syncPwaState();
+        const handleAppInstalled = () => {
+            setIsInstalled(true);
+            setInstallAvailable(false);
+            setDeferredPrompt(null);
+        };
 
-        window.addEventListener(
-            'simap:pwa-install-available',
-            syncPwaState
-        );
+        window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+        window.addEventListener('appinstalled', handleAppInstalled);
 
-        window.addEventListener(
-            'simap:pwa-installed',
-            syncPwaState
-        );
+        // 2. Fallback: Cek apakah script eksternal (Blade) sudah menangkapnya duluan
+        if (window.__SIMAP_PWA__?.installPrompt) {
+            setDeferredPrompt(window.__SIMAP_PWA__.installPrompt);
+            setInstallAvailable(true);
+        }
+        if (window.__SIMAP_PWA__?.installed) {
+            setIsInstalled(true);
+        }
 
-        window.addEventListener(
-            'visibilitychange',
-            syncPwaState
-        );
+        // 3. Tangkap custom event (jika Anda masih menggunakannya di script luar)
+        const handleCustomAvailable = () => {
+            if (window.__SIMAP_PWA__?.installPrompt) {
+                setDeferredPrompt(window.__SIMAP_PWA__.installPrompt);
+                setInstallAvailable(true);
+            }
+        };
+        const handleCustomInstalled = () => setIsInstalled(true);
+
+        window.addEventListener('simap:pwa-install-available', handleCustomAvailable);
+        window.addEventListener('simap:pwa-installed', handleCustomInstalled);
 
         return () => {
-            window.removeEventListener(
-                'simap:pwa-install-available',
-                syncPwaState
-            );
-
-            window.removeEventListener(
-                'simap:pwa-installed',
-                syncPwaState
-            );
-
-            window.removeEventListener(
-                'visibilitychange',
-                syncPwaState
-            );
+            window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+            window.removeEventListener('appinstalled', handleAppInstalled);
+            window.removeEventListener('simap:pwa-install-available', handleCustomAvailable);
+            window.removeEventListener('simap:pwa-installed', handleCustomInstalled);
         };
     }, []);
 
     const handleInstallApp = async () => {
-        if (isInstalled) {
-            return;
-        }
-
-        const promptEvent =
-            window.__SIMAP_PWA__?.installPrompt || null;
-
-        if (!promptEvent) {
-            console.info(
-                'SIMAP PWA: beforeinstallprompt belum tersedia.'
-            );
-
-            setInstallAvailable(false);
+        if (isInstalled || !deferredPrompt) {
+            console.info('Pemasangan PWA tidak tersedia atau sudah terinstal.');
             return;
         }
 
         try {
             setInstalling(true);
 
-            // beforeinstallprompt hanya boleh dipakai sekali.
-            window.__SIMAP_PWA__.installPrompt = null;
-            setInstallAvailable(false);
+            // Tampilkan prompt instalasi ke user
+            deferredPrompt.prompt();
 
-            promptEvent.prompt();
+            // Tunggu respon dari user
+            const choiceResult = await deferredPrompt.userChoice;
+            console.log('SIMAP PWA install result:', choiceResult.outcome);
 
-            const choice = await promptEvent.userChoice;
-
-            console.log(
-                'SIMAP PWA install result:',
-                choice?.outcome
-            );
-
-            if (choice?.outcome === 'accepted') {
+            if (choiceResult.outcome === 'accepted') {
                 setIsInstalled(true);
             }
-        } catch (error) {
-            console.error(
-                'Gagal membuka prompt instalasi PWA:',
-                error
-            );
 
+            // Prompt hanya bisa dipakai satu kali, jadi kita reset
+            setDeferredPrompt(null);
+            setInstallAvailable(false);
+            if (window.__SIMAP_PWA__) {
+                window.__SIMAP_PWA__.installPrompt = null;
+            }
+
+        } catch (error) {
+            console.error('Gagal membuka prompt instalasi PWA:', error);
         } finally {
             setInstalling(false);
         }
@@ -835,7 +821,7 @@ export default function LoginPage() {
             <div className="login-shell">
 
                 {/* =================================================
-                    PANEL KIRI
+                   PANEL KIRI
                 ================================================= */}
 
                 <section className="login-left">
@@ -930,7 +916,7 @@ export default function LoginPage() {
                 </section>
 
                 {/* =================================================
-                    PANEL KANAN
+                   PANEL KANAN
                 ================================================= */}
 
                 <section className="login-right">
