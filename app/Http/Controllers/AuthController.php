@@ -76,6 +76,15 @@ class AuthController extends Controller
         }
 
         $roleSlug = $user->role?->slug;
+        /*
+        |--------------------------------------------------------------------------
+        | SUPER ADMIN
+        |--------------------------------------------------------------------------
+        */
+        if ($roleSlug === 'super-admin') {
+            return redirect()
+                ->route('super-admin.dashboard');
+        }
 
         /*
         |--------------------------------------------------------------------------

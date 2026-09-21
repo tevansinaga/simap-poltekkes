@@ -11,6 +11,7 @@ import LoginPage from './pages/login';
 import Dashboard from './pages/Dashboard';
 import DirekturDashboard from './pages/DirekturDashboard';
 import SekretarisDashboard from './pages/SekretarisDashboard';
+import SuperAdminDashboard from './pages/SuperAdminDashboard';
 
 // =====================================================
 // UNIT
@@ -67,6 +68,40 @@ if (app) {
         createRoot(app).render(
             <React.StrictMode>
                 <LoginPage />
+            </React.StrictMode>
+        );
+
+    }
+
+    // =====================================================
+    // SUPER ADMIN DASHBOARD
+    // =====================================================
+
+    else if (page === 'super-admin-dashboard') {
+
+        createRoot(app).render(
+            <React.StrictMode>
+
+                <SuperAdminDashboard
+                    user={
+                        window.superAdminDashboardData
+                            ?.user ||
+                        null
+                    }
+
+                    stats={
+                        window.superAdminDashboardData
+                            ?.stats ||
+                        {}
+                    }
+
+                    usersTerbaru={
+                        window.superAdminDashboardData
+                            ?.usersTerbaru ||
+                        []
+                    }
+                />
+
             </React.StrictMode>
         );
 

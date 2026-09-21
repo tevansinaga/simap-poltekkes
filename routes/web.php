@@ -16,7 +16,7 @@ use App\Http\Controllers\Unit\UnitDashboardController;
 use App\Http\Controllers\Unit\DisposisiUnitController;
 
 use App\Http\Controllers\DisposisiPesanController;
-
+use App\Http\Controllers\SuperAdmin\SuperAdminDashboardController;
 
 /*
 |--------------------------------------------------------------------------
@@ -74,6 +74,24 @@ Route::post('/login', [
 */
 
 Route::middleware(['auth'])->group(function () {
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | AREA SUPER ADMIN
+    |--------------------------------------------------------------------------
+    */
+
+    Route::prefix('super-admin')
+    ->name('super-admin.')
+    ->middleware(['role:super-admin'])
+    ->group(function () {
+
+        Route::get('/dashboard', [
+            SuperAdminDashboardController::class,
+            'index',
+        ])->name('dashboard');
+    });
 
     /*
     |--------------------------------------------------------------------------
