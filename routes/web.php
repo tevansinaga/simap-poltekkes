@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\AuthController;
@@ -35,6 +36,28 @@ Route::get('/', function () {
 */
 
 Route::get('/login', function () {
+    // Jika pengguna masih terautentikasi (termasuk melalui Remember Me),
+    // jangan tampilkan form login lagi. Arahkan langsung ke dashboard sesuai role.
+    if (Auth::check()) {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+        $roleSlug = $user->role?->slug;
+
+        if ($roleSlug === 'direktur') {
+            return redirect()->route('direktur.dashboard');
+        }
+
+        if ($roleSlug === 'sekretaris-direktur') {
+            return redirect()->route('sekretaris.dashboard');
+        }
+
+        if ($user->unit_id) {
+            return redirect()->route('unit.dashboard');
+        }
+
+        return redirect()->route('dashboard');
+    }
+
     return view('auth.login');
 })->name('login');
 
@@ -86,50 +109,20 @@ Route::middleware(['auth'])->group(function () {
         ->middleware(['role:direktur'])
         ->group(function () {
 
-            /*
-            |--------------------------------------------------------------------------
-            | DASHBOARD DIREKTUR
-            |--------------------------------------------------------------------------
-            */
-
             Route::get('/dashboard', [
                 DirekturDashboardController::class,
                 'index',
             ])->name('dashboard');
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | DETAIL SURAT MASUK DIREKTUR
-            |--------------------------------------------------------------------------
-            |
-            | Direktur hanya dapat melihat surat.
-            |
-            */
 
             Route::get('/surat-masuk/{suratMasuk}', [
                 SuratMasukController::class,
                 'showDirektur',
             ])->name('surat-masuk.show');
 
-
-            /*
-            |--------------------------------------------------------------------------
-            | DAFTAR AGENDA DIREKTUR
-            |--------------------------------------------------------------------------
-            */
-
             Route::get('/agenda', [
                 AgendaController::class,
                 'indexDirektur',
             ])->name('agenda');
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | DETAIL AGENDA DIREKTUR
-            |--------------------------------------------------------------------------
-            */
 
             Route::get('/agenda/{agenda}', [
                 AgendaController::class,
@@ -149,23 +142,10 @@ Route::middleware(['auth'])->group(function () {
         ->middleware(['role:sekretaris-direktur'])
         ->group(function () {
 
-            /*
-            |--------------------------------------------------------------------------
-            | DASHBOARD
-            |--------------------------------------------------------------------------
-            */
-
             Route::get('/dashboard', [
                 SekretarisDashboardController::class,
                 'index',
             ])->name('dashboard');
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | SURAT MASUK
-            |--------------------------------------------------------------------------
-            */
 
             Route::get('/surat-masuk', [
                 SuratMasukController::class,
@@ -202,58 +182,20 @@ Route::middleware(['auth'])->group(function () {
                 'destroy',
             ])->name('surat-masuk.destroy');
 
-
-            /*
-            |--------------------------------------------------------------------------
-            | DISPOSISI SEKRETARIS
-            |--------------------------------------------------------------------------
-            */
-
             Route::get('/disposisi', [
                 DirekturDisposisiController::class,
                 'index',
             ])->name('disposisi');
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | DETAIL MONITORING DISPOSISI
-            |--------------------------------------------------------------------------
-            |
-            | /sekretaris/disposisi/24/detail
-            |
-            */
 
             Route::get('/disposisi/{disposisi}/detail', [
                 DirekturDisposisiController::class,
                 'show',
             ])->name('disposisi.show');
 
-
-            /*
-            |--------------------------------------------------------------------------
-            | CHAT / PESAN DISPOSISI SEKRETARIS
-            |--------------------------------------------------------------------------
-            |
-            | Sekretaris dapat:
-            | - mengirim pesan
-            | - melampirkan PDF
-            |
-            | PDF maksimal 10 MB dan hanya PDF.
-            |
-            */
-
             Route::post('/disposisi/{disposisi}/pesan', [
                 DisposisiPesanController::class,
                 'storeSekretaris',
             ])->name('disposisi.pesan.store');
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | BUAT DISPOSISI
-            |--------------------------------------------------------------------------
-            */
 
             Route::get('/disposisi/{suratMasuk}', [
                 DirekturDisposisiController::class,
@@ -264,13 +206,6 @@ Route::middleware(['auth'])->group(function () {
                 DirekturDisposisiController::class,
                 'store',
             ])->name('disposisi.store');
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | AGENDA SEKRETARIS
-            |--------------------------------------------------------------------------
-            */
 
             Route::get('/agenda', [
                 AgendaController::class,
@@ -320,91 +255,35 @@ Route::middleware(['auth'])->group(function () {
         ->middleware(['unit'])
         ->group(function () {
 
-            /*
-            |--------------------------------------------------------------------------
-            | DASHBOARD UNIT
-            |--------------------------------------------------------------------------
-            */
-
             Route::get('/dashboard', [
                 UnitDashboardController::class,
                 'index',
             ])->name('dashboard');
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | DISPOSISI UNIT
-            |--------------------------------------------------------------------------
-            */
 
             Route::get('/disposisi', [
                 DisposisiUnitController::class,
                 'index',
             ])->name('disposisi');
 
-
-            /*
-            |--------------------------------------------------------------------------
-            | DETAIL DISPOSISI UNIT
-            |--------------------------------------------------------------------------
-            */
-
             Route::get('/disposisi/{disposisi}', [
                 DisposisiUnitController::class,
                 'show',
             ])->name('disposisi.show');
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | MULAI PROSES
-            |--------------------------------------------------------------------------
-            */
 
             Route::post('/disposisi/{disposisi}/mulai', [
                 DisposisiUnitController::class,
                 'mulai',
             ])->name('disposisi.mulai');
 
-
-            /*
-            |--------------------------------------------------------------------------
-            | CHAT / PESAN DISPOSISI UNIT
-            |--------------------------------------------------------------------------
-            |
-            | Unit dapat:
-            | - membalas pesan
-            | - mengirim PDF
-            |
-            */
-
             Route::post('/disposisi/{disposisi}/pesan', [
                 DisposisiPesanController::class,
                 'storeUnit',
             ])->name('disposisi.pesan.store');
 
-
-            /*
-            |--------------------------------------------------------------------------
-            | CATATAN LAMA
-            |--------------------------------------------------------------------------
-            |
-            | Tetap dipertahankan untuk data lama.
-            |
-            */
-
             Route::post('/disposisi/{disposisi}/catatan', [
                 DisposisiUnitController::class,
                 'simpanCatatan',
             ])->name('disposisi.catatan');
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | SELESAI
-            |--------------------------------------------------------------------------
-            */
 
             Route::post('/disposisi/{disposisi}/selesai', [
                 DisposisiUnitController::class,
