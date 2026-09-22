@@ -11,12 +11,14 @@ export default function SuperAdminAktivitas({
 }) {
     const safeActivities = Array.isArray(activities) ? activities : [];
     const safeStats = stats && typeof stats === 'object' ? stats : {};
-    const safeActions = actionOptions && typeof actionOptions === 'object'
-        ? actionOptions
-        : {};
-    const safeModules = moduleOptions && typeof moduleOptions === 'object'
-        ? moduleOptions
-        : {};
+    const safeActions =
+        actionOptions && typeof actionOptions === 'object'
+            ? actionOptions
+            : {};
+    const safeModules =
+        moduleOptions && typeof moduleOptions === 'object'
+            ? moduleOptions
+            : {};
 
     const [search, setSearch] = useState(filters?.search || '');
     const [action, setAction] = useState(filters?.action || '');
@@ -27,6 +29,11 @@ export default function SuperAdminAktivitas({
     const userName = user?.name || 'Super Admin';
     const userRole = user?.role?.name || 'Super Admin';
     const userInitial = userName.trim().charAt(0).toUpperCase() || 'S';
+
+    const csrfToken =
+        document
+            .querySelector('meta[name="csrf-token"]')
+            ?.getAttribute('content') || '';
 
     const actionLabel = (value) =>
         safeActions[value] || formatAction(value);
@@ -61,7 +68,10 @@ export default function SuperAdminAktivitas({
         if (!value) return '-';
 
         const date = new Date(value);
-        if (Number.isNaN(date.getTime())) return String(value);
+
+        if (Number.isNaN(date.getTime())) {
+            return String(value);
+        }
 
         return new Intl.DateTimeFormat('id-ID', {
             day: '2-digit',
@@ -83,19 +93,36 @@ export default function SuperAdminAktivitas({
     const buildQuery = () => {
         const params = new URLSearchParams();
 
-        if (search.trim()) params.set('search', search.trim());
-        if (action) params.set('action', action);
-        if (module) params.set('module', module);
-        if (dateFrom) params.set('date_from', dateFrom);
-        if (dateTo) params.set('date_to', dateTo);
+        if (search.trim()) {
+            params.set('search', search.trim());
+        }
+
+        if (action) {
+            params.set('action', action);
+        }
+
+        if (module) {
+            params.set('module', module);
+        }
+
+        if (dateFrom) {
+            params.set('date_from', dateFrom);
+        }
+
+        if (dateTo) {
+            params.set('date_to', dateTo);
+        }
 
         const query = params.toString();
+
         return query ? `?${query}` : '';
     };
 
     const submitFilter = (event) => {
         event.preventDefault();
-        window.location.href = `/super-admin/aktivitas${buildQuery()}`;
+
+        window.location.href =
+            `/super-admin/aktivitas${buildQuery()}`;
     };
 
     const resetFilter = () => {
@@ -103,7 +130,9 @@ export default function SuperAdminAktivitas({
     };
 
     const openPagination = (url) => {
-        if (url) window.location.href = url;
+        if (url) {
+            window.location.href = url;
+        }
     };
 
     const handleLogout = (event) => {
@@ -115,10 +144,35 @@ export default function SuperAdminAktivitas({
     return (
         <>
             <style>{`
-                * { box-sizing: border-box; }
-                body { margin: 0; background: #f4f7fb; }
-                button, input, select { font: inherit; }
-                a { color: inherit; text-decoration: none; }
+                * {
+                    box-sizing: border-box;
+                }
+
+                html,
+                body,
+                #app {
+                    margin: 0;
+                    min-height: 100%;
+                }
+
+                body {
+                    background: #f4f7fb;
+                }
+
+                button,
+                input,
+                select {
+                    font: inherit;
+                }
+
+                a {
+                    color: inherit;
+                    text-decoration: none;
+                }
+
+                /* =========================================================
+                   PAGE
+                ========================================================= */
 
                 .activity-page {
                     min-height: 100vh;
@@ -131,6 +185,10 @@ export default function SuperAdminAktivitas({
                     display: flex;
                 }
 
+                /* =========================================================
+                   SIDEBAR
+                ========================================================= */
+
                 .activity-sidebar {
                     width: 236px;
                     min-height: 100vh;
@@ -141,7 +199,10 @@ export default function SuperAdminAktivitas({
                     padding: 22px 15px;
                     display: flex;
                     flex-direction: column;
-                    z-index: 20;
+                    z-index: 100;
+                    overflow-y: auto;
+                    overflow-x: hidden;
+                    box-shadow: 8px 0 30px rgba(15, 23, 42, .06);
                 }
 
                 .activity-brand {
@@ -149,18 +210,20 @@ export default function SuperAdminAktivitas({
                     align-items: center;
                     gap: 11px;
                     padding: 3px 7px 22px;
+                    flex-shrink: 0;
                 }
 
                 .activity-brand-logo {
                     width: 38px;
                     height: 38px;
                     border-radius: 11px;
-                    background: rgba(255,255,255,.1);
-                    border: 1px solid rgba(255,255,255,.1);
+                    background: rgba(255, 255, 255, .1);
+                    border: 1px solid rgba(255, 255, 255, .1);
                     display: flex;
                     align-items: center;
                     justify-content: center;
                     overflow: hidden;
+                    flex-shrink: 0;
                 }
 
                 .activity-brand-logo img {
@@ -180,6 +243,7 @@ export default function SuperAdminAktivitas({
                     margin-top: 2px;
                     font-size: 10px;
                     color: #93a7c4;
+                    white-space: nowrap;
                 }
 
                 .activity-nav-label {
@@ -188,11 +252,13 @@ export default function SuperAdminAktivitas({
                     font-weight: 800;
                     letter-spacing: .12em;
                     color: #7185a2;
+                    flex-shrink: 0;
                 }
 
                 .activity-nav {
                     display: grid;
                     gap: 5px;
+                    flex-shrink: 0;
                 }
 
                 .activity-nav-item {
@@ -210,13 +276,17 @@ export default function SuperAdminAktivitas({
 
                 .activity-nav-item:hover {
                     color: #fff;
-                    background: rgba(255,255,255,.06);
+                    background: rgba(255, 255, 255, .06);
                 }
 
                 .activity-nav-item.active {
                     color: #fff;
-                    background: linear-gradient(135deg, #1677ff, #135bd8);
-                    box-shadow: 0 8px 22px rgba(19,91,216,.28);
+                    background: linear-gradient(
+                        135deg,
+                        #1677ff,
+                        #135bd8
+                    );
+                    box-shadow: 0 8px 22px rgba(19, 91, 216, .28);
                 }
 
                 .activity-nav-icon {
@@ -226,20 +296,52 @@ export default function SuperAdminAktivitas({
                     place-items: center;
                     flex: 0 0 auto;
                     border-radius: 7px;
-                    background: rgba(255,255,255,.08);
+                    background: rgba(255, 255, 255, .08);
                 }
 
                 .activity-nav-item.active .activity-nav-icon {
-                    background: rgba(255,255,255,.12);
+                    background: rgba(255, 255, 255, .12);
                 }
 
-                .activity-sidebar-spacer { flex: 1; }
+                .activity-sidebar-spacer {
+                    flex: 1;
+                    min-height: 20px;
+                }
+
+                /* =========================================================
+                   PROFILE + LOGOUT
+                ========================================================= */
 
                 .activity-profile {
                     padding: 13px 12px;
                     border-radius: 13px;
-                    background: rgba(255,255,255,.055);
-                    border: 1px solid rgba(255,255,255,.07);
+                    background: rgba(255, 255, 255, .055);
+                    border: 1px solid rgba(255, 255, 255, .07);
+                    flex-shrink: 0;
+                }
+
+                .activity-profile-top {
+                    display: flex;
+                    align-items: center;
+                    gap: 9px;
+                }
+
+                .activity-profile-avatar {
+                    width: 32px;
+                    height: 32px;
+                    border-radius: 9px;
+                    background: rgba(255, 255, 255, .1);
+                    color: #fff;
+                    display: grid;
+                    place-items: center;
+                    font-size: 10px;
+                    font-weight: 800;
+                    flex: 0 0 auto;
+                }
+
+                .activity-profile-copy {
+                    min-width: 0;
+                    flex: 1;
                 }
 
                 .activity-profile-name {
@@ -255,19 +357,48 @@ export default function SuperAdminAktivitas({
                     margin-top: 3px;
                     color: #8fa2bc;
                     font-size: 9px;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+
+                .activity-logout-form {
+                    width: 100%;
+                    margin: 11px 0 0;
+                    padding: 0;
                 }
 
                 .activity-logout {
-                    margin-top: 11px;
-                    display: inline-flex;
+                    width: 100%;
+                    min-height: 34px;
+                    display: flex;
                     align-items: center;
+                    justify-content: center;
                     gap: 7px;
+                    padding: 0 10px;
+                    border: 1px solid rgba(255, 255, 255, .08);
+                    border-radius: 9px;
+                    background: rgba(255, 255, 255, .045);
                     color: #a9bad0;
                     font-size: 10px;
-                    font-weight: 700;
+                    font-weight: 750;
+                    cursor: pointer;
+                    transition: .18s ease;
                 }
 
-                .activity-logout:hover { color: #fff; }
+                .activity-logout:hover {
+                    color: #fff;
+                    background: rgba(255, 255, 255, .1);
+                    border-color: rgba(255, 255, 255, .13);
+                }
+
+                .activity-logout:active {
+                    transform: translateY(1px);
+                }
+
+                /* =========================================================
+                   MAIN
+                ========================================================= */
 
                 .activity-main {
                     flex: 1;
@@ -276,6 +407,7 @@ export default function SuperAdminAktivitas({
                 }
 
                 .activity-container {
+                    width: 100%;
                     max-width: 1420px;
                     margin: 0 auto;
                     padding: 27px 29px 40px;
@@ -320,10 +452,12 @@ export default function SuperAdminAktivitas({
                     border-radius: 13px;
                     background: #fff;
                     border: 1px solid #e3eaf2;
+                    flex-shrink: 0;
                 }
 
                 .activity-header-copy {
                     text-align: right;
+                    min-width: 0;
                 }
 
                 .activity-header-name {
@@ -348,7 +482,12 @@ export default function SuperAdminAktivitas({
                     color: #1a63d9;
                     font-size: 11px;
                     font-weight: 800;
+                    flex-shrink: 0;
                 }
+
+                /* =========================================================
+                   STATS
+                ========================================================= */
 
                 .activity-stat-grid {
                     display: grid;
@@ -362,7 +501,7 @@ export default function SuperAdminAktivitas({
                     border-radius: 15px;
                     background: #fff;
                     border: 1px solid #e1e8f0;
-                    box-shadow: 0 6px 20px rgba(31,52,75,.035);
+                    box-shadow: 0 6px 20px rgba(31, 52, 75, .035);
                 }
 
                 .activity-stat-label {
@@ -384,13 +523,18 @@ export default function SuperAdminAktivitas({
                     margin-top: 7px;
                     color: #a1adbd;
                     font-size: 8px;
+                    line-height: 1.4;
                 }
+
+                /* =========================================================
+                   CARD
+                ========================================================= */
 
                 .activity-card {
                     border-radius: 16px;
                     background: #fff;
                     border: 1px solid #e1e8f0;
-                    box-shadow: 0 8px 26px rgba(31,52,75,.04);
+                    box-shadow: 0 8px 26px rgba(31, 52, 75, .04);
                     overflow: hidden;
                 }
 
@@ -424,12 +568,21 @@ export default function SuperAdminAktivitas({
                     font-size: 8px;
                     font-weight: 760;
                     white-space: nowrap;
+                    flex-shrink: 0;
                 }
+
+                /* =========================================================
+                   FILTER
+                ========================================================= */
 
                 .activity-filter {
                     padding: 13px 17px;
                     display: grid;
-                    grid-template-columns: minmax(220px, 1.7fr) repeat(2, minmax(135px, .8fr)) repeat(2, minmax(130px, .75fr)) auto auto;
+                    grid-template-columns:
+                        minmax(220px, 1.7fr)
+                        repeat(2, minmax(135px, .8fr))
+                        repeat(2, minmax(130px, .75fr))
+                        auto auto;
                     gap: 8px;
                     border-bottom: 1px solid #eef2f6;
                     background: #fbfcfe;
@@ -448,9 +601,15 @@ export default function SuperAdminAktivitas({
                     font-size: 9px;
                 }
 
-                .activity-input::placeholder { color: #adb8c7; }
+                .activity-input::placeholder {
+                    color: #adb8c7;
+                }
+
                 .activity-input:focus,
-                .activity-select:focus { border-color: #77aaf5; box-shadow: 0 0 0 3px rgba(23,119,255,.08); }
+                .activity-select:focus {
+                    border-color: #77aaf5;
+                    box-shadow: 0 0 0 3px rgba(23, 119, 255, .08);
+                }
 
                 .activity-button {
                     height: 34px;
@@ -460,6 +619,7 @@ export default function SuperAdminAktivitas({
                     cursor: pointer;
                     font-size: 9px;
                     font-weight: 800;
+                    white-space: nowrap;
                 }
 
                 .activity-button-primary {
@@ -467,16 +627,28 @@ export default function SuperAdminAktivitas({
                     color: #fff;
                 }
 
-                .activity-button-primary:hover { background: #0f59c4; }
+                .activity-button-primary:hover {
+                    background: #0f59c4;
+                }
 
                 .activity-button-light {
                     background: #eef3f8;
                     color: #5b6d82;
                 }
 
-                .activity-button-light:hover { background: #e5ebf1; }
+                .activity-button-light:hover {
+                    background: #e5ebf1;
+                }
 
-                .activity-table-wrap { overflow-x: auto; }
+                /* =========================================================
+                   TABLE
+                ========================================================= */
+
+                .activity-table-wrap {
+                    width: 100%;
+                    overflow-x: auto;
+                    -webkit-overflow-scrolling: touch;
+                }
 
                 .activity-table {
                     width: 100%;
@@ -494,6 +666,7 @@ export default function SuperAdminAktivitas({
                     font-weight: 800;
                     text-transform: uppercase;
                     letter-spacing: .06em;
+                    white-space: nowrap;
                 }
 
                 .activity-table td {
@@ -504,8 +677,13 @@ export default function SuperAdminAktivitas({
                     font-size: 9px;
                 }
 
-                .activity-table tr:last-child td { border-bottom: 0; }
-                .activity-table tbody tr:hover td { background: #fcfdff; }
+                .activity-table tr:last-child td {
+                    border-bottom: 0;
+                }
+
+                .activity-table tbody tr:hover td {
+                    background: #fcfdff;
+                }
 
                 .activity-actor {
                     font-size: 9px;
@@ -534,7 +712,12 @@ export default function SuperAdminAktivitas({
                     margin-top: 3px;
                     color: #a2adba;
                     font-size: 8px;
+                    line-height: 1.5;
                 }
+
+                /* =========================================================
+                   BADGES
+                ========================================================= */
 
                 .activity-badge {
                     display: inline-flex;
@@ -549,12 +732,39 @@ export default function SuperAdminAktivitas({
                     white-space: nowrap;
                 }
 
-                .activity-badge-login { background: #eaf7ef; color: #16824d; }
-                .activity-badge-logout { background: #eef2f7; color: #64748b; }
-                .activity-badge-create { background: #eaf2ff; color: #1d66d5; }
-                .activity-badge-update { background: #f1edff; color: #6d49c6; }
-                .activity-badge-status { background: #fff6df; color: #a66e00; }
-                .activity-badge-delete { background: #fff0f0; color: #c84c4c; }
+                .activity-badge-login {
+                    background: #eaf7ef;
+                    color: #16824d;
+                }
+
+                .activity-badge-logout {
+                    background: #eef2f7;
+                    color: #64748b;
+                }
+
+                .activity-badge-create {
+                    background: #eaf2ff;
+                    color: #1d66d5;
+                }
+
+                .activity-badge-update {
+                    background: #f1edff;
+                    color: #6d49c6;
+                }
+
+                .activity-badge-status {
+                    background: #fff6df;
+                    color: #a66e00;
+                }
+
+                .activity-badge-delete {
+                    background: #fff0f0;
+                    color: #c84c4c;
+                }
+
+                /* =========================================================
+                   EMPTY
+                ========================================================= */
 
                 .activity-empty {
                     padding: 52px 18px;
@@ -569,6 +779,10 @@ export default function SuperAdminAktivitas({
                     color: #344861;
                     font-size: 12px;
                 }
+
+                /* =========================================================
+                   FOOTER / PAGINATION
+                ========================================================= */
 
                 .activity-footer {
                     display: flex;
@@ -608,6 +822,10 @@ export default function SuperAdminAktivitas({
                     cursor: pointer;
                 }
 
+                .activity-page-link:hover {
+                    background: #f5f8fc;
+                }
+
                 .activity-page-link.active {
                     background: #1265dd;
                     border-color: #1265dd;
@@ -626,6 +844,10 @@ export default function SuperAdminAktivitas({
                     font-size: 8px;
                 }
 
+                /* =========================================================
+                   TABLET
+                ========================================================= */
+
                 @media (max-width: 1180px) {
                     .activity-filter {
                         grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -634,163 +856,648 @@ export default function SuperAdminAktivitas({
 
                 @media (max-width: 920px) {
                     .activity-sidebar {
-                        width: 76px;
-                        padding-left: 9px;
-                        padding-right: 9px;
+                        width: 78px;
+                        padding: 18px 8px;
                     }
-                    .activity-brand { justify-content: center; padding-left: 0; padding-right: 0; }
+
+                    .activity-brand {
+                        justify-content: center;
+                        padding-left: 0;
+                        padding-right: 0;
+                    }
+
                     .activity-brand-copy,
                     .activity-nav-label,
                     .activity-nav-item span:not(.activity-nav-icon),
-                    .activity-profile-name,
-                    .activity-profile-role,
-                    .activity-logout-text { display: none; }
-                    .activity-nav-item { justify-content: center; padding-left: 0; padding-right: 0; }
-                    .activity-nav-icon { width: 32px; height: 32px; }
-                    .activity-profile { padding: 10px; display: flex; justify-content: center; }
-                    .activity-logout { margin-top: 0; }
-                    .activity-main { margin-left: 76px; }
-                    .activity-stat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+                    .activity-profile-copy,
+                    .activity-logout-text {
+                        display: none;
+                    }
+
+                    .activity-nav-item {
+                        justify-content: center;
+                        padding-left: 0;
+                        padding-right: 0;
+                    }
+
+                    .activity-nav-icon {
+                        width: 34px;
+                        height: 34px;
+                    }
+
+                    .activity-profile {
+                        padding: 9px;
+                    }
+
+                    .activity-profile-top {
+                        justify-content: center;
+                    }
+
+                    .activity-profile-avatar {
+                        width: 34px;
+                        height: 34px;
+                    }
+
+                    .activity-logout-form {
+                        margin-top: 8px;
+                    }
+
+                    .activity-logout {
+                        min-height: 35px;
+                        padding: 0;
+                    }
+
+                    .activity-main {
+                        margin-left: 78px;
+                    }
+
+                    .activity-container {
+                        padding-left: 20px;
+                        padding-right: 20px;
+                    }
+
+                    .activity-stat-grid {
+                        grid-template-columns: repeat(2, minmax(0, 1fr));
+                    }
                 }
 
+                /* =========================================================
+                   MOBILE
+                ========================================================= */
+
                 @media (max-width: 640px) {
-                    .activity-container { padding: 18px 13px 30px; }
-                    .activity-topbar { flex-direction: column; }
-                    .activity-header-user { align-self: stretch; justify-content: space-between; }
-                    .activity-header-copy { text-align: left; }
-                    .activity-stat-grid { grid-template-columns: 1fr 1fr; gap: 7px; }
-                    .activity-stat { padding: 12px; }
-                    .activity-stat-value { font-size: 20px; }
-                    .activity-filter { grid-template-columns: 1fr 1fr; }
-                    .activity-filter > :first-child { grid-column: 1 / -1; }
-                    .activity-filter > .wide-mobile { grid-column: 1 / -1; }
-                    .activity-card-header { padding: 13px; }
-                    .activity-footer { align-items: flex-start; flex-direction: column; }
-                    .activity-pagination { justify-content: flex-start; }
+                    .activity-sidebar {
+                        width: 72px;
+                        padding: 13px 7px;
+                    }
+
+                    .activity-main {
+                        margin-left: 72px;
+                    }
+
+                    .activity-container {
+                        padding: 16px 10px 28px;
+                    }
+
+                    .activity-topbar {
+                        flex-direction: column;
+                        gap: 12px;
+                        margin-bottom: 15px;
+                    }
+
+                    .activity-title {
+                        font-size: 21px;
+                    }
+
+                    .activity-subtitle {
+                        font-size: 10px;
+                    }
+
+                    .activity-header-user {
+                        width: 100%;
+                        justify-content: space-between;
+                        padding: 8px 10px;
+                    }
+
+                    .activity-header-copy {
+                        text-align: left;
+                    }
+
+                    .activity-stat-grid {
+                        grid-template-columns: 1fr 1fr;
+                        gap: 7px;
+                    }
+
+                    .activity-stat {
+                        padding: 12px;
+                        border-radius: 13px;
+                    }
+
+                    .activity-stat-label {
+                        font-size: 8px;
+                    }
+
+                    .activity-stat-value {
+                        font-size: 19px;
+                    }
+
+                    .activity-stat-note {
+                        font-size: 7px;
+                    }
+
+                    .activity-card {
+                        border-radius: 13px;
+                    }
+
+                    .activity-card-header {
+                        padding: 13px;
+                        align-items: flex-start;
+                    }
+
+                    .activity-card-description {
+                        max-width: 220px;
+                    }
+
+                    .activity-filter {
+                        grid-template-columns: 1fr 1fr;
+                        padding: 11px;
+                        gap: 7px;
+                    }
+
+                    .activity-filter > :first-child {
+                        grid-column: 1 / -1;
+                    }
+
+                    .activity-input,
+                    .activity-select,
+                    .activity-button {
+                        height: 36px;
+                    }
+
+                    .activity-footer {
+                        align-items: flex-start;
+                        flex-direction: column;
+                        padding: 12px;
+                    }
+
+                    .activity-pagination {
+                        justify-content: flex-start;
+                    }
+
+                    .activity-bottom-note {
+                        text-align: center;
+                        line-height: 1.5;
+                    }
                 }
 
                 @media (max-width: 430px) {
-                    .activity-sidebar { display: none; }
-                    .activity-main { margin-left: 0; }
-                    .activity-stat-grid { grid-template-columns: 1fr 1fr; }
-                    .activity-filter { grid-template-columns: 1fr; }
-                    .activity-filter > * { grid-column: 1 / -1 !important; }
+                    /*
+                     * Sidebar TETAP terlihat di HP kecil.
+                     * Sebelumnya sidebar di-hide di sini.
+                     */
+
+                    .activity-sidebar {
+                        display: flex;
+                        width: 66px;
+                        padding: 11px 6px;
+                    }
+
+                    .activity-main {
+                        margin-left: 66px;
+                    }
+
+                    .activity-brand-logo {
+                        width: 38px;
+                        height: 38px;
+                    }
+
+                    .activity-nav {
+                        gap: 4px;
+                    }
+
+                    .activity-nav-icon {
+                        width: 36px;
+                        height: 36px;
+                        border-radius: 9px;
+                    }
+
+                    .activity-nav-item {
+                        min-height: 42px;
+                    }
+
+                    .activity-profile {
+                        padding: 7px 5px;
+                        border-radius: 10px;
+                    }
+
+                    .activity-profile-avatar {
+                        width: 32px;
+                        height: 32px;
+                    }
+
+                    /*
+                     * Tombol logout tetap terlihat sebagai tombol/icon.
+                     */
+                    .activity-logout-form {
+                        margin-top: 7px;
+                    }
+
+                    .activity-logout {
+                        min-height: 36px;
+                        border-radius: 9px;
+                        background: rgba(255, 255, 255, .07);
+                        border-color: rgba(255, 255, 255, .1);
+                    }
+
+                    .activity-container {
+                        padding: 14px 8px 24px;
+                    }
+
+                    .activity-title {
+                        font-size: 19px;
+                    }
+
+                    .activity-subtitle {
+                        font-size: 9px;
+                        line-height: 1.6;
+                    }
+
+                    .activity-stat {
+                        padding: 10px;
+                    }
+
+                    .activity-stat-value {
+                        font-size: 18px;
+                    }
+
+                    .activity-stat-note {
+                        display: none;
+                    }
+
+                    .activity-card-header {
+                        flex-direction: column;
+                        gap: 8px;
+                    }
+
+                    .activity-count-pill {
+                        align-self: flex-start;
+                    }
+
+                    .activity-filter {
+                        grid-template-columns: 1fr;
+                    }
+
+                    .activity-filter > * {
+                        grid-column: 1 / -1 !important;
+                    }
+
+                    .activity-table {
+                        min-width: 880px;
+                    }
+                }
+
+                /* =========================================================
+                   VERY SMALL DEVICES
+                ========================================================= */
+
+                @media (max-width: 360px) {
+                    .activity-sidebar {
+                        width: 62px;
+                    }
+
+                    .activity-main {
+                        margin-left: 62px;
+                    }
+
+                    .activity-nav-icon {
+                        width: 33px;
+                        height: 33px;
+                    }
+
+                    .activity-profile-avatar {
+                        width: 29px;
+                        height: 29px;
+                    }
+
+                    .activity-logout {
+                        min-height: 33px;
+                    }
+
+                    .activity-container {
+                        padding-left: 7px;
+                        padding-right: 7px;
+                    }
+
+                    .activity-title {
+                        font-size: 18px;
+                    }
                 }
             `}</style>
 
             <div className="activity-page">
                 <div className="activity-shell">
+
+                    {/* =====================================================
+                        SIDEBAR
+                    ====================================================== */}
                     <aside className="activity-sidebar">
+
                         <div className="activity-brand">
                             <div className="activity-brand-logo">
-                                <img src="/images/poltekkes-icon.png" alt="Logo Poltekkes Maluku" />
+                                <img
+                                    src="/images/poltekkes-icon.png"
+                                    alt="Logo Poltekkes Maluku"
+                                />
                             </div>
+
                             <div className="activity-brand-copy">
-                                <div className="activity-brand-title">SIMAP</div>
-                                <div className="activity-brand-subtitle">Poltekkes Maluku</div>
+                                <div className="activity-brand-title">
+                                    SIMAP
+                                </div>
+
+                                <div className="activity-brand-subtitle">
+                                    Poltekkes Maluku
+                                </div>
                             </div>
                         </div>
 
-                        <div className="activity-nav-label">MENU UTAMA</div>
+                        <div className="activity-nav-label">
+                            MENU UTAMA
+                        </div>
 
                         <nav className="activity-nav">
-                            <NavItem href="/super-admin/dashboard" label="Dashboard" icon="dashboard" />
-                            <NavItem href="/super-admin/pengguna" label="Pengguna" icon="users" />
-                            <NavItem href="/super-admin/unit" label="Unit" icon="building" />
-                            <NavItem href="/super-admin/aktivitas" label="Aktivitas Sistem" icon="activity" active />
+
+                            <NavItem
+                                href="/super-admin/dashboard"
+                                label="Dashboard"
+                                icon="dashboard"
+                            />
+
+                            <NavItem
+                                href="/super-admin/pengguna"
+                                label="Pengguna"
+                                icon="users"
+                            />
+
+                            <NavItem
+                                href="/super-admin/unit"
+                                label="Unit"
+                                icon="building"
+                            />
+
+                            <NavItem
+                                href="/super-admin/aktivitas"
+                                label="Aktivitas Sistem"
+                                icon="activity"
+                                active
+                            />
+
                         </nav>
 
                         <div className="activity-sidebar-spacer" />
 
                         <div className="activity-profile">
-                            <div>
-                                <div className="activity-profile-name">{userName}</div>
-                                <div className="activity-profile-role">{userRole}</div>
+
+                            <div className="activity-profile-top">
+
+                                <div
+                                    className="activity-profile-avatar"
+                                    title={userName}
+                                >
+                                    {userInitial}
+                                </div>
+
+                                <div className="activity-profile-copy">
+                                    <div className="activity-profile-name">
+                                        {userName}
+                                    </div>
+
+                                    <div className="activity-profile-role">
+                                        {userRole}
+                                    </div>
+                                </div>
+
                             </div>
-                            <a className="activity-logout" href="/logout" onClick={handleLogout} title="Keluar dari SIMAP">
-                                <Icon name="logout" size={13} />
-                                <span className="activity-logout-text">Keluar</span>
-                            </a>
+
+                            {/* LOGOUT POST */}
+                            <form
+                                method="POST"
+                                action="/logout"
+                                className="activity-logout-form"
+                                onSubmit={handleLogout}
+                            >
+                                <input
+                                    type="hidden"
+                                    name="_token"
+                                    value={csrfToken}
+                                />
+
+                                <button
+                                    type="submit"
+                                    className="activity-logout"
+                                    title="Keluar dari SIMAP"
+                                    aria-label="Keluar dari SIMAP"
+                                >
+                                    <Icon name="logout" size={14} />
+
+                                    <span className="activity-logout-text">
+                                        Keluar
+                                    </span>
+                                </button>
+                            </form>
+
                         </div>
                     </aside>
 
+                    {/* =====================================================
+                        MAIN
+                    ====================================================== */}
                     <main className="activity-main">
                         <div className="activity-container">
+
+                            {/* TOPBAR */}
                             <div className="activity-topbar">
+
                                 <div>
-                                    <div className="activity-kicker">ADMINISTRASI SISTEM</div>
-                                    <h1 className="activity-title">Aktivitas Sistem</h1>
+                                    <div className="activity-kicker">
+                                        ADMINISTRASI SISTEM
+                                    </div>
+
+                                    <h1 className="activity-title">
+                                        Aktivitas Sistem
+                                    </h1>
+
                                     <p className="activity-subtitle">
-                                        Pantau riwayat tindakan penting yang tercatat di SIMAP Poltekkes Maluku.
+                                        Pantau riwayat tindakan penting yang
+                                        tercatat di SIMAP Poltekkes Maluku.
                                     </p>
                                 </div>
 
                                 <div className="activity-header-user">
+
                                     <div className="activity-header-copy">
-                                        <div className="activity-header-name">{userName}</div>
-                                        <div className="activity-header-role">{userRole}</div>
-                                    </div>
-                                    <div className="activity-avatar">{userInitial}</div>
-                                </div>
-                            </div>
+                                        <div className="activity-header-name">
+                                            {userName}
+                                        </div>
 
-                            <div className="activity-stat-grid">
-                                <Stat label="Total Aktivitas" value={safeStats.total ?? 0} note="Seluruh log yang tersimpan" />
-                                <Stat label="Hari Ini" value={safeStats.today ?? 0} note="Aktivitas pada hari berjalan" />
-                                <Stat label="Minggu Ini" value={safeStats.thisWeek ?? 0} note="Aktivitas sejak awal minggu" />
-                                <Stat label="Bulan Ini" value={safeStats.thisMonth ?? 0} note="Aktivitas pada bulan berjalan" />
-                            </div>
-
-                            <section className="activity-card">
-                                <div className="activity-card-header">
-                                    <div>
-                                        <div className="activity-card-title">Riwayat Aktivitas</div>
-                                        <div className="activity-card-description">
-                                            Setiap entri menampilkan pengguna, modul, tindakan, waktu, dan sumber akses.
+                                        <div className="activity-header-role">
+                                            {userRole}
                                         </div>
                                     </div>
-                                    <div className="activity-count-pill">
-                                        {Number(pagination?.total || 0)} aktivitas
+
+                                    <div className="activity-avatar">
+                                        {userInitial}
                                     </div>
+
+                                </div>
+                            </div>
+
+                            {/* STATS */}
+                            <div className="activity-stat-grid">
+
+                                <Stat
+                                    label="Total Aktivitas"
+                                    value={safeStats.total ?? 0}
+                                    note="Seluruh log yang tersimpan"
+                                />
+
+                                <Stat
+                                    label="Hari Ini"
+                                    value={safeStats.today ?? 0}
+                                    note="Aktivitas pada hari berjalan"
+                                />
+
+                                <Stat
+                                    label="Minggu Ini"
+                                    value={safeStats.thisWeek ?? 0}
+                                    note="Aktivitas sejak awal minggu"
+                                />
+
+                                <Stat
+                                    label="Bulan Ini"
+                                    value={safeStats.thisMonth ?? 0}
+                                    note="Aktivitas pada bulan berjalan"
+                                />
+
+                            </div>
+
+                            {/* MAIN CARD */}
+                            <section className="activity-card">
+
+                                <div className="activity-card-header">
+
+                                    <div>
+                                        <div className="activity-card-title">
+                                            Riwayat Aktivitas
+                                        </div>
+
+                                        <div className="activity-card-description">
+                                            Setiap entri menampilkan pengguna,
+                                            modul, tindakan, waktu, dan sumber
+                                            akses.
+                                        </div>
+                                    </div>
+
+                                    <div className="activity-count-pill">
+                                        {Number(pagination?.total || 0)}
+                                        {' '}
+                                        aktivitas
+                                    </div>
+
                                 </div>
 
-                                <form className="activity-filter" onSubmit={submitFilter}>
+                                {/* FILTER */}
+                                <form
+                                    className="activity-filter"
+                                    onSubmit={submitFilter}
+                                >
+
                                     <input
-                                        className="activity-input wide-mobile"
+                                        className="activity-input"
                                         value={search}
-                                        onChange={(event) => setSearch(event.target.value)}
+                                        onChange={(event) =>
+                                            setSearch(event.target.value)
+                                        }
                                         placeholder="Cari pengguna, deskripsi, modul, aksi, atau IP..."
                                     />
 
-                                    <select className="activity-select" value={module} onChange={(event) => setModule(event.target.value)}>
-                                        <option value="">Semua Modul</option>
-                                        {Object.entries(safeModules).map(([key, label]) => (
-                                            <option key={key} value={key}>{label}</option>
-                                        ))}
+                                    <select
+                                        className="activity-select"
+                                        value={module}
+                                        onChange={(event) =>
+                                            setModule(event.target.value)
+                                        }
+                                    >
+                                        <option value="">
+                                            Semua Modul
+                                        </option>
+
+                                        {Object.entries(safeModules).map(
+                                            ([key, label]) => (
+                                                <option
+                                                    key={key}
+                                                    value={key}
+                                                >
+                                                    {label}
+                                                </option>
+                                            )
+                                        )}
                                     </select>
 
-                                    <select className="activity-select" value={action} onChange={(event) => setAction(event.target.value)}>
-                                        <option value="">Semua Aksi</option>
-                                        {Object.entries(safeActions).map(([key, label]) => (
-                                            <option key={key} value={key}>{label}</option>
-                                        ))}
+                                    <select
+                                        className="activity-select"
+                                        value={action}
+                                        onChange={(event) =>
+                                            setAction(event.target.value)
+                                        }
+                                    >
+                                        <option value="">
+                                            Semua Aksi
+                                        </option>
+
+                                        {Object.entries(safeActions).map(
+                                            ([key, label]) => (
+                                                <option
+                                                    key={key}
+                                                    value={key}
+                                                >
+                                                    {label}
+                                                </option>
+                                            )
+                                        )}
                                     </select>
 
-                                    <input className="activity-input" type="date" value={dateFrom} onChange={(event) => setDateFrom(event.target.value)} />
-                                    <input className="activity-input" type="date" value={dateTo} onChange={(event) => setDateTo(event.target.value)} />
+                                    <input
+                                        className="activity-input"
+                                        type="date"
+                                        value={dateFrom}
+                                        onChange={(event) =>
+                                            setDateFrom(event.target.value)
+                                        }
+                                    />
 
-                                    <button type="submit" className="activity-button activity-button-primary">Terapkan</button>
-                                    <button type="button" className="activity-button activity-button-light" onClick={resetFilter}>Reset</button>
+                                    <input
+                                        className="activity-input"
+                                        type="date"
+                                        value={dateTo}
+                                        onChange={(event) =>
+                                            setDateTo(event.target.value)
+                                        }
+                                    />
+
+                                    <button
+                                        type="submit"
+                                        className="activity-button activity-button-primary"
+                                    >
+                                        Terapkan
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        className="activity-button activity-button-light"
+                                        onClick={resetFilter}
+                                    >
+                                        Reset
+                                    </button>
+
                                 </form>
 
+                                {/* TABLE */}
                                 <div className="activity-table-wrap">
+
                                     {safeActivities.length === 0 ? (
                                         <div className="activity-empty">
-                                            <strong>Belum ada aktivitas tercatat</strong>
-                                            Aktivitas akan muncul setelah tindakan penting dilakukan di sistem.
+                                            <strong>
+                                                Belum ada aktivitas tercatat
+                                            </strong>
+
+                                            Aktivitas akan muncul setelah
+                                            tindakan penting dilakukan di
+                                            sistem.
                                         </div>
                                     ) : (
                                         <table className="activity-table">
+
                                             <thead>
                                                 <tr>
                                                     <th>Waktu</th>
@@ -801,116 +1508,266 @@ export default function SuperAdminAktivitas({
                                                     <th>IP</th>
                                                 </tr>
                                             </thead>
+
                                             <tbody>
-                                                {safeActivities.map((item) => (
-                                                    <tr key={item.id}>
-                                                        <td>
-                                                            <div>{formatDateTime(item.created_at)}</div>
-                                                            {item?.user?.unit?.name ? (
-                                                                <div className="activity-meta">{item.user.unit.name}</div>
-                                                            ) : null}
-                                                        </td>
-                                                        <td>
-                                                            <div className="activity-actor">{item?.user?.name || 'Akun dihapus'}</div>
-                                                            <div className="activity-actor-email">{item?.user?.email || '-'}</div>
-                                                        </td>
-                                                        <td>
-                                                            <div className="activity-module">{item?.module || '-'}</div>
-                                                        </td>
-                                                        <td>
-                                                            <span className={actionClass(item?.action)}>
-                                                                {actionLabel(item?.action)}
-                                                            </span>
-                                                        </td>
-                                                        <td>
-                                                            <div className="activity-description">{item?.description || '-'}</div>
-                                                            {item?.user_agent ? (
-                                                                <div className="activity-meta">Perangkat: {item.user_agent}</div>
-                                                            ) : null}
-                                                        </td>
-                                                        <td>
-                                                            <div>{item?.ip_address || '-'}</div>
-                                                        </td>
-                                                    </tr>
-                                                ))}
+
+                                                {safeActivities.map(
+                                                    (item) => (
+                                                        <tr key={item.id}>
+
+                                                            <td>
+                                                                <div>
+                                                                    {formatDateTime(
+                                                                        item.created_at
+                                                                    )}
+                                                                </div>
+
+                                                                {item?.user?.unit
+                                                                    ?.name ? (
+                                                                    <div className="activity-meta">
+                                                                        {
+                                                                            item
+                                                                                .user
+                                                                                .unit
+                                                                                .name
+                                                                        }
+                                                                    </div>
+                                                                ) : null}
+                                                            </td>
+
+                                                            <td>
+                                                                <div className="activity-actor">
+                                                                    {item
+                                                                        ?.user
+                                                                        ?.name ||
+                                                                        'Akun dihapus'}
+                                                                </div>
+
+                                                                <div className="activity-actor-email">
+                                                                    {item
+                                                                        ?.user
+                                                                        ?.email ||
+                                                                        '-'}
+                                                                </div>
+                                                            </td>
+
+                                                            <td>
+                                                                <div className="activity-module">
+                                                                    {item?.module ||
+                                                                        '-'}
+                                                                </div>
+                                                            </td>
+
+                                                            <td>
+                                                                <span
+                                                                    className={actionClass(
+                                                                        item?.action
+                                                                    )}
+                                                                >
+                                                                    {actionLabel(
+                                                                        item?.action
+                                                                    )}
+                                                                </span>
+                                                            </td>
+
+                                                            <td>
+                                                                <div className="activity-description">
+                                                                    {item
+                                                                        ?.description ||
+                                                                        '-'}
+                                                                </div>
+
+                                                                {item?.user_agent ? (
+                                                                    <div className="activity-meta">
+                                                                        Perangkat:{' '}
+                                                                        {
+                                                                            item.user_agent
+                                                                        }
+                                                                    </div>
+                                                                ) : null}
+                                                            </td>
+
+                                                            <td>
+                                                                <div>
+                                                                    {item?.ip_address ||
+                                                                        '-'}
+                                                                </div>
+                                                            </td>
+
+                                                        </tr>
+                                                    )
+                                                )}
+
                                             </tbody>
                                         </table>
                                     )}
+
                                 </div>
 
-                                {(Number(pagination?.total || 0) > 0) && (
+                                {/* PAGINATION */}
+                                {Number(pagination?.total || 0) > 0 && (
                                     <div className="activity-footer">
+
                                         <div className="activity-pagination-info">
-                                            Menampilkan {pagination?.from || 0}–{pagination?.to || 0} dari {pagination?.total || 0} aktivitas
+                                            Menampilkan{' '}
+                                            {pagination?.from || 0}
+                                            {'–'}
+                                            {pagination?.to || 0}
+                                            {' '}dari{' '}
+                                            {pagination?.total || 0}
+                                            {' '}aktivitas
                                         </div>
 
                                         <div className="activity-pagination">
+
                                             <button
                                                 type="button"
-                                                className={`activity-page-link ${pagination?.prev_page_url ? '' : 'disabled'}`}
-                                                onClick={() => openPagination(pagination?.prev_page_url)}
+                                                className={`activity-page-link ${
+                                                    pagination?.prev_page_url
+                                                        ? ''
+                                                        : 'disabled'
+                                                }`}
+                                                onClick={() =>
+                                                    openPagination(
+                                                        pagination?.prev_page_url
+                                                    )
+                                                }
                                             >
                                                 ‹
                                             </button>
 
-                                            {paginationLinks.slice(0, 7).map((link, index) => (
-                                                <button
-                                                    type="button"
-                                                    key={`${link.label}-${index}`}
-                                                    className={`activity-page-link ${link.active ? 'active' : ''}`}
-                                                    onClick={() => openPagination(link.url)}
-                                                >
-                                                    {stripHtml(link.label)}
-                                                </button>
-                                            ))}
+                                            {paginationLinks
+                                                .slice(0, 7)
+                                                .map((link, index) => (
+                                                    <button
+                                                        type="button"
+                                                        key={`${link.label}-${index}`}
+                                                        className={`activity-page-link ${
+                                                            link.active
+                                                                ? 'active'
+                                                                : ''
+                                                        }`}
+                                                        onClick={() =>
+                                                            openPagination(
+                                                                link.url
+                                                            )
+                                                        }
+                                                    >
+                                                        {stripHtml(
+                                                            link.label
+                                                        )}
+                                                    </button>
+                                                ))}
 
                                             <button
                                                 type="button"
-                                                className={`activity-page-link ${pagination?.next_page_url ? '' : 'disabled'}`}
-                                                onClick={() => openPagination(pagination?.next_page_url)}
+                                                className={`activity-page-link ${
+                                                    pagination?.next_page_url
+                                                        ? ''
+                                                        : 'disabled'
+                                                }`}
+                                                onClick={() =>
+                                                    openPagination(
+                                                        pagination?.next_page_url
+                                                    )
+                                                }
                                             >
                                                 ›
                                             </button>
+
                                         </div>
                                     </div>
                                 )}
+
                             </section>
 
                             <div className="activity-bottom-note">
-                                SIMAP Poltekkes Maluku • Aktivitas sistem tersimpan sebagai catatan administrasi.
+                                SIMAP Poltekkes Maluku • Aktivitas sistem
+                                tersimpan sebagai catatan administrasi.
                             </div>
+
                         </div>
                     </main>
+
                 </div>
             </div>
         </>
     );
 }
 
+/* =========================================================
+   STAT
+========================================================= */
+
 function Stat({ label, value, note }) {
     return (
         <div className="activity-stat">
-            <div className="activity-stat-label">{label}</div>
-            <div className="activity-stat-value">{value}</div>
-            <div className="activity-stat-note">{note}</div>
+            <div className="activity-stat-label">
+                {label}
+            </div>
+
+            <div className="activity-stat-value">
+                {value}
+            </div>
+
+            <div className="activity-stat-note">
+                {note}
+            </div>
         </div>
     );
 }
 
-function NavItem({ href, label, icon, active = false }) {
+/* =========================================================
+   NAV ITEM
+========================================================= */
+
+function NavItem({
+    href,
+    label,
+    icon,
+    active = false,
+}) {
     return (
-        <a className={`activity-nav-item ${active ? 'active' : ''}`} href={href}>
-            <span className="activity-nav-icon"><Icon name={icon} size={14} /></span>
-            <span>{label}</span>
+        <a
+            className={`activity-nav-item ${
+                active ? 'active' : ''
+            }`}
+            href={href}
+            title={label}
+        >
+            <span className="activity-nav-icon">
+                <Icon
+                    name={icon}
+                    size={14}
+                />
+            </span>
+
+            <span>
+                {label}
+            </span>
         </a>
     );
 }
 
+/* =========================================================
+   HELPERS
+========================================================= */
+
 function stripHtml(value) {
-    return String(value || '').replace(/<[^>]*>/g, '');
+    return String(value || '').replace(
+        /<[^>]*>/g,
+        ''
+    );
 }
 
-function Icon({ name, size = 16 }) {
+/* =========================================================
+   ICON
+========================================================= */
+
+function Icon({
+    name,
+    size = 16,
+}) {
     const common = {
         width: size,
         height: size,
@@ -926,39 +1783,84 @@ function Icon({ name, size = 16 }) {
     const icons = {
         dashboard: (
             <>
-                <rect x="4" y="4" width="6" height="6" rx="1" />
-                <rect x="14" y="4" width="6" height="6" rx="1" />
-                <rect x="4" y="14" width="6" height="6" rx="1" />
-                <rect x="14" y="14" width="6" height="6" rx="1" />
+                <rect
+                    x="4"
+                    y="4"
+                    width="6"
+                    height="6"
+                    rx="1"
+                />
+
+                <rect
+                    x="14"
+                    y="4"
+                    width="6"
+                    height="6"
+                    rx="1"
+                />
+
+                <rect
+                    x="4"
+                    y="14"
+                    width="6"
+                    height="6"
+                    rx="1"
+                />
+
+                <rect
+                    x="14"
+                    y="14"
+                    width="6"
+                    height="6"
+                    rx="1"
+                />
             </>
         ),
+
         users: (
             <>
-                <circle cx="9" cy="8" r="3" />
+                <circle
+                    cx="9"
+                    cy="8"
+                    r="3"
+                />
+
                 <path d="M3.5 20c.5-3.5 2.3-5.5 5.5-5.5s5 2 5.5 5.5" />
+
                 <path d="M16 6.5a3 3 0 0 1 0 5.8" />
+
                 <path d="M17 14.5c2.1.5 3.4 2.2 3.7 5.5" />
             </>
         ),
+
         building: (
             <>
                 <path d="M4 20V6a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v14" />
+
                 <path d="M8 8h2M8 12h2M8 16h2M13 8h1M13 12h1M13 16h1M2 20h20" />
             </>
         ),
+
         activity: (
             <>
                 <path d="M3 12h4l2.2-6 4.1 12 2.1-6H21" />
             </>
         ),
+
         logout: (
             <>
                 <path d="M10 5H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h4" />
+
                 <path d="M14 8l4 4-4 4" />
+
                 <path d="M9 12h9" />
             </>
         ),
     };
 
-    return <svg {...common}>{icons[name] || icons.activity}</svg>;
+    return (
+        <svg {...common}>
+            {icons[name] || icons.activity}
+        </svg>
+    );
 }
