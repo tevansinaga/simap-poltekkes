@@ -13,6 +13,8 @@ import DirekturDashboard from './pages/DirekturDashboard';
 import SekretarisDashboard from './pages/SekretarisDashboard';
 import SuperAdminDashboard from './pages/SuperAdminDashboard';
 import SuperAdminPengguna from './pages/SuperAdminPengguna';
+import SuperAdminUnit from './pages/SuperAdminUnit';
+import SuperAdminAktivitas from './pages/SuperAdminAktivitas';
 
 // =====================================================
 // UNIT
@@ -172,6 +174,123 @@ if (app) {
                             ?.errors ||
                         []
                     }
+                />
+
+            </React.StrictMode>
+        );
+
+    }
+
+    // =====================================================
+    // SUPER ADMIN UNIT
+    // =====================================================
+
+    else if (page === 'super-admin-unit') {
+
+        createRoot(app).render(
+            <React.StrictMode>
+
+                <SuperAdminUnit
+                    user={
+                        window.superAdminUnitData
+                            ?.user ||
+                        null
+                    }
+
+                    units={
+                        window.superAdminUnitData
+                            ?.units ||
+                        []
+                    }
+
+                    pagination={
+                        window.superAdminUnitData
+                            ?.pagination ||
+                        {}
+                    }
+
+                    filters={
+                        window.superAdminUnitData
+                            ?.filters ||
+                        {}
+                    }
+
+                    csrfToken={
+                        window.superAdminUnitData
+                            ?.csrfToken ||
+                        ''
+                    }
+
+                    flash={
+                        window.superAdminUnitData
+                            ?.flash ||
+                        {}
+                    }
+
+                    errors={
+                        window.superAdminUnitData
+                            ?.errors ||
+                        []
+                    }
+                />
+
+            </React.StrictMode>
+        );
+
+    }
+
+    // =====================================================
+    // SUPER ADMIN AKTIVITAS
+    // =====================================================
+
+    else if (page === 'super-admin-aktivitas') {
+
+        createRoot(app).render(
+            <React.StrictMode>
+
+                <SuperAdminAktivitas
+                    user={
+                        window.superAdminAktivitasData
+                            ?.user ||
+                        null
+                    }
+
+                    activities={
+                        window.superAdminAktivitasData
+                            ?.activities ||
+                        []
+                    }
+
+                    stats={
+                        window.superAdminAktivitasData
+                            ?.stats ||
+                        {}
+                    }
+
+                    filters={
+                        window.superAdminAktivitasData
+                            ?.filters ||
+                        {}
+                    }
+
+                    actionOptions={
+                        window.superAdminAktivitasData
+                            ?.actionOptions ||
+                        {}
+                    }
+
+                    moduleOptions={
+                        window.superAdminAktivitasData
+                            ?.moduleOptions ||
+                        {}
+                    }
+
+                    pagination={
+                        window.superAdminAktivitasData
+                            ?.pagination ||
+                        {}
+                    }
+
                 />
 
             </React.StrictMode>

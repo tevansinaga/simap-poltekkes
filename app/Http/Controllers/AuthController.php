@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\ActivityLogger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -17,15 +18,21 @@ class AuthController extends Controller
         | VALIDASI LOGIN
         |--------------------------------------------------------------------------
         */
+
         $credentials = $request->validate(
             [
                 'email' => ['required', 'email'],
                 'password' => ['required'],
             ],
             [
-                'email.required' => 'Email wajib diisi.',
-                'email.email' => 'Format email tidak valid.',
-                'password.required' => 'Password wajib diisi.',
+                'email.required' =>
+                    'Email wajib diisi.',
+
+                'email.email' =>
+                    'Format email tidak valid.',
+
+                'password.required' =>
+                    'Password wajib diisi.',
             ]
         );
 
@@ -33,23 +40,37 @@ class AuthController extends Controller
         |--------------------------------------------------------------------------
         | REMEMBER LOGIN
         |--------------------------------------------------------------------------
+        |
         | Default true agar pengguna tetap login ketika browser/PWA ditutup
         | kemudian dibuka kembali.
         |
         | Checkbox "Ingat saya" dari Login.jsx tetap dapat digunakan.
         |--------------------------------------------------------------------------
         */
-        $remember = $request->boolean('remember', true);
+
+        $remember =
+            $request->boolean(
+                'remember',
+                true
+            );
 
         /*
         |--------------------------------------------------------------------------
         | ATTEMPT LOGIN
         |--------------------------------------------------------------------------
         */
-        if (!Auth::attempt($credentials, $remember)) {
+
+        if (
+            !Auth::attempt(
+                $credentials,
+                $remember
+            )
+        ) {
+
             return back()
                 ->withErrors([
-                    'email' => 'Email atau password yang Anda masukkan salah.',
+                    'email' =>
+                        'Email atau password yang Anda masukkan salah.',
                 ])
                 ->withInput(
                     $request->only('email')
@@ -61,6 +82,7 @@ class AuthController extends Controller
         | REGENERATE SESSION
         |--------------------------------------------------------------------------
         */
+
         $request->session()->regenerate();
 
         /** @var \App\Models\User $user */
@@ -71,7 +93,9 @@ class AuthController extends Controller
         | CEK AKUN AKTIF
         |--------------------------------------------------------------------------
         */
+
         if (!$user->is_active) {
+
             Auth::logout();
 
             $request->session()->invalidate();
@@ -79,7 +103,8 @@ class AuthController extends Controller
 
             return back()
                 ->withErrors([
-                    'email' => 'Akun Anda tidak aktif.',
+                    'email' =>
+                        'Akun Anda tidak aktif.',
                 ])
                 ->withInput(
                     $request->only('email')
@@ -88,22 +113,46 @@ class AuthController extends Controller
 
         /*
         |--------------------------------------------------------------------------
+        | CATAT AKTIVITAS LOGIN
+        |--------------------------------------------------------------------------
+        |
+        | Login dicatat setelah autentikasi berhasil dan akun dinyatakan aktif.
+        |--------------------------------------------------------------------------
+        */
+
+        ActivityLogger::log(
+            $request,
+            'login',
+            'Autentikasi',
+            'Login berhasil ke SIMAP oleh "' .
+                $user->name .
+                '".'
+        );
+
+        /*
+        |--------------------------------------------------------------------------
         | AMBIL ROLE
         |--------------------------------------------------------------------------
         */
-        $roleSlug = $user->role?->slug;
+
+        $roleSlug =
+            $user->role?->slug;
 
         /*
         |--------------------------------------------------------------------------
         | SUPER ADMIN
         |--------------------------------------------------------------------------
-        | Super Admin selalu diarahkan ke dashboard Super Admin.
-        | Tidak peduli apakah user memiliki unit_id atau tidak.
-        |--------------------------------------------------------------------------
         */
-        if ($roleSlug === 'super-admin') {
+
+        if (
+            $roleSlug ===
+            'super-admin'
+        ) {
+
             return redirect()
-                ->route('super-admin.dashboard');
+                ->route(
+                    'super-admin.dashboard'
+                );
         }
 
         /*
@@ -111,9 +160,16 @@ class AuthController extends Controller
         | DIREKTUR
         |--------------------------------------------------------------------------
         */
-        if ($roleSlug === 'direktur') {
+
+        if (
+            $roleSlug ===
+            'direktur'
+        ) {
+
             return redirect()
-                ->route('direktur.dashboard');
+                ->route(
+                    'direktur.dashboard'
+                );
         }
 
         /*
@@ -121,9 +177,16 @@ class AuthController extends Controller
         | SEKRETARIS DIREKTUR
         |--------------------------------------------------------------------------
         */
-        if ($roleSlug === 'sekretaris-direktur') {
+
+        if (
+            $roleSlug ===
+            'sekretaris-direktur'
+        ) {
+
             return redirect()
-                ->route('sekretaris.dashboard');
+                ->route(
+                    'sekretaris.dashboard'
+                );
         }
 
         /*
@@ -131,8 +194,16 @@ class AuthController extends Controller
         | KEPALA UNIT
         |--------------------------------------------------------------------------
         */
-        if ($roleSlug === 'kepala-unit') {
-            if (!$user->unit_id) {
+
+        if (
+            $roleSlug ===
+            'kepala-unit'
+        ) {
+
+            if (
+                !$user->unit_id
+            ) {
+
                 Auth::logout();
 
                 $request->session()->invalidate();
@@ -149,7 +220,9 @@ class AuthController extends Controller
             }
 
             return redirect()
-                ->route('unit.dashboard');
+                ->route(
+                    'unit.dashboard'
+                );
         }
 
         /*
@@ -157,8 +230,16 @@ class AuthController extends Controller
         | STAF
         |--------------------------------------------------------------------------
         */
-        if ($roleSlug === 'staf') {
-            if (!$user->unit_id) {
+
+        if (
+            $roleSlug ===
+            'staf'
+        ) {
+
+            if (
+                !$user->unit_id
+            ) {
+
                 Auth::logout();
 
                 $request->session()->invalidate();
@@ -175,7 +256,9 @@ class AuthController extends Controller
             }
 
             return redirect()
-                ->route('unit.dashboard');
+                ->route(
+                    'unit.dashboard'
+                );
         }
 
         /*
@@ -183,6 +266,7 @@ class AuthController extends Controller
         | ROLE TIDAK DIKENALI
         |--------------------------------------------------------------------------
         */
+
         Auth::logout();
 
         $request->session()->invalidate();
@@ -205,9 +289,42 @@ class AuthController extends Controller
     {
         /*
         |--------------------------------------------------------------------------
+        | AMBIL USER YANG SEDANG LOGIN
+        |--------------------------------------------------------------------------
+        */
+
+        /** @var \App\Models\User|null $user */
+        $user =
+            Auth::user();
+
+        /*
+        |--------------------------------------------------------------------------
+        | CATAT AKTIVITAS LOGOUT
+        |--------------------------------------------------------------------------
+        |
+        | Harus dicatat sebelum Auth::logout(), karena setelah logout
+        | request->user() tidak lagi tersedia.
+        |--------------------------------------------------------------------------
+        */
+
+        if ($user) {
+
+            ActivityLogger::log(
+                $request,
+                'logout',
+                'Autentikasi',
+                'Logout dari SIMAP oleh "' .
+                    $user->name .
+                    '".'
+            );
+        }
+
+        /*
+        |--------------------------------------------------------------------------
         | LOGOUT
         |--------------------------------------------------------------------------
         */
+
         Auth::logout();
 
         /*
@@ -215,6 +332,7 @@ class AuthController extends Controller
         | INVALIDATE SESSION
         |--------------------------------------------------------------------------
         */
+
         $request->session()->invalidate();
 
         /*
@@ -222,9 +340,18 @@ class AuthController extends Controller
         | REGENERATE CSRF TOKEN
         |--------------------------------------------------------------------------
         */
+
         $request->session()->regenerateToken();
 
+        /*
+        |--------------------------------------------------------------------------
+        | KEMBALI KE LOGIN
+        |--------------------------------------------------------------------------
+        */
+
         return redirect()
-            ->route('login');
+            ->route(
+                'login'
+            );
     }
 }

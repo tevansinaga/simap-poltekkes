@@ -1,5 +1,6 @@
 import React, {
-    useMemo,
+    useEffect,
+    useState,
 } from 'react';
 
 
@@ -9,11 +10,9 @@ export default function SuperAdminDashboard({
     usersTerbaru = [],
 }) {
 
-    /*
-    |--------------------------------------------------------------------------
-    | DATA AMAN
-    |--------------------------------------------------------------------------
-    */
+    // =====================================================
+    // DATA AMAN
+    // =====================================================
 
     const safeStats = {
         totalUsers: Number(
@@ -49,42 +48,44 @@ export default function SuperAdminDashboard({
         'Super Admin';
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | TANGGAL HARI INI
-    |--------------------------------------------------------------------------
-    */
+    // =====================================================
+    // TANGGAL HARI INI
+    // =====================================================
 
-    const todayLabel = useMemo(() => {
+    const [todayLabel, setTodayLabel] =
+        useState('');
 
-        return new Intl.DateTimeFormat(
-            'id-ID',
-            {
-                timeZone:
-                    'Asia/Jayapura',
+    useEffect(() => {
+        const formatter =
+            new Intl.DateTimeFormat(
+                'id-ID',
+                {
+                    timeZone:
+                        'Asia/Jayapura',
 
-                weekday:
-                    'long',
+                    weekday:
+                        'long',
 
-                day:
-                    '2-digit',
+                    day:
+                        '2-digit',
 
-                month:
-                    'long',
+                    month:
+                        'long',
 
-                year:
-                    'numeric',
-            }
-        ).format(new Date());
+                    year:
+                        'numeric',
+                }
+            );
 
+        setTodayLabel(
+            formatter.format(new Date())
+        );
     }, []);
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | ROLE LABEL
-    |--------------------------------------------------------------------------
-    */
+    // =====================================================
+    // ROLE LABEL
+    // =====================================================
 
     const roleLabel = (slug) => {
 
@@ -118,11 +119,9 @@ export default function SuperAdminDashboard({
     };
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | STATUS LABEL
-    |--------------------------------------------------------------------------
-    */
+    // =====================================================
+    // STATUS LABEL
+    // =====================================================
 
     const formatStatus = (
         active
@@ -134,51 +133,61 @@ export default function SuperAdminDashboard({
     };
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | CSRF TOKEN
-    |--------------------------------------------------------------------------
-    */
+    // =====================================================
+    // CSRF
+    // =====================================================
 
-    const csrfToken =
-        document
-            .querySelector(
-                'meta[name="csrf-token"]'
-            )
-            ?.getAttribute('content') ||
-        '';
+    const [csrfToken, setCsrfToken] =
+        useState('');
+
+    useEffect(() => {
+        if (
+            typeof document ===
+            'undefined'
+        ) {
+            return;
+        }
+
+        const token =
+            document
+                .querySelector(
+                    'meta[name="csrf-token"]'
+                )
+                ?.getAttribute('content') ||
+            '';
+
+        setCsrfToken(token);
+    }, []);
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | LOGOUT
-    |--------------------------------------------------------------------------
-    */
+    // =====================================================
+    // LOGOUT
+    // =====================================================
 
     const handleLogout = (
         event
     ) => {
+        if (
+            typeof window ===
+            'undefined'
+        ) {
+            return;
+        }
 
         const confirmed =
             window.confirm(
                 'Yakin ingin keluar dari SIMAP?'
             );
 
-
         if (!confirmed) {
-
             event.preventDefault();
-
         }
-
     };
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | ICON
-    |--------------------------------------------------------------------------
-    */
+    // =====================================================
+    // ICON
+    // =====================================================
 
     const Icon = ({
         name,
@@ -186,7 +195,6 @@ export default function SuperAdminDashboard({
     }) => {
 
         const common = {
-
             width:
                 size,
 
@@ -219,7 +227,6 @@ export default function SuperAdminDashboard({
         const icons = {
 
             shield: (
-
                 <>
                     <path
                         d="
@@ -245,12 +252,10 @@ export default function SuperAdminDashboard({
                         "
                     />
                 </>
-
             ),
 
 
             users: (
-
                 <>
                     <circle
                         cx="9"
@@ -272,8 +277,8 @@ export default function SuperAdminDashboard({
                     <path
                         d="
                             M16 6.5
-                            a3 3
-                            0 0 1
+                            a3 3 0
+                            0 1
                             0 5.8
                         "
                     />
@@ -287,12 +292,10 @@ export default function SuperAdminDashboard({
                         "
                     />
                 </>
-
             ),
 
 
             check: (
-
                 <>
                     <circle
                         cx="12"
@@ -308,12 +311,10 @@ export default function SuperAdminDashboard({
                         "
                     />
                 </>
-
             ),
 
 
             userX: (
-
                 <>
                     <circle
                         cx="9"
@@ -346,12 +347,10 @@ export default function SuperAdminDashboard({
                         "
                     />
                 </>
-
             ),
 
 
             building: (
-
                 <>
                     <path
                         d="
@@ -384,34 +383,10 @@ export default function SuperAdminDashboard({
                         "
                     />
                 </>
-
-            ),
-
-
-            arrow: (
-
-                <>
-                    <path
-                        d="
-                            M5 12
-                            h13
-                        "
-                    />
-
-                    <path
-                        d="
-                            m13 6
-                            6 6
-                            -6 6
-                        "
-                    />
-                </>
-
             ),
 
 
             settings: (
-
                 <>
                     <path
                         d="
@@ -432,42 +407,34 @@ export default function SuperAdminDashboard({
                         r="3.5"
                     />
                 </>
-
             ),
 
 
             activity: (
-
-                <>
-                    <path
-                        d="
-                            M3 12
-                            h4
-                            l2-7
-                            4 14
-                            2-7
-                            h6
-                        "
-                    />
-                </>
-
+                <path
+                    d="
+                        M3 12
+                        h4
+                        l2-7
+                        4 14
+                        2-7
+                        h6
+                    "
+                />
             ),
 
 
             logout: (
-
                 <>
                     <path
                         d="
                             M10 5
                             H6
                             a2 2
-                            0 0 0
-                            -2 2
+                            0 0 0-2 2
                             v10
                             a2 2
-                            0 0 0
-                            2 2
+                            0 0 0 2 2
                             h4
                         "
                     />
@@ -487,24 +454,23 @@ export default function SuperAdminDashboard({
                         "
                     />
                 </>
-
             ),
         };
 
 
         return (
-
             <svg {...common}>
-                {icons[name]}
+                {icons[name] || null}
             </svg>
-
         );
-
     };
 
 
-    return (
+    // =====================================================
+    // RENDER
+    // =====================================================
 
+    return (
         <>
             <style>{`
 
@@ -512,8 +478,14 @@ export default function SuperAdminDashboard({
                     box-sizing: border-box;
                 }
 
+                html,
                 body {
                     margin: 0;
+                    padding: 0;
+                    min-height: 100%;
+                }
+
+                body {
                     background: #f5f7fb;
                 }
 
@@ -578,24 +550,33 @@ export default function SuperAdminDashboard({
                     background:
                         #0f2747;
 
-                    color: #ffffff;
+                    color:
+                        #ffffff;
 
-                    display: flex;
+                    display:
+                        flex;
 
-                    flex-direction: column;
+                    flex-direction:
+                        column;
 
                     border-right:
                         1px solid
                         rgba(255,255,255,.07);
+
+                    overflow-y:
+                        auto;
                 }
 
 
                 .sa-brand {
-                    display: flex;
+                    display:
+                        flex;
 
-                    align-items: center;
+                    align-items:
+                        center;
 
-                    gap: 11px;
+                    gap:
+                        11px;
 
                     padding:
                         5px 8px 22px;
@@ -603,10 +584,14 @@ export default function SuperAdminDashboard({
 
 
                 .sa-brand-logo {
-                    width: 40px;
-                    height: 40px;
+                    width:
+                        40px;
 
-                    padding: 5px;
+                    height:
+                        40px;
+
+                    padding:
+                        5px;
 
                     border-radius:
                         11px;
@@ -614,9 +599,11 @@ export default function SuperAdminDashboard({
                     background:
                         #ffffff;
 
-                    display: flex;
+                    display:
+                        flex;
 
-                    align-items: center;
+                    align-items:
+                        center;
 
                     justify-content:
                         center;
@@ -627,8 +614,11 @@ export default function SuperAdminDashboard({
 
 
                 .sa-brand-logo img {
-                    width: 100%;
-                    height: 100%;
+                    width:
+                        100%;
+
+                    height:
+                        100%;
 
                     object-fit:
                         contain;
@@ -753,6 +743,9 @@ export default function SuperAdminDashboard({
 
                     color:
                         #ffffff;
+
+                    cursor:
+                        pointer;
                 }
 
 
@@ -798,6 +791,10 @@ export default function SuperAdminDashboard({
                         rgba(255,255,255,.13);
                 }
 
+
+                /* =====================================================
+                   SIDEBAR SPACER
+                ====================================================== */
 
                 .sa-sidebar-spacer {
                     flex:
@@ -859,7 +856,7 @@ export default function SuperAdminDashboard({
 
 
                 /* =====================================================
-                   LOGOUT FORM
+                   LOGOUT
                 ====================================================== */
 
                 .sa-logout-form {
@@ -1072,148 +1069,6 @@ export default function SuperAdminDashboard({
 
                     white-space:
                         nowrap;
-                }
-
-
-                /* =====================================================
-                   WELCOME
-                ====================================================== */
-
-                .sa-welcome {
-                    position:
-                        relative;
-
-                    overflow:
-                        hidden;
-
-                    margin-bottom:
-                        18px;
-
-                    padding:
-                        22px;
-
-                    border-radius:
-                        17px;
-
-                    background:
-                        linear-gradient(
-                            135deg,
-                            #0f2747,
-                            #173e66
-                        );
-
-                    color:
-                        #ffffff;
-
-                    box-shadow:
-                        0 12px 30px
-                        rgba(15,39,71,.10);
-                }
-
-
-                .sa-welcome::after {
-                    content:
-                        "";
-
-                    position:
-                        absolute;
-
-                    width:
-                        190px;
-
-                    height:
-                        190px;
-
-                    right:
-                        -60px;
-
-                    top:
-                        -90px;
-
-                    border:
-                        1px solid
-                        rgba(255,255,255,.10);
-
-                    border-radius:
-                        50%;
-                }
-
-
-                .sa-welcome-badge {
-                    position:
-                        relative;
-
-                    z-index:
-                        1;
-
-                    display:
-                        inline-flex;
-
-                    align-items:
-                        center;
-
-                    gap:
-                        6px;
-
-                    padding:
-                        6px 9px;
-
-                    border-radius:
-                        999px;
-
-                    background:
-                        rgba(255,255,255,.09);
-
-                    color:
-                        rgba(255,255,255,.78);
-
-                    font-size:
-                        8px;
-
-                    font-weight:
-                        800;
-                }
-
-
-                .sa-welcome-title {
-                    position:
-                        relative;
-
-                    z-index:
-                        1;
-
-                    margin:
-                        10px 0 0;
-
-                    font-size:
-                        21px;
-
-                    font-weight:
-                        850;
-                }
-
-
-                .sa-welcome-text {
-                    position:
-                        relative;
-
-                    z-index:
-                        1;
-
-                    max-width:
-                        700px;
-
-                    margin:
-                        6px 0 0;
-
-                    color:
-                        rgba(255,255,255,.69);
-
-                    font-size:
-                        10px;
-
-                    line-height:
-                        1.7;
                 }
 
 
@@ -1634,7 +1489,7 @@ export default function SuperAdminDashboard({
                         flex;
 
                     align-items:
-                        center;
+                        flex-start;
 
                     gap:
                         10px;
@@ -1703,6 +1558,44 @@ export default function SuperAdminDashboard({
 
 
                 /* =====================================================
+                   CLICKABLE SIDE ITEM
+                ====================================================== */
+
+                .sa-mini-link {
+                    display:
+                        flex;
+
+                    align-items:
+                        flex-start;
+
+                    gap:
+                        10px;
+
+                    color:
+                        inherit;
+
+                    text-decoration:
+                        none;
+
+                    border-radius:
+                        10px;
+
+                    padding:
+                        2px;
+
+                    margin:
+                        -2px;
+                }
+
+
+                .sa-mini-link:hover
+                .sa-mini-title {
+                    color:
+                        #0f2747;
+                }
+
+
+                /* =====================================================
                    FOOTER
                 ====================================================== */
 
@@ -1749,7 +1642,6 @@ export default function SuperAdminDashboard({
                                 minmax(0,1fr)
                             );
                     }
-
                 }
 
 
@@ -1823,7 +1715,6 @@ export default function SuperAdminDashboard({
                         grid-template-columns:
                             1fr;
                     }
-
                 }
 
 
@@ -1852,18 +1743,6 @@ export default function SuperAdminDashboard({
                     }
 
 
-                    .sa-welcome {
-                        padding:
-                            18px;
-                    }
-
-
-                    .sa-welcome-title {
-                        font-size:
-                            18px;
-                    }
-
-
                     .sa-stat-grid {
                         grid-template-columns:
                             1fr 1fr;
@@ -1883,7 +1762,6 @@ export default function SuperAdminDashboard({
                         font-size:
                             21px;
                     }
-
                 }
 
             `}</style>
@@ -1937,12 +1815,9 @@ export default function SuperAdminDashboard({
                         </div>
 
 
-                        {/* NAVIGATION */}
+                        {/* NAV */}
 
                         <nav className="sa-nav">
-
-
-                            {/* DASHBOARD */}
 
                             <a
                                 href="/super-admin/dashboard"
@@ -1951,142 +1826,64 @@ export default function SuperAdminDashboard({
                                     sa-nav-item-active
                                 "
                             >
-
                                 <span className="sa-nav-icon">
-
                                     <Icon
                                         name="shield"
                                         size={15}
                                     />
-
                                 </span>
 
                                 Dashboard
-
                             </a>
 
-
-                            {/* PENGGUNA */}
 
                             <a
                                 href="/super-admin/pengguna"
                                 className="sa-nav-item"
                             >
-
                                 <span className="sa-nav-icon">
-
                                     <Icon
                                         name="users"
                                         size={15}
                                     />
-
                                 </span>
 
                                 Pengguna
-
                             </a>
 
 
-                            {/* UNIT */}
+                            {/* UNIT SUDAH AKTIF */}
 
-                            <div
-                                className="
-                                    sa-nav-item
-                                    sa-nav-disabled
-                                "
-                                aria-disabled="true"
+                            <a
+                                href="/super-admin/unit"
+                                className="sa-nav-item"
                             >
-
                                 <span className="sa-nav-icon">
-
                                     <Icon
                                         name="building"
                                         size={15}
                                     />
-
                                 </span>
 
                                 Unit
-
-                                <span
-                                    style={{
-                                        marginLeft:
-                                            'auto',
-
-                                        padding:
-                                            '3px 6px',
-
-                                        borderRadius:
-                                            '999px',
-
-                                        background:
-                                            'rgba(255,255,255,.08)',
-
-                                        color:
-                                            'rgba(255,255,255,.62)',
-
-                                        fontSize:
-                                            '7px',
-
-                                        fontWeight:
-                                            800,
-                                    }}
-                                >
-                                    Segera
-                                </span>
-
-                            </div>
+                            </a>
 
 
-                            {/* AKTIVITAS */}
+                            {/* AKTIVITAS SISTEM */}
 
-                            <div
-                                className="
-                                    sa-nav-item
-                                    sa-nav-disabled
-                                "
-                                aria-disabled="true"
+                            <a
+                                href="/super-admin/aktivitas"
+                                className="sa-nav-item"
                             >
-
                                 <span className="sa-nav-icon">
-
                                     <Icon
                                         name="activity"
                                         size={15}
                                     />
-
                                 </span>
 
                                 Aktivitas Sistem
-
-                                <span
-                                    style={{
-                                        marginLeft:
-                                            'auto',
-
-                                        padding:
-                                            '3px 6px',
-
-                                        borderRadius:
-                                            '999px',
-
-                                        background:
-                                            'rgba(255,255,255,.08)',
-
-                                        color:
-                                            'rgba(255,255,255,.62)',
-
-                                        fontSize:
-                                            '7px',
-
-                                        fontWeight:
-                                            800,
-                                    }}
-                                >
-                                    Segera
-                                </span>
-
-                            </div>
+                            </a>
 
                         </nav>
 
@@ -2100,11 +1897,7 @@ export default function SuperAdminDashboard({
 
                         {/* PROFILE */}
 
-                        <div
-                            className="
-                                sa-profile-box
-                            "
-                        >
+                        <div className="sa-profile-box">
 
                             <div
                                 className="
@@ -2126,9 +1919,7 @@ export default function SuperAdminDashboard({
                             </div>
 
 
-                            {/* =================================================
-                                LOGOUT
-                            ================================================== */}
+                            {/* LOGOUT */}
 
                             <form
                                 method="POST"
@@ -2177,73 +1968,40 @@ export default function SuperAdminDashboard({
                         MAIN
                     ================================================== */}
 
-                    <main
-                        className="
-                            sa-main
-                        "
-                    >
+                    <main className="sa-main">
 
-                        <div
-                            className="
-                                sa-container
-                            "
-                        >
+                        <div className="sa-container">
 
 
-                            {/* =================================================
-                                TOPBAR
-                            ================================================== */}
+                            {/* TOPBAR */}
 
-                            <div
-                                className="
-                                    sa-topbar
-                                "
-                            >
+                            <div className="sa-topbar">
 
                                 <div>
 
-                                    <div
-                                        className="
-                                            sa-kicker
-                                        "
-                                    >
+                                    <div className="sa-kicker">
                                         ADMINISTRASI SISTEM
                                     </div>
 
 
-                                    <h1
-                                        className="
-                                            sa-title
-                                        "
-                                    >
+                                    <h1 className="sa-title">
                                         Dashboard Super Admin
                                     </h1>
 
 
-                                    <p
-                                        className="
-                                            sa-subtitle
-                                        "
-                                    >
-
-                                        Kelola pengguna dan
-                                        konfigurasi dasar
-                                        Sistem Manajemen
-                                        Administrasi
+                                    <p className="sa-subtitle">
+                                        Kelola pengguna dan konfigurasi
+                                        dasar Sistem Manajemen Administrasi
                                         Poltekkes Maluku.
-
                                     </p>
 
                                 </div>
 
 
-                                <div
-                                    className="
-                                        sa-date-chip
-                                    "
-                                >
+                                <div className="sa-date-chip">
                                     {
-                                        todayLabel
+                                        todayLabel ||
+                                        'Memuat tanggal...'
                                     }
                                     {' '}· WIT
                                 </div>
@@ -2251,202 +2009,85 @@ export default function SuperAdminDashboard({
                             </div>
 
 
-                            {/* =================================================
-                                WELCOME
-                            ================================================== */}
+                            {/* STATISTIK */}
 
-                            <section
-                                className="
-                                    sa-welcome
-                                "
-                            >
-
-                                <div
-                                    className="
-                                        sa-welcome-badge
-                                    "
-                                >
-
-                                    <Icon
-                                        name="shield"
-                                        size={11}
-                                    />
-
-                                    Super Admin
-
-                                </div>
-
-
-                                <div
-                                    className="
-                                        sa-welcome-title
-                                    "
-                                >
-                                    Selamat datang,
-                                    {' '}
-                                    {userName}
-                                </div>
-
-
-                                <p
-                                    className="
-                                        sa-welcome-text
-                                    "
-                                >
-
-                                    Halaman ini digunakan
-                                    untuk memantau kondisi
-                                    dasar sistem.
-                                    Pengelolaan operasional
-                                    surat, disposisi, dan
-                                    agenda tetap dilakukan
-                                    oleh role masing-masing.
-
-                                </p>
-
-                            </section>
-
-
-                            {/* =================================================
-                                STATISTIK
-                            ================================================== */}
-
-                            <div
-                                className="
-                                    sa-stat-grid
-                                "
-                            >
+                            <div className="sa-stat-grid">
 
                                 <StatCard
                                     icon="users"
-                                    label="
-                                        Total Pengguna
-                                    "
+                                    label="Total Pengguna"
                                     value={
                                         safeStats.totalUsers
                                     }
-                                    note="
-                                        Seluruh akun terdaftar
-                                    "
-                                    iconBackground="
-                                        #eff6ff
-                                    "
-                                    iconColor="
-                                        #2563eb
-                                    "
+                                    note="Seluruh akun terdaftar"
+                                    iconBackground="#eff6ff"
+                                    iconColor="#2563eb"
                                 />
 
 
                                 <StatCard
                                     icon="check"
-                                    label="
-                                        Pengguna Aktif
-                                    "
+                                    label="Pengguna Aktif"
                                     value={
                                         safeStats.activeUsers
                                     }
-                                    note="
-                                        Akun dapat digunakan
-                                    "
-                                    iconBackground="
-                                        #f0fdf4
-                                    "
-                                    iconColor="
-                                        #16a34a
-                                    "
+                                    note="Akun dapat digunakan"
+                                    iconBackground="#f0fdf4"
+                                    iconColor="#16a34a"
                                 />
 
 
                                 <StatCard
                                     icon="userX"
-                                    label="
-                                        Pengguna Nonaktif
-                                    "
+                                    label="Pengguna Nonaktif"
                                     value={
                                         safeStats.inactiveUsers
                                     }
-                                    note="
-                                        Akun tidak dapat digunakan
-                                    "
-                                    iconBackground="
-                                        #fef2f2
-                                    "
-                                    iconColor="
-                                        #dc2626
-                                    "
+                                    note="Akun tidak dapat digunakan"
+                                    iconBackground="#fef2f2"
+                                    iconColor="#dc2626"
                                 />
 
 
                                 <StatCard
                                     icon="building"
-                                    label="
-                                        Total Unit
-                                    "
+                                    label="Total Unit"
                                     value={
                                         safeStats.totalUnits
                                     }
-                                    note={`
-                                        ${safeStats.activeUnits}
-                                        unit aktif
-                                    `}
-                                    iconBackground="
-                                        #f5f3ff
-                                    "
-                                    iconColor="
-                                        #7c3aed
-                                    "
+                                    note={
+                                        `${safeStats.activeUnits} unit aktif`
+                                    }
+                                    iconBackground="#f5f3ff"
+                                    iconColor="#7c3aed"
                                 />
 
                             </div>
 
 
-                            {/* =================================================
-                                CONTENT
-                            ================================================== */}
+                            {/* CONTENT */}
 
-                            <div
-                                className="
-                                    sa-content-grid
-                                "
-                            >
+                            <div className="sa-content-grid">
 
 
-                                {/* USERS */}
+                                {/* =================================================
+                                    USERS
+                                ================================================== */}
 
-                                <section
-                                    className="
-                                        sa-card
-                                    "
-                                >
+                                <section className="sa-card">
 
-                                    <div
-                                        className="
-                                            sa-card-header
-                                        "
-                                    >
+                                    <div className="sa-card-header">
 
                                         <div>
 
-                                            <div
-                                                className="
-                                                    sa-card-title
-                                                "
-                                            >
+                                            <div className="sa-card-title">
                                                 Pengguna Terbaru
                                             </div>
 
 
-                                            <div
-                                                className="
-                                                    sa-card-description
-                                                "
-                                            >
-
-                                                Ringkasan akun
-                                                pengguna yang
-                                                terakhir
-                                                ditambahkan.
-
+                                            <div className="sa-card-description">
+                                                Ringkasan akun pengguna yang
+                                                terakhir ditambahkan.
                                             </div>
 
                                         </div>
@@ -2475,6 +2116,7 @@ export default function SuperAdminDashboard({
 
                                         {
                                             safeUsers.length === 0
+
                                                 ? (
 
                                                     <div
@@ -2492,13 +2134,12 @@ export default function SuperAdminDashboard({
                                                                 '10px',
                                                         }}
                                                     >
-
                                                         Belum ada data
                                                         pengguna.
-
                                                     </div>
 
                                                 )
+
                                                 : (
 
                                                     <table
@@ -2549,7 +2190,8 @@ export default function SuperAdminDashboard({
                                                                             <tr
                                                                                 key={
                                                                                     item?.id ??
-                                                                                    `${item?.email}-${item?.name}`
+                                                                                    item?.email ??
+                                                                                    `${item?.name ?? 'user'}-${item?.role?.slug ?? 'role'}`
                                                                                 }
                                                                             >
 
@@ -2632,7 +2274,6 @@ export default function SuperAdminDashboard({
                                                                             </tr>
 
                                                                         );
-
                                                                     }
                                                                 )
                                                             }
@@ -2640,7 +2281,6 @@ export default function SuperAdminDashboard({
                                                         </tbody>
 
                                                     </table>
-
                                                 )
                                         }
 
@@ -2653,20 +2293,12 @@ export default function SuperAdminDashboard({
                                     SIDE
                                 ================================================== */}
 
-                                <div
-                                    className="
-                                        sa-side-stack
-                                    "
-                                >
+                                <div className="sa-side-stack">
 
 
                                     {/* FUNGSI */}
 
-                                    <section
-                                        className="
-                                            sa-card
-                                        "
-                                    >
+                                    <section className="sa-card">
 
                                         <div
                                             className="
@@ -2690,11 +2322,8 @@ export default function SuperAdminDashboard({
                                                         sa-card-description
                                                     "
                                                 >
-
                                                     Ruang lingkup
-                                                    administrasi
-                                                    sistem.
-
+                                                    administrasi sistem.
                                                 </div>
 
                                             </div>
@@ -2714,44 +2343,146 @@ export default function SuperAdminDashboard({
                                                 "
                                             >
 
-                                                <MiniItem
-                                                    icon="users"
-                                                    title="
-                                                        Kelola Pengguna
+                                                <a
+                                                    href="/super-admin/pengguna"
+                                                    className="
+                                                        sa-mini-link
                                                     "
-                                                    text="
-                                                        Mengatur akun,
-                                                        role, unit,
-                                                        dan status
-                                                        pengguna.
-                                                    "
-                                                />
+                                                >
+
+                                                    <div
+                                                        className="
+                                                            sa-mini-icon
+                                                        "
+                                                    >
+
+                                                        <InlineIcon
+                                                            name="users"
+                                                            size={14}
+                                                        />
+
+                                                    </div>
 
 
-                                                <MiniItem
-                                                    icon="building"
-                                                    title="
-                                                        Kelola Unit
-                                                    "
-                                                    text="
-                                                        Mengatur daftar
-                                                        unit dan status
-                                                        unit.
-                                                    "
-                                                />
+                                                    <div>
+
+                                                        <div
+                                                            className="
+                                                                sa-mini-title
+                                                            "
+                                                        >
+                                                            Kelola Pengguna
+                                                        </div>
 
 
-                                                <MiniItem
-                                                    icon="activity"
-                                                    title="
-                                                        Aktivitas Sistem
+                                                        <div
+                                                            className="
+                                                                sa-mini-text
+                                                            "
+                                                        >
+                                                            Mengatur akun,
+                                                            role, unit,
+                                                            dan status
+                                                            pengguna.
+                                                        </div>
+
+                                                    </div>
+
+                                                </a>
+
+
+                                                <a
+                                                    href="/super-admin/unit"
+                                                    className="
+                                                        sa-mini-link
                                                     "
-                                                    text="
-                                                        Melihat riwayat
-                                                        tindakan penting
-                                                        di sistem.
+                                                >
+
+                                                    <div
+                                                        className="
+                                                            sa-mini-icon
+                                                        "
+                                                    >
+
+                                                        <InlineIcon
+                                                            name="building"
+                                                            size={14}
+                                                        />
+
+                                                    </div>
+
+
+                                                    <div>
+
+                                                        <div
+                                                            className="
+                                                                sa-mini-title
+                                                            "
+                                                        >
+                                                            Kelola Unit
+                                                        </div>
+
+
+                                                        <div
+                                                            className="
+                                                                sa-mini-text
+                                                            "
+                                                        >
+                                                            Mengatur daftar
+                                                            unit dan status
+                                                            unit.
+                                                        </div>
+
+                                                    </div>
+
+                                                </a>
+
+
+                                                <a
+                                                    href="/super-admin/aktivitas"
+                                                    className="
+                                                        sa-mini-link
                                                     "
-                                                />
+                                                >
+
+                                                    <div
+                                                        className="
+                                                            sa-mini-icon
+                                                        "
+                                                    >
+
+                                                        <InlineIcon
+                                                            name="activity"
+                                                            size={14}
+                                                        />
+
+                                                    </div>
+
+
+                                                    <div>
+
+                                                        <div
+                                                            className="
+                                                                sa-mini-title
+                                                            "
+                                                        >
+                                                            Aktivitas Sistem
+                                                        </div>
+
+
+                                                        <div
+                                                            className="
+                                                                sa-mini-text
+                                                            "
+                                                        >
+                                                            Melihat riwayat
+                                                            tindakan penting
+                                                            di sistem.
+                                                        </div>
+
+                                                    </div>
+
+                                                </a>
 
                                             </div>
 
@@ -2760,13 +2491,9 @@ export default function SuperAdminDashboard({
                                     </section>
 
 
-                                    {/* ADMINISTRASI */}
+                                    {/* ADMINISTRASI TERPUSAT */}
 
-                                    <section
-                                        className="
-                                            sa-card
-                                        "
-                                    >
+                                    <section className="sa-card">
 
                                         <div
                                             className="
@@ -2818,17 +2545,11 @@ export default function SuperAdminDashboard({
                                                         "
                                                     >
 
-                                                        Super Admin
-                                                        menangani
-                                                        konfigurasi
-                                                        dasar sistem,
-                                                        sedangkan
-                                                        pekerjaan surat
-                                                        dan disposisi
-                                                        tetap mengikuti
-                                                        hak akses
-                                                        masing-masing
-                                                        role.
+                                                        Super Admin menangani
+                                                        konfigurasi dasar sistem,
+                                                        sedangkan pekerjaan surat
+                                                        dan disposisi tetap mengikuti
+                                                        hak akses masing-masing role.
 
                                                     </div>
 
@@ -2867,11 +2588,9 @@ export default function SuperAdminDashboard({
 }
 
 
-/*
-|--------------------------------------------------------------------------
-| STAT CARD
-|--------------------------------------------------------------------------
-*/
+// =====================================================
+// STAT CARD
+// =====================================================
 
 function StatCard({
     icon,
@@ -2884,22 +2603,12 @@ function StatCard({
 
     return (
 
-        <div
-            className="
-                sa-stat-card
-            "
-        >
+        <div className="sa-stat-card">
 
-            <div
-                className="
-                    sa-stat-top
-                "
-            >
+            <div className="sa-stat-top">
 
                 <div
-                    className="
-                        sa-stat-icon
-                    "
+                    className="sa-stat-icon"
                     style={{
                         background:
                             iconBackground,
@@ -2919,29 +2628,17 @@ function StatCard({
             </div>
 
 
-            <div
-                className="
-                    sa-stat-label
-                "
-            >
+            <div className="sa-stat-label">
                 {label}
             </div>
 
 
-            <div
-                className="
-                    sa-stat-value
-                "
-            >
+            <div className="sa-stat-value">
                 {value}
             </div>
 
 
-            <div
-                className="
-                    sa-stat-note
-                "
-            >
+            <div className="sa-stat-note">
                 {note}
             </div>
 
@@ -2950,71 +2647,9 @@ function StatCard({
 }
 
 
-/*
-|--------------------------------------------------------------------------
-| MINI ITEM
-|--------------------------------------------------------------------------
-*/
-
-function MiniItem({
-    icon,
-    title,
-    text,
-}) {
-
-    return (
-
-        <div
-            className="
-                sa-mini-item
-            "
-        >
-
-            <div
-                className="
-                    sa-mini-icon
-                "
-            >
-
-                <InlineIcon
-                    name={icon}
-                    size={14}
-                />
-
-            </div>
-
-
-            <div>
-
-                <div
-                    className="
-                        sa-mini-title
-                    "
-                >
-                    {title}
-                </div>
-
-
-                <div
-                    className="
-                        sa-mini-text
-                    "
-                >
-                    {text}
-                </div>
-
-            </div>
-
-        </div>
-    );
-}
-
-
-/*
-|--------------------------------------------------------------------------
-| INLINE ICON
-|--------------------------------------------------------------------------
-*/
+// =====================================================
+// INLINE ICON
+// =====================================================
 
 function InlineIcon({
     name,
@@ -3022,7 +2657,6 @@ function InlineIcon({
 }) {
 
     const common = {
-
         width:
             size,
 
@@ -3209,6 +2843,31 @@ function InlineIcon({
                     d="
                         M9 21
                         v-3h6v3
+                    "
+                />
+
+            </svg>
+        );
+
+    }
+
+
+    if (
+        name === 'activity'
+    ) {
+
+        return (
+
+            <svg {...common}>
+
+                <path
+                    d="
+                        M3 12
+                        h4
+                        l2-7
+                        4 14
+                        2-7
+                        h6
                     "
                 />
 

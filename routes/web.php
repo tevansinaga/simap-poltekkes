@@ -5,20 +5,27 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\AuthController;
 
+// DIREKTUR
 use App\Http\Controllers\Direktur\DashboardController as DirekturDashboardController;
 use App\Http\Controllers\Direktur\AgendaController;
 use App\Http\Controllers\Direktur\SuratMasukController;
 use App\Http\Controllers\Direktur\DisposisiController as DirekturDisposisiController;
 
+// SEKRETARIS
 use App\Http\Controllers\Sekretaris\SekretarisDashboardController;
 
+// UNIT
 use App\Http\Controllers\Unit\UnitDashboardController;
 use App\Http\Controllers\Unit\DisposisiUnitController;
 
+// UMUM
 use App\Http\Controllers\DisposisiPesanController;
 
+// SUPER ADMIN
 use App\Http\Controllers\SuperAdmin\SuperAdminDashboardController;
 use App\Http\Controllers\SuperAdmin\PenggunaController;
+use App\Http\Controllers\SuperAdmin\UnitController;
+use App\Http\Controllers\SuperAdmin\AktivitasController;
 
 
 /*
@@ -34,115 +41,44 @@ Route::get('/', function () {
 
 /*
 |--------------------------------------------------------------------------
-| AUTENTIKASI
+| LOGIN
 |--------------------------------------------------------------------------
-*/
-
-/*
-|----------------------------------------------------------------------
-| LOGIN PAGE
-|----------------------------------------------------------------------
-| Jika user masih login karena session / Remember Me, langsung arahkan
-| ke dashboard sesuai role.
-|---------------------------------------------------------------------- 
+|
+| Jika user sudah login, langsung diarahkan ke dashboard sesuai role.
+|
 */
 
 Route::get('/login', function () {
 
-    if (Auth::check()) {
-
-        /** @var \App\Models\User $user */
-        $user = Auth::user();
-
-        $roleSlug = $user->role?->slug;
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | SUPER ADMIN
-        |--------------------------------------------------------------------------
-        */
-
-        if ($roleSlug === 'super-admin') {
-            return redirect()
-                ->route('super-admin.dashboard');
-        }
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | DIREKTUR
-        |--------------------------------------------------------------------------
-        */
-
-        if ($roleSlug === 'direktur') {
-            return redirect()
-                ->route('direktur.dashboard');
-        }
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | SEKRETARIS DIREKTUR
-        |--------------------------------------------------------------------------
-        */
-
-        if ($roleSlug === 'sekretaris-direktur') {
-            return redirect()
-                ->route('sekretaris.dashboard');
-        }
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | KEPALA UNIT
-        |--------------------------------------------------------------------------
-        */
-
-        if ($roleSlug === 'kepala-unit') {
-
-            if ($user->unit_id) {
-                return redirect()
-                    ->route('unit.dashboard');
-            }
-
-        }
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | STAF
-        |--------------------------------------------------------------------------
-        */
-
-        if ($roleSlug === 'staf') {
-
-            if ($user->unit_id) {
-                return redirect()
-                    ->route('unit.dashboard');
-            }
-
-        }
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | FALLBACK
-        |--------------------------------------------------------------------------
-        */
-
-        return redirect()
-            ->route('dashboard');
+    if (!Auth::check()) {
+        return view('auth.login');
     }
 
+    /** @var \App\Models\User $user */
+    $user = Auth::user();
 
-    /*
-    |--------------------------------------------------------------------------
-    | BELUM LOGIN
-    |--------------------------------------------------------------------------
-    */
+    $roleSlug = $user->role?->slug;
 
-    return view('auth.login');
+    return match ($roleSlug) {
+
+        'super-admin' =>
+            redirect()->route('super-admin.dashboard'),
+
+        'direktur' =>
+            redirect()->route('direktur.dashboard'),
+
+        'sekretaris-direktur' =>
+            redirect()->route('sekretaris.dashboard'),
+
+        'kepala-unit',
+        'staf' =>
+            $user->unit_id
+                ? redirect()->route('unit.dashboard')
+                : redirect()->route('dashboard'),
+
+        default =>
+            redirect()->route('dashboard'),
+    };
 
 })->name('login');
 
@@ -170,21 +106,19 @@ Route::middleware(['auth'])->group(function () {
 
     /*
     |--------------------------------------------------------------------------
-    | AREA SUPER ADMIN
+    | SUPER ADMIN
     |--------------------------------------------------------------------------
     */
 
     Route::prefix('super-admin')
         ->name('super-admin.')
-        ->middleware([
-            'role:super-admin',
-        ])
+        ->middleware('role:super-admin')
         ->group(function () {
 
 
             /*
             |--------------------------------------------------------------------------
-            | DASHBOARD SUPER ADMIN
+            | DASHBOARD
             |--------------------------------------------------------------------------
             */
 
@@ -206,23 +140,11 @@ Route::middleware(['auth'])->group(function () {
             ])->name('pengguna');
 
 
-            /*
-            |--------------------------------------------------------------------------
-            | TAMBAH PENGGUNA
-            |--------------------------------------------------------------------------
-            */
-
             Route::post('/pengguna', [
                 PenggunaController::class,
                 'store',
             ])->name('pengguna.store');
 
-
-            /*
-            |--------------------------------------------------------------------------
-            | EDIT PENGGUNA
-            |--------------------------------------------------------------------------
-            */
 
             Route::put('/pengguna/{user}', [
                 PenggunaController::class,
@@ -230,28 +152,65 @@ Route::middleware(['auth'])->group(function () {
             ])->name('pengguna.update');
 
 
-            /*
-            |--------------------------------------------------------------------------
-            | AKTIF / NONAKTIF PENGGUNA
-            |--------------------------------------------------------------------------
-            */
-
             Route::post('/pengguna/{user}/status', [
                 PenggunaController::class,
                 'toggleStatus',
             ])->name('pengguna.status');
 
 
-            /*
-            |--------------------------------------------------------------------------
-            | HAPUS PENGGUNA
-            |--------------------------------------------------------------------------
-            */
-
             Route::delete('/pengguna/{user}', [
                 PenggunaController::class,
                 'destroy',
             ])->name('pengguna.destroy');
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | UNIT
+            |--------------------------------------------------------------------------
+            */
+
+            Route::get('/unit', [
+                UnitController::class,
+                'index',
+            ])->name('unit');
+
+
+            Route::post('/unit', [
+                UnitController::class,
+                'store',
+            ])->name('unit.store');
+
+
+            Route::put('/unit/{unit}', [
+                UnitController::class,
+                'update',
+            ])->name('unit.update');
+
+
+            Route::post('/unit/{unit}/status', [
+                UnitController::class,
+                'toggleStatus',
+            ])->name('unit.status');
+
+
+            Route::delete('/unit/{unit}', [
+                UnitController::class,
+                'destroy',
+            ])->name('unit.destroy');
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | AKTIVITAS SISTEM
+            |--------------------------------------------------------------------------
+            */
+
+            Route::get('/aktivitas', [
+                AktivitasController::class,
+                'index',
+            ])->name('aktivitas');
+
         });
 
 
@@ -269,26 +228,50 @@ Route::middleware(['auth'])->group(function () {
 
     /*
     |--------------------------------------------------------------------------
-    | DASHBOARD DEFAULT
+    | DEFAULT DASHBOARD
     |--------------------------------------------------------------------------
     */
 
     Route::get('/dashboard', function () {
-        return view('dashboard');
+
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        $roleSlug = $user->role?->slug;
+
+        return match ($roleSlug) {
+
+            'super-admin' =>
+                redirect()->route('super-admin.dashboard'),
+
+            'direktur' =>
+                redirect()->route('direktur.dashboard'),
+
+            'sekretaris-direktur' =>
+                redirect()->route('sekretaris.dashboard'),
+
+            'kepala-unit',
+            'staf' =>
+                $user->unit_id
+                    ? redirect()->route('unit.dashboard')
+                    : view('dashboard'),
+
+            default =>
+                view('dashboard'),
+        };
+
     })->name('dashboard');
 
 
     /*
     |--------------------------------------------------------------------------
-    | AREA DIREKTUR
+    | DIREKTUR
     |--------------------------------------------------------------------------
     */
 
     Route::prefix('direktur')
         ->name('direktur.')
-        ->middleware([
-            'role:direktur',
-        ])
+        ->middleware('role:direktur')
         ->group(function () {
 
 
@@ -332,20 +315,19 @@ Route::middleware(['auth'])->group(function () {
                 AgendaController::class,
                 'showDirektur',
             ])->name('agenda.show');
+
         });
 
 
     /*
     |--------------------------------------------------------------------------
-    | AREA SEKRETARIS DIREKTUR
+    | SEKRETARIS DIREKTUR
     |--------------------------------------------------------------------------
     */
 
     Route::prefix('sekretaris')
         ->name('sekretaris.')
-        ->middleware([
-            'role:sekretaris-direktur',
-        ])
+        ->middleware('role:sekretaris-direktur')
         ->group(function () {
 
 
@@ -491,17 +473,19 @@ Route::middleware(['auth'])->group(function () {
                 AgendaController::class,
                 'destroy',
             ])->name('agenda.destroy');
+
         });
 
 
     /*
     |--------------------------------------------------------------------------
-    | AREA UNIT
+    | UNIT
     |--------------------------------------------------------------------------
-    | HANYA:
+    |
+    | Hanya role:
     | - kepala-unit
     | - staf
-    |--------------------------------------------------------------------------
+    |
     */
 
     Route::prefix('unit')
@@ -515,7 +499,7 @@ Route::middleware(['auth'])->group(function () {
 
             /*
             |--------------------------------------------------------------------------
-            | DASHBOARD UNIT
+            | DASHBOARD
             |--------------------------------------------------------------------------
             */
 
@@ -527,7 +511,7 @@ Route::middleware(['auth'])->group(function () {
 
             /*
             |--------------------------------------------------------------------------
-            | DISPOSISI UNIT
+            | DISPOSISI
             |--------------------------------------------------------------------------
             */
 
@@ -537,12 +521,6 @@ Route::middleware(['auth'])->group(function () {
             ])->name('disposisi');
 
 
-            /*
-            |--------------------------------------------------------------------------
-            | DETAIL DISPOSISI
-            |--------------------------------------------------------------------------
-            */
-
             Route::get('/disposisi/{disposisi}', [
                 DisposisiUnitController::class,
                 'show',
@@ -551,7 +529,7 @@ Route::middleware(['auth'])->group(function () {
 
             /*
             |--------------------------------------------------------------------------
-            | MULAI DISPOSISI
+            | MULAI
             |--------------------------------------------------------------------------
             */
 
@@ -563,7 +541,7 @@ Route::middleware(['auth'])->group(function () {
 
             /*
             |--------------------------------------------------------------------------
-            | PESAN DISPOSISI
+            | PESAN
             |--------------------------------------------------------------------------
             */
 
@@ -595,5 +573,7 @@ Route::middleware(['auth'])->group(function () {
                 DisposisiUnitController::class,
                 'selesai',
             ])->name('disposisi.selesai');
+
         });
+
 });

@@ -8,35 +8,6 @@ export default function DisposisiUnitDetail({
     disposisi = null,
 }) {
     // =====================================================
-    // DATA KOSONG
-    // =====================================================
-
-    if (!disposisi) {
-        return (
-            <div className="unit-detail-empty">
-                <div className="unit-empty-card">
-                    <div className="unit-empty-icon">
-                        !
-                    </div>
-
-                    <h1>
-                        Data tidak ditemukan
-                    </h1>
-
-                    <p>
-                        Data disposisi yang ingin
-                        dilihat tidak tersedia.
-                    </p>
-
-                    <a href="/unit/disposisi">
-                        Kembali ke disposisi
-                    </a>
-                </div>
-            </div>
-        );
-    }
-
-    // =====================================================
     // DATA RELASI
     // =====================================================
 
@@ -76,6 +47,26 @@ export default function DisposisiUnitDetail({
 
     const [sending, setSending] =
         useState(false);
+
+    // =====================================================
+    // ERROR PENYELESAIAN
+    // =====================================================
+
+    const [finishError, setFinishError] =
+        useState('');
+
+    const serverErrors =
+        typeof window !== 'undefined' &&
+        Array.isArray(
+            window.disposisiUnitDetailErrors
+        )
+            ? window.disposisiUnitDetailErrors
+            : [];
+
+    const serverSuccess =
+        typeof window !== 'undefined'
+            ? window.disposisiUnitDetailSuccess || ''
+            : '';
 
     const fileInputRef =
         useRef(null);
@@ -428,6 +419,44 @@ export default function DisposisiUnitDetail({
     };
 
     // =====================================================
+    // VALIDASI SEBELUM SELESAI
+    // =====================================================
+
+    const handleFinishSubmit = (event) => {
+        const hasOldNote =
+            Boolean(
+                disposisi?.catatan_tindak_lanjut &&
+                String(
+                    disposisi.catatan_tindak_lanjut
+                ).trim()
+            );
+
+        const hasChat =
+            pesanList.length > 0;
+
+        if (!hasOldNote && !hasChat) {
+            event.preventDefault();
+
+            setFinishError(
+                'Isi balasan atau catatan tindak lanjut terlebih dahulu sebelum menandai disposisi selesai.'
+            );
+
+            window.requestAnimationFrame(() => {
+                document
+                    .querySelector('.ud-finish-error')
+                    ?.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center',
+                    });
+            });
+
+            return;
+        }
+
+        setFinishError('');
+    };
+
+    // =====================================================
     // ICON
     // =====================================================
 
@@ -572,6 +601,35 @@ export default function DisposisiUnitDetail({
             </svg>
         );
     };
+
+    // =====================================================
+    // DATA KOSONG
+    // =====================================================
+
+    if (!disposisi) {
+        return (
+            <div className="unit-detail-empty">
+                <div className="unit-empty-card">
+                    <div className="unit-empty-icon">
+                        !
+                    </div>
+
+                    <h1>
+                        Data tidak ditemukan
+                    </h1>
+
+                    <p>
+                        Data disposisi yang ingin
+                        dilihat tidak tersedia.
+                    </p>
+
+                    <a href="/unit/disposisi">
+                        Kembali ke disposisi
+                    </a>
+                </div>
+            </div>
+        );
+    }
 
     // =====================================================
     // RENDER
@@ -1450,6 +1508,66 @@ export default function DisposisiUnitDetail({
                 }
 
                 /* =================================================
+                   SERVER ALERT
+                ================================================= */
+
+                .ud-alert {
+                    margin-bottom: 18px;
+                    padding: 14px 16px;
+                    border-radius: 13px;
+                    display: flex;
+                    align-items: flex-start;
+                    gap: 11px;
+                }
+
+                .ud-alert-error {
+                    background: #fff7ed;
+                    border: 1px solid #fed7aa;
+                    color: #9a3412;
+                }
+
+                .ud-alert-success {
+                    background: #ecfdf5;
+                    border: 1px solid #a7f3d0;
+                    color: #047857;
+                }
+
+                .ud-alert-icon {
+                    width: 30px;
+                    height: 30px;
+                    flex-shrink: 0;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    border-radius: 9px;
+                    background: rgba(255,255,255,.65);
+                }
+
+                .ud-alert-title {
+                    font-size: 11px;
+                    font-weight: 850;
+                }
+
+                .ud-alert-text {
+                    margin-top: 3px;
+                    font-size: 10px;
+                    line-height: 1.6;
+                }
+
+                .ud-finish-error {
+                    margin-bottom: 14px;
+                    padding: 13px 14px;
+                    border-radius: 12px;
+                    background: #fff7ed;
+                    border: 1px solid #fdba74;
+                    color: #9a3412;
+                    font-size: 11px;
+                    font-weight: 700;
+                    line-height: 1.6;
+                    scroll-margin-top: 20px;
+                }
+
+                /* =================================================
                    FOOTER
                 ================================================= */
 
@@ -1588,6 +1706,46 @@ export default function DisposisiUnitDetail({
                     </a>
 
                 </div>
+
+                {serverSuccess && (
+                    <div className="ud-alert ud-alert-success">
+                        <div className="ud-alert-icon">
+                            <Icon name="check" size={15} />
+                        </div>
+
+                        <div>
+                            <div className="ud-alert-title">
+                                Berhasil
+                            </div>
+
+                            <div className="ud-alert-text">
+                                {serverSuccess}
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {serverErrors.length > 0 && (
+                    <div className="ud-alert ud-alert-error">
+                        <div className="ud-alert-icon">
+                            <Icon name="alert" size={15} />
+                        </div>
+
+                        <div>
+                            <div className="ud-alert-title">
+                                Tindakan belum dapat diproses
+                            </div>
+
+                            <div className="ud-alert-text">
+                                {serverErrors.map((message, index) => (
+                                    <div key={index}>
+                                        {String(message)}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                )}
 
                 {/* =================================================
                     STATUS HEADER
@@ -2435,9 +2593,18 @@ export default function DisposisiUnitDetail({
                                 {disposisi.status ===
                                     'in_progress' && (
 
-                                    <form
-                                        method="POST"
-                                        action={`/unit/disposisi/${disposisi.id}/selesai`}
+                                    <>
+
+                                        {finishError && (
+                                            <div className="ud-finish-error">
+                                                {finishError}
+                                            </div>
+                                        )}
+
+                                        <form
+                                            method="POST"
+                                            action={`/unit/disposisi/${disposisi.id}/selesai`}
+                                            onSubmit={handleFinishSubmit}
                                     >
 
                                         <input
@@ -2487,7 +2654,9 @@ export default function DisposisiUnitDetail({
 
                                         </div>
 
-                                    </form>
+                                        </form>
+
+                                    </>
 
                                 )}
 

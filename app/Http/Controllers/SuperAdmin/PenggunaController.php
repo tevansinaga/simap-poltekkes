@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Role;
 use App\Models\Unit;
 use App\Models\User;
+use App\Services\ActivityLogger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -91,7 +92,6 @@ class PenggunaController extends Controller
             ->paginate(12)
             ->withQueryString();
 
-
         /*
         |--------------------------------------------------------------------------
         | ROLE AKTIF
@@ -99,10 +99,12 @@ class PenggunaController extends Controller
         */
 
         $roles = Role::query()
-            ->where('is_active', true)
+            ->where(
+                'is_active',
+                true
+            )
             ->orderBy('name')
             ->get();
-
 
         /*
         |--------------------------------------------------------------------------
@@ -111,10 +113,12 @@ class PenggunaController extends Controller
         */
 
         $units = Unit::query()
-            ->where('is_active', true)
+            ->where(
+                'is_active',
+                true
+            )
             ->orderBy('name')
             ->get();
-
 
         return view(
             'super-admin-pengguna',
@@ -153,7 +157,6 @@ class PenggunaController extends Controller
         );
     }
 
-
     /*
     |--------------------------------------------------------------------------
     | TAMBAH PENGGUNA
@@ -191,6 +194,7 @@ class PenggunaController extends Controller
                         'id'
                     )->where(
                         function ($query) {
+
                             $query->where(
                                 'is_active',
                                 true
@@ -207,6 +211,7 @@ class PenggunaController extends Controller
                         'id'
                     )->where(
                         function ($query) {
+
                             $query->where(
                                 'is_active',
                                 true
@@ -242,11 +247,9 @@ class PenggunaController extends Controller
             ]
         );
 
-
         $role = Role::findOrFail(
             $validated['role_id']
         );
-
 
         /*
         |--------------------------------------------------------------------------
@@ -275,18 +278,15 @@ class PenggunaController extends Controller
                 ->withInput();
         }
 
-
         /*
         |--------------------------------------------------------------------------
-        | ROLE NON UNIT
-        |--------------------------------------------------------------------------
-        | Direktur, Sekretaris Direktur, dan Super Admin
-        | tidak wajib memiliki unit.
+        | UNIT
         |--------------------------------------------------------------------------
         */
 
-        $unitId = $validated['unit_id'] ?? null;
-
+        $unitId =
+            $validated['unit_id'] ??
+            null;
 
         /*
         |--------------------------------------------------------------------------
@@ -294,7 +294,7 @@ class PenggunaController extends Controller
         |--------------------------------------------------------------------------
         */
 
-        User::create([
+        $newUser = User::create([
             'name' =>
                 trim(
                     $validated['name']
@@ -322,6 +322,22 @@ class PenggunaController extends Controller
                 true,
         ]);
 
+        /*
+        |--------------------------------------------------------------------------
+        | LOG AKTIVITAS
+        |--------------------------------------------------------------------------
+        */
+
+        ActivityLogger::log(
+            $request,
+            'create',
+            'Pengguna',
+            'Menambahkan pengguna baru "' .
+                $newUser->name .
+                '" (' .
+                $newUser->email .
+                ').'
+        );
 
         return redirect()
             ->route(
@@ -332,7 +348,6 @@ class PenggunaController extends Controller
                 'Pengguna berhasil ditambahkan.'
             );
     }
-
 
     /*
     |--------------------------------------------------------------------------
@@ -347,7 +362,6 @@ class PenggunaController extends Controller
         $currentUser =
             $request->user();
 
-
         $validated = $request->validate(
             [
                 'name' => [
@@ -359,7 +373,6 @@ class PenggunaController extends Controller
                 'email' => [
                     'required',
                     'email',
-                    'max:255',
                     Rule::unique(
                         'users',
                         'email'
@@ -382,6 +395,7 @@ class PenggunaController extends Controller
                         'id'
                     )->where(
                         function ($query) {
+
                             $query->where(
                                 'is_active',
                                 true
@@ -398,6 +412,7 @@ class PenggunaController extends Controller
                         'id'
                     )->where(
                         function ($query) {
+
                             $query->where(
                                 'is_active',
                                 true
@@ -421,14 +436,18 @@ class PenggunaController extends Controller
 
                 'password.min' =>
                     'Password minimal 8 karakter.',
+
+                'role_id.required' =>
+                    'Role wajib dipilih.',
+
+                'unit_id.exists' =>
+                    'Unit yang dipilih tidak valid.',
             ]
         );
-
 
         $role = Role::findOrFail(
             $validated['role_id']
         );
-
 
         /*
         |--------------------------------------------------------------------------
@@ -457,7 +476,6 @@ class PenggunaController extends Controller
                 ->withInput();
         }
 
-
         /*
         |--------------------------------------------------------------------------
         | PROTEKSI AKUN SENDIRI
@@ -472,17 +490,17 @@ class PenggunaController extends Controller
             $currentRole =
                 $currentUser->role?->slug;
 
-
             /*
-            |------------------------------------------------------------------
-            | SUPER ADMIN TIDAK BOLEH MENGUBAH ROLE DIRI SENDIRI
-            |------------------------------------------------------------------
+            |--------------------------------------------------------------------------
+            | SUPER ADMIN TIDAK BOLEH MENGUBAH ROLE SENDIRI
+            |--------------------------------------------------------------------------
             */
 
             if (
                 $currentRole === 'super-admin' &&
                 $role->slug !== 'super-admin'
             ) {
+
                 return back()
                     ->withErrors([
                         'role_id' =>
@@ -491,11 +509,10 @@ class PenggunaController extends Controller
                     ->withInput();
             }
 
-
             /*
-            |------------------------------------------------------------------
+            |--------------------------------------------------------------------------
             | SUPER ADMIN TIDAK BOLEH MENONAKTIFKAN DIRI SENDIRI
-            |------------------------------------------------------------------
+            |--------------------------------------------------------------------------
             */
 
             if (
@@ -504,6 +521,7 @@ class PenggunaController extends Controller
                     true
                 )
             ) {
+
                 return back()
                     ->withErrors([
                         'is_active' =>
@@ -512,7 +530,6 @@ class PenggunaController extends Controller
                     ->withInput();
             }
         }
-
 
         /*
         |--------------------------------------------------------------------------
@@ -537,9 +554,9 @@ class PenggunaController extends Controller
                 $role->id,
 
             'unit_id' =>
-                $validated['unit_id'] ?? null,
+                $validated['unit_id'] ??
+                null,
         ];
-
 
         /*
         |--------------------------------------------------------------------------
@@ -552,12 +569,12 @@ class PenggunaController extends Controller
                 'password'
             )
         ) {
+
             $data['password'] =
                 Hash::make(
                     $validated['password']
                 );
         }
-
 
         /*
         |--------------------------------------------------------------------------
@@ -569,16 +586,16 @@ class PenggunaController extends Controller
             !$user->is_active ||
             $request->has('is_active')
         ) {
+
             $data['is_active'] =
                 $request->boolean(
                     'is_active'
                 );
         }
 
-
         /*
         |--------------------------------------------------------------------------
-        | UPDATE
+        | SIMPAN UPDATE
         |--------------------------------------------------------------------------
         */
 
@@ -586,6 +603,22 @@ class PenggunaController extends Controller
             $data
         );
 
+        /*
+        |--------------------------------------------------------------------------
+        | LOG AKTIVITAS
+        |--------------------------------------------------------------------------
+        */
+
+        ActivityLogger::log(
+            $request,
+            'update',
+            'Pengguna',
+            'Mengubah data pengguna "' .
+                $user->name .
+                '" (' .
+                $user->email .
+                ').'
+        );
 
         return redirect()
             ->route(
@@ -596,7 +629,6 @@ class PenggunaController extends Controller
                 'Data pengguna berhasil diperbarui.'
             );
     }
-
 
     /*
     |--------------------------------------------------------------------------
@@ -611,10 +643,9 @@ class PenggunaController extends Controller
         $currentUser =
             $request->user();
 
-
         /*
         |--------------------------------------------------------------------------
-        | DIRI SENDIRI
+        | JANGAN UBAH STATUS DIRI SENDIRI
         |--------------------------------------------------------------------------
         */
 
@@ -622,6 +653,7 @@ class PenggunaController extends Controller
             (int) $currentUser->id ===
             (int) $user->id
         ) {
+
             return back()
                 ->withErrors([
                     'status' =>
@@ -629,10 +661,9 @@ class PenggunaController extends Controller
                 ]);
         }
 
-
         /*
         |--------------------------------------------------------------------------
-        | TOGGLE
+        | TOGGLE STATUS
         |--------------------------------------------------------------------------
         */
 
@@ -641,6 +672,26 @@ class PenggunaController extends Controller
                 !$user->is_active,
         ]);
 
+        /*
+        |--------------------------------------------------------------------------
+        | LOG AKTIVITAS
+        |--------------------------------------------------------------------------
+        */
+
+        ActivityLogger::log(
+            $request,
+            'status',
+            'Pengguna',
+            'Mengubah status pengguna "' .
+                $user->name .
+                '" menjadi ' .
+                (
+                    $user->is_active
+                        ? 'aktif'
+                        : 'tidak aktif'
+                ) .
+                '.'
+        );
 
         return back()
             ->with(
@@ -650,7 +701,6 @@ class PenggunaController extends Controller
                     : 'Akun berhasil dinonaktifkan.'
             );
     }
-
 
     /*
     |--------------------------------------------------------------------------
@@ -665,7 +715,6 @@ class PenggunaController extends Controller
         $currentUser =
             $request->user();
 
-
         /*
         |--------------------------------------------------------------------------
         | JANGAN HAPUS DIRI SENDIRI
@@ -676,6 +725,7 @@ class PenggunaController extends Controller
             (int) $currentUser->id ===
             (int) $user->id
         ) {
+
             return back()
                 ->withErrors([
                     'user' =>
@@ -683,80 +733,90 @@ class PenggunaController extends Controller
                 ]);
         }
 
-
         /*
         |--------------------------------------------------------------------------
         | CEK DATA TERKAIT
         |--------------------------------------------------------------------------
         |
-        | Jangan menghapus user yang masih direferensikan oleh data
-        | administratif. Ini mencegah kerusakan histori surat/disposisi.
+        | Jangan menghapus user yang masih direferensikan
+        | oleh data administratif.
         |
         |--------------------------------------------------------------------------
         */
 
         $suratMasukCount =
-            DB::table('surat_masuks')
+            DB::table(
+                'surat_masuks'
+            )
                 ->where(
                     'created_by',
                     $user->id
                 )
                 ->count();
 
-
         $disposisiCount =
-            DB::table('disposisis')
+            DB::table(
+                'disposisis'
+            )
                 ->where(
                     'dari_user_id',
                     $user->id
                 )
                 ->count();
 
-
         $pesanCount =
-            DB::table('disposisi_pesans')
+            DB::table(
+                'disposisi_pesans'
+            )
                 ->where(
                     'user_id',
                     $user->id
                 )
                 ->count();
 
-
         $agendaCount =
-            DB::table('agendas')
+            DB::table(
+                'agendas'
+            )
                 ->where(
                     'created_by',
                     $user->id
                 )
                 ->count();
 
-
         $relatedData = [];
 
+        if (
+            $suratMasukCount > 0
+        ) {
 
-        if ($suratMasukCount > 0) {
             $relatedData[] =
                 "{$suratMasukCount} surat masuk";
         }
 
+        if (
+            $disposisiCount > 0
+        ) {
 
-        if ($disposisiCount > 0) {
             $relatedData[] =
                 "{$disposisiCount} disposisi";
         }
 
+        if (
+            $pesanCount > 0
+        ) {
 
-        if ($pesanCount > 0) {
             $relatedData[] =
                 "{$pesanCount} pesan disposisi";
         }
 
+        if (
+            $agendaCount > 0
+        ) {
 
-        if ($agendaCount > 0) {
             $relatedData[] =
                 "{$agendaCount} agenda";
         }
-
 
         /*
         |--------------------------------------------------------------------------
@@ -782,6 +842,17 @@ class PenggunaController extends Controller
                 ]);
         }
 
+        /*
+        |--------------------------------------------------------------------------
+        | SIMPAN INFORMASI UNTUK LOG
+        |--------------------------------------------------------------------------
+        */
+
+        $userName =
+            $user->name;
+
+        $userEmail =
+            $user->email;
 
         /*
         |--------------------------------------------------------------------------
@@ -789,12 +860,24 @@ class PenggunaController extends Controller
         |--------------------------------------------------------------------------
         */
 
-        $userName =
-            $user->name;
-
-
         $user->delete();
 
+        /*
+        |--------------------------------------------------------------------------
+        | LOG AKTIVITAS
+        |--------------------------------------------------------------------------
+        */
+
+        ActivityLogger::log(
+            $request,
+            'delete',
+            'Pengguna',
+            'Menghapus pengguna "' .
+                $userName .
+                '" (' .
+                $userEmail .
+                ').'
+        );
 
         /*
         |--------------------------------------------------------------------------
@@ -805,7 +888,9 @@ class PenggunaController extends Controller
         return back()
             ->with(
                 'success',
-                "Pengguna \"{$userName}\" berhasil dihapus."
+                'Pengguna "' .
+                    $userName .
+                    '" berhasil dihapus.'
             );
     }
 }
