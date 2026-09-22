@@ -1,15 +1,10 @@
-import React, {
-    useEffect,
-    useState,
-} from 'react';
-
+import React, { useEffect, useState } from 'react';
 
 export default function SuperAdminDashboard({
     user = null,
     stats = {},
     usersTerbaru = [],
 }) {
-
     // =====================================================
     // DATA AMAN
     // =====================================================
@@ -36,17 +31,21 @@ export default function SuperAdminDashboard({
         ),
     };
 
-
-    const safeUsers =
-        Array.isArray(usersTerbaru)
-            ? usersTerbaru
-            : [];
-
+    const safeUsers = Array.isArray(usersTerbaru)
+        ? usersTerbaru
+        : [];
 
     const userName =
         user?.name ||
         'Super Admin';
 
+    const userRole =
+        user?.role?.name ||
+        'Super Admin';
+
+    const userInitial =
+        userName.trim().charAt(0).toUpperCase() ||
+        'S';
 
     // =====================================================
     // TANGGAL HARI INI
@@ -82,15 +81,12 @@ export default function SuperAdminDashboard({
         );
     }, []);
 
-
     // =====================================================
     // ROLE LABEL
     // =====================================================
 
     const roleLabel = (slug) => {
-
         const labels = {
-
             'super-admin':
                 'Super Admin',
 
@@ -110,7 +106,6 @@ export default function SuperAdminDashboard({
                 'Staf',
         };
 
-
         return (
             labels[slug] ||
             slug ||
@@ -118,20 +113,15 @@ export default function SuperAdminDashboard({
         );
     };
 
-
     // =====================================================
     // STATUS LABEL
     // =====================================================
 
-    const formatStatus = (
-        active
-    ) => {
-
+    const formatStatus = (active) => {
         return active
             ? 'Aktif'
             : 'Nonaktif';
     };
-
 
     // =====================================================
     // CSRF
@@ -159,14 +149,11 @@ export default function SuperAdminDashboard({
         setCsrfToken(token);
     }, []);
 
-
     // =====================================================
     // LOGOUT
     // =====================================================
 
-    const handleLogout = (
-        event
-    ) => {
+    const handleLogout = (event) => {
         if (
             typeof window ===
             'undefined'
@@ -184,288 +171,6 @@ export default function SuperAdminDashboard({
         }
     };
 
-
-    // =====================================================
-    // ICON
-    // =====================================================
-
-    const Icon = ({
-        name,
-        size = 18,
-    }) => {
-
-        const common = {
-            width:
-                size,
-
-            height:
-                size,
-
-            viewBox:
-                '0 0 24 24',
-
-            fill:
-                'none',
-
-            stroke:
-                'currentColor',
-
-            strokeWidth:
-                1.8,
-
-            strokeLinecap:
-                'round',
-
-            strokeLinejoin:
-                'round',
-
-            'aria-hidden':
-                'true',
-        };
-
-
-        const icons = {
-
-            shield: (
-                <>
-                    <path
-                        d="
-                            M12 3
-                            20 6
-                            v5
-                            c0 5.2
-                            -3.2 8.6
-                            -8 10
-                            -4.8-1.4
-                            -8-4.8
-                            -8-10
-                            V6
-                            l8-3Z
-                        "
-                    />
-
-                    <path
-                        d="
-                            m9 12
-                            2 2
-                            4-4
-                        "
-                    />
-                </>
-            ),
-
-
-            users: (
-                <>
-                    <circle
-                        cx="9"
-                        cy="8"
-                        r="3"
-                    />
-
-                    <path
-                        d="
-                            M3.5 20
-                            c.5-3.5
-                            2.3-5.5
-                            5.5-5.5
-                            s5 2
-                            5.5 5.5
-                        "
-                    />
-
-                    <path
-                        d="
-                            M16 6.5
-                            a3 3 0
-                            0 1
-                            0 5.8
-                        "
-                    />
-
-                    <path
-                        d="
-                            M17 14.5
-                            c2.1.5
-                            3.4 2.2
-                            3.7 5.5
-                        "
-                    />
-                </>
-            ),
-
-
-            check: (
-                <>
-                    <circle
-                        cx="12"
-                        cy="12"
-                        r="9"
-                    />
-
-                    <path
-                        d="
-                            m8.5 12
-                            2.3 2.3
-                            4.7-5
-                        "
-                    />
-                </>
-            ),
-
-
-            userX: (
-                <>
-                    <circle
-                        cx="9"
-                        cy="8"
-                        r="3"
-                    />
-
-                    <path
-                        d="
-                            M3.5 20
-                            c.5-3.5
-                            2.3-5.5
-                            5.5-5.5
-                            s5 2
-                            5.5 5.5
-                        "
-                    />
-
-                    <path
-                        d="
-                            m16 9
-                            5 5
-                        "
-                    />
-
-                    <path
-                        d="
-                            m21 9
-                            -5 5
-                        "
-                    />
-                </>
-            ),
-
-
-            building: (
-                <>
-                    <path
-                        d="
-                            M4 21
-                            V5
-                            a2 2 0
-                            0 1 2-2
-                            h12
-                            a2 2 0
-                            0 1 2 2
-                            v16
-                        "
-                    />
-
-                    <path
-                        d="
-                            M8 7h2
-                            M14 7h2
-                            M8 11h2
-                            M14 11h2
-                            M8 15h2
-                            M14 15h2
-                        "
-                    />
-
-                    <path
-                        d="
-                            M9 21
-                            v-3h6v3
-                        "
-                    />
-                </>
-            ),
-
-
-            settings: (
-                <>
-                    <path
-                        d="
-                            M12 3v2
-                            M12 19v2
-                            M3 12h2
-                            M19 12h2
-                            M5.6 5.6l1.4 1.4
-                            M17 17l1.4 1.4
-                            M18.4 5.6L17 7
-                            M7 17l-1.4 1.4
-                        "
-                    />
-
-                    <circle
-                        cx="12"
-                        cy="12"
-                        r="3.5"
-                    />
-                </>
-            ),
-
-
-            activity: (
-                <path
-                    d="
-                        M3 12
-                        h4
-                        l2-7
-                        4 14
-                        2-7
-                        h6
-                    "
-                />
-            ),
-
-
-            logout: (
-                <>
-                    <path
-                        d="
-                            M10 5
-                            H6
-                            a2 2
-                            0 0 0-2 2
-                            v10
-                            a2 2
-                            0 0 0 2 2
-                            h4
-                        "
-                    />
-
-                    <path
-                        d="
-                            m14 8
-                            4 4
-                            -4 4
-                        "
-                    />
-
-                    <path
-                        d="
-                            M9 12
-                            h9
-                        "
-                    />
-                </>
-            ),
-        };
-
-
-        return (
-            <svg {...common}>
-                {icons[name] || null}
-            </svg>
-        );
-    };
-
-
     // =====================================================
     // RENDER
     // =====================================================
@@ -473,13 +178,13 @@ export default function SuperAdminDashboard({
     return (
         <>
             <style>{`
-
                 * {
                     box-sizing: border-box;
                 }
 
                 html,
-                body {
+                body,
+                #app {
                     margin: 0;
                     padding: 0;
                     min-height: 100%;
@@ -487,8 +192,23 @@ export default function SuperAdminDashboard({
 
                 body {
                     background: #f5f7fb;
+                    color: #0f172a;
                 }
 
+                button,
+                input,
+                select {
+                    font: inherit;
+                }
+
+                button {
+                    -webkit-tap-highlight-color: transparent;
+                }
+
+                a {
+                    color: inherit;
+                    text-decoration: none;
+                }
 
                 /* =====================================================
                    PAGE
@@ -496,12 +216,11 @@ export default function SuperAdminDashboard({
 
                 .sa-page {
                     min-height: 100vh;
-
                     background:
                         radial-gradient(
                             circle at top left,
-                            rgba(15,39,71,.055),
-                            transparent 28%
+                            rgba(15,39,71,.045),
+                            transparent 30%
                         ),
                         #f5f7fb;
 
@@ -517,369 +236,440 @@ export default function SuperAdminDashboard({
                         sans-serif;
                 }
 
-
                 /* =====================================================
-                   SHELL
+                   TOP NAVIGATION
                 ====================================================== */
 
-                .sa-shell {
-                    min-height: 100vh;
-
-                    display: grid;
-
-                    grid-template-columns:
-                        248px
-                        minmax(0,1fr);
-                }
-
-
-                /* =====================================================
-                   SIDEBAR
-                ====================================================== */
-
-                .sa-sidebar {
+                .sa-navbar {
                     position: sticky;
-
                     top: 0;
+                    z-index: 100;
 
-                    height: 100vh;
-
-                    padding:
-                        22px 16px;
+                    width: 100%;
 
                     background:
-                        #0f2747;
+                        rgba(255,255,255,.95);
 
-                    color:
-                        #ffffff;
+                    backdrop-filter:
+                        blur(16px);
 
-                    display:
-                        flex;
+                    -webkit-backdrop-filter:
+                        blur(16px);
 
-                    flex-direction:
-                        column;
-
-                    border-right:
+                    border-bottom:
                         1px solid
-                        rgba(255,255,255,.07);
+                        #e6ebf2;
 
-                    overflow-y:
-                        auto;
+                    box-shadow:
+                        0 4px 18px
+                        rgba(15,23,42,.035);
                 }
 
+                .sa-navbar-inner {
+                    width: 100%;
+                    max-width: 1480px;
+                    min-height: 70px;
+
+                    margin: 0 auto;
+
+                    padding:
+                        0 28px;
+
+                    display: flex;
+                    align-items: center;
+
+                    gap: 22px;
+                }
+
+                /* =====================================================
+                   BRAND
+                ====================================================== */
 
                 .sa-brand {
-                    display:
-                        flex;
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
 
-                    align-items:
-                        center;
-
-                    gap:
-                        11px;
-
-                    padding:
-                        5px 8px 22px;
+                    flex-shrink: 0;
                 }
-
 
                 .sa-brand-logo {
-                    width:
-                        40px;
+                    width: 40px;
+                    height: 40px;
 
-                    height:
-                        40px;
+                    padding: 5px;
 
-                    padding:
-                        5px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
 
-                    border-radius:
-                        11px;
+                    border-radius: 11px;
 
-                    background:
-                        #ffffff;
-
-                    display:
-                        flex;
-
-                    align-items:
-                        center;
-
-                    justify-content:
-                        center;
-
-                    overflow:
-                        hidden;
-                }
-
-
-                .sa-brand-logo img {
-                    width:
-                        100%;
-
-                    height:
-                        100%;
-
-                    object-fit:
-                        contain;
-                }
-
-
-                .sa-brand-title {
-                    font-size:
-                        17px;
-
-                    font-weight:
-                        850;
-
-                    line-height:
-                        1;
-                }
-
-
-                .sa-brand-subtitle {
-                    margin-top:
-                        5px;
-
-                    color:
-                        rgba(255,255,255,.62);
-
-                    font-size:
-                        9px;
-                }
-
-
-                /* =====================================================
-                   NAV
-                ====================================================== */
-
-                .sa-nav-label {
-                    padding:
-                        14px
-                        10px
-                        8px;
-
-                    color:
-                        rgba(255,255,255,.43);
-
-                    font-size:
-                        9px;
-
-                    font-weight:
-                        850;
-
-                    letter-spacing:
-                        .8px;
-
-                    text-transform:
-                        uppercase;
-                }
-
-
-                .sa-nav {
-                    display:
-                        flex;
-
-                    flex-direction:
-                        column;
-                }
-
-
-                .sa-nav-item {
-                    display:
-                        flex;
-
-                    align-items:
-                        center;
-
-                    gap:
-                        10px;
-
-                    width:
-                        100%;
-
-                    margin-bottom:
-                        4px;
-
-                    padding:
-                        11px 10px;
-
-                    border-radius:
-                        10px;
-
-                    color:
-                        rgba(255,255,255,.78);
-
-                    background:
-                        transparent;
+                    background: #ffffff;
 
                     border:
-                        0;
+                        1px solid
+                        #dfe7f0;
 
-                    font:
-                        inherit;
-
-                    font-size:
-                        11px;
-
-                    font-weight:
-                        700;
-
-                    text-align:
-                        left;
-
-                    text-decoration:
-                        none;
-
-                    transition:
-                        background .18s ease,
-                        color .18s ease;
+                    overflow: hidden;
                 }
 
+                .sa-brand-logo img {
+                    width: 100%;
+                    height: 100%;
 
-                .sa-nav-item:hover {
-                    background:
-                        rgba(255,255,255,.07);
-
-                    color:
-                        #ffffff;
-
-                    cursor:
-                        pointer;
+                    object-fit: contain;
                 }
 
-
-                .sa-nav-item-active {
-                    background:
-                        rgba(255,255,255,.105);
-
-                    color:
-                        #ffffff;
+                .sa-brand-copy {
+                    min-width: 0;
                 }
 
+                .sa-brand-title {
+                    color: #10223d;
 
-                .sa-nav-icon {
-                    width:
-                        26px;
+                    font-size: 16px;
+                    font-weight: 850;
 
-                    height:
-                        26px;
+                    line-height: 1;
 
-                    display:
-                        flex;
+                    letter-spacing: .03em;
+                }
 
-                    align-items:
-                        center;
+                .sa-brand-subtitle {
+                    margin-top: 4px;
 
-                    justify-content:
-                        center;
+                    color: #8795a8;
 
-                    flex-shrink:
-                        0;
+                    font-size: 8px;
+
+                    line-height: 1;
+
+                    white-space: nowrap;
+                }
+
+                /* =====================================================
+                   DESKTOP NAV
+                ====================================================== */
+
+                .sa-nav {
+                    flex: 1;
+
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+
+                    gap: 4px;
+                }
+
+                .sa-nav-item {
+                    min-height: 38px;
+
+                    display: inline-flex;
+                    align-items: center;
+
+                    gap: 7px;
+
+                    padding:
+                        0 12px;
 
                     border-radius:
-                        8px;
+                        10px;
 
-                    background:
-                        rgba(255,255,255,.07);
+                    color:
+                        #6b7b90;
+
+                    font-size:
+                        10px;
+
+                    font-weight:
+                        750;
+
+                    white-space:
+                        nowrap;
+
+                    transition:
+                        .18s ease;
                 }
 
+                .sa-nav-item:hover {
+                    color:
+                        #1d5fcf;
+
+                    background:
+                        #f2f6fc;
+                }
+
+                .sa-nav-item-active {
+                    color:
+                        #ffffff;
+
+                    background:
+                        linear-gradient(
+                            135deg,
+                            #1768df 0%,
+                            #1358c8 100%
+                        );
+
+                    box-shadow:
+                        0 7px 17px
+                        rgba(21,95,209,.18);
+                }
+
+                .sa-nav-item-active:hover {
+                    color:
+                        #ffffff;
+
+                    background:
+                        linear-gradient(
+                            135deg,
+                            #1768df 0%,
+                            #1358c8 100%
+                        );
+                }
+
+                .sa-nav-icon {
+                    width: 19px;
+                    height: 19px;
+
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+
+                    border-radius: 6px;
+
+                    flex-shrink: 0;
+                }
+
+                .sa-nav-item:not(
+                    .sa-nav-item-active
+                ) .sa-nav-icon {
+                    background:
+                        #f1f5f9;
+                }
 
                 .sa-nav-item-active
                 .sa-nav-icon {
                     background:
-                        rgba(255,255,255,.13);
+                        rgba(255,255,255,.12);
                 }
 
-
                 /* =====================================================
-                   SIDEBAR SPACER
+                   USER AREA
                 ====================================================== */
 
-                .sa-sidebar-spacer {
-                    flex:
-                        1;
+                .sa-nav-right {
+                    display: flex;
+                    align-items: center;
+
+                    gap: 9px;
+
+                    flex-shrink: 0;
                 }
 
+                .sa-user-box {
+                    min-height: 42px;
 
-                /* =====================================================
-                   PROFILE
-                ====================================================== */
+                    display: flex;
+                    align-items: center;
 
-                .sa-profile-box {
+                    gap: 9px;
+
                     padding:
-                        12px;
+                        4px 8px 4px 10px;
+
+                    background:
+                        #f8fafc;
 
                     border:
                         1px solid
-                        rgba(255,255,255,.09);
+                        #e5ebf2;
 
                     border-radius:
-                        13px;
-
-                    background:
-                        rgba(255,255,255,.045);
+                        11px;
                 }
 
+                .sa-user-copy {
+                    min-width: 0;
+                    max-width: 120px;
+                }
 
-                .sa-profile-name {
+                .sa-user-name {
+                    overflow: hidden;
+
                     color:
-                        #ffffff;
+                        #1a2c45;
+
+                    font-size:
+                        9px;
+
+                    font-weight:
+                        800;
+
+                    white-space:
+                        nowrap;
+
+                    text-overflow:
+                        ellipsis;
+                }
+
+                .sa-user-role {
+                    margin-top:
+                        2px;
+
+                    overflow:
+                        hidden;
+
+                    color:
+                        #8b98a9;
+
+                    font-size:
+                        7px;
+
+                    white-space:
+                        nowrap;
+
+                    text-overflow:
+                        ellipsis;
+                }
+
+                .sa-avatar {
+                    width: 30px;
+                    height: 30px;
+
+                    display: grid;
+                    place-items: center;
+
+                    border-radius: 9px;
+
+                    background:
+                        #eaf2ff;
+
+                    color:
+                        #185fcf;
 
                     font-size:
                         10px;
 
                     font-weight:
-                        800;
+                        850;
 
-                    overflow:
-                        hidden;
-
-                    text-overflow:
-                        ellipsis;
-
-                    white-space:
-                        nowrap;
+                    flex-shrink:
+                        0;
                 }
-
-
-                .sa-profile-role {
-                    margin-top:
-                        4px;
-
-                    color:
-                        rgba(255,255,255,.58);
-
-                    font-size:
-                        8px;
-                }
-
 
                 /* =====================================================
                    LOGOUT
                 ====================================================== */
 
                 .sa-logout-form {
-                    width:
-                        100%;
-
-                    margin:
-                        0;
-
-                    padding:
-                        0;
+                    margin: 0;
+                    padding: 0;
                 }
 
-
                 .sa-logout {
-                    width:
-                        100%;
+                    min-height: 40px;
 
-                    margin-top:
-                        9px;
+                    display: inline-flex;
+
+                    align-items: center;
+                    justify-content: center;
+
+                    gap: 7px;
 
                     padding:
-                        9px 10px;
+                        0 12px;
+
+                    border:
+                        1px solid
+                        #e2e8f0;
+
+                    border-radius:
+                        10px;
+
+                    background:
+                        #ffffff;
+
+                    color:
+                        #62738a;
+
+                    font-size:
+                        9px;
+
+                    font-weight:
+                        800;
+
+                    cursor:
+                        pointer;
+
+                    transition:
+                        .18s ease;
+                }
+
+                .sa-logout:hover {
+                    color:
+                        #c23f3f;
+
+                    background:
+                        #fff7f7;
+
+                    border-color:
+                        #efd5d5;
+                }
+
+                .sa-logout:active {
+                    transform:
+                        translateY(1px);
+                }
+
+                /* =====================================================
+                   MOBILE NAV
+                ====================================================== */
+
+                .sa-mobile-nav {
+                    display: none;
+
+                    overflow-x:
+                        auto;
+
+                    scrollbar-width:
+                        none;
+
+                    -webkit-overflow-scrolling:
+                        touch;
+
+                    border-top:
+                        1px solid
+                        #edf1f5;
+
+                    background:
+                        rgba(255,255,255,.97);
+                }
+
+                .sa-mobile-nav::-webkit-scrollbar {
+                    display: none;
+                }
+
+                .sa-mobile-nav-inner {
+                    min-width:
+                        max-content;
+
+                    display:
+                        flex;
+
+                    align-items:
+                        center;
+
+                    gap:
+                        5px;
+
+                    padding:
+                        8px 12px;
+                }
+
+                .sa-mobile-item {
+                    min-height:
+                        34px;
 
                     display:
                         inline-flex;
@@ -887,179 +677,17 @@ export default function SuperAdminDashboard({
                     align-items:
                         center;
 
-                    justify-content:
-                        center;
-
                     gap:
-                        7px;
+                        6px;
 
-                    border:
-                        1px solid
-                        rgba(255,255,255,.12);
+                    padding:
+                        0 10px;
 
                     border-radius:
                         9px;
 
-                    background:
-                        transparent;
-
                     color:
-                        rgba(255,255,255,.82);
-
-                    font-family:
-                        inherit;
-
-                    font-size:
-                        9px;
-
-                    font-weight:
-                        800;
-
-                    cursor:
-                        pointer;
-
-                    transition:
-                        background .18s ease,
-                        color .18s ease,
-                        border-color .18s ease,
-                        transform .18s ease;
-                }
-
-
-                .sa-logout:hover {
-                    background:
-                        rgba(255,255,255,.08);
-
-                    color:
-                        #ffffff;
-
-                    border-color:
-                        rgba(255,255,255,.18);
-                }
-
-
-                .sa-logout:active {
-                    transform:
-                        translateY(1px);
-                }
-
-
-                /* =====================================================
-                   MAIN
-                ====================================================== */
-
-                .sa-main {
-                    min-width:
-                        0;
-
-                    padding:
-                        28px
-                        30px
-                        50px;
-                }
-
-
-                .sa-container {
-                    width:
-                        100%;
-
-                    max-width:
-                        1280px;
-
-                    margin:
-                        0 auto;
-                }
-
-
-                /* =====================================================
-                   TOPBAR
-                ====================================================== */
-
-                .sa-topbar {
-                    display:
-                        flex;
-
-                    align-items:
-                        flex-end;
-
-                    justify-content:
-                        space-between;
-
-                    gap:
-                        20px;
-
-                    margin-bottom:
-                        20px;
-                }
-
-
-                .sa-kicker {
-                    color:
-                        #2563eb;
-
-                    font-size:
-                        10px;
-
-                    font-weight:
-                        850;
-
-                    letter-spacing:
-                        .8px;
-                }
-
-
-                .sa-title {
-                    margin:
-                        6px 0 0;
-
-                    color:
-                        #0f2747;
-
-                    font-size:
-                        30px;
-
-                    line-height:
-                        1.12;
-
-                    font-weight:
-                        850;
-
-                    letter-spacing:
-                        -.5px;
-                }
-
-
-                .sa-subtitle {
-                    margin:
-                        7px 0 0;
-
-                    color:
-                        #64748b;
-
-                    font-size:
-                        12px;
-
-                    line-height:
-                        1.6;
-                }
-
-
-                .sa-date-chip {
-                    padding:
-                        8px 11px;
-
-                    border-radius:
-                        999px;
-
-                    background:
-                        #ffffff;
-
-                    border:
-                        1px solid
-                        #e2e8f0;
-
-                    color:
-                        #64748b;
+                        #66768a;
 
                     font-size:
                         9px;
@@ -1071,6 +699,157 @@ export default function SuperAdminDashboard({
                         nowrap;
                 }
 
+                .sa-mobile-item:hover {
+                    background:
+                        #f5f8fc;
+                }
+
+                .sa-mobile-item.active {
+                    color:
+                        #145ecf;
+
+                    background:
+                        #eef5ff;
+                }
+
+                /* =====================================================
+                   MAIN
+                ====================================================== */
+
+                .sa-main {
+                    width: 100%;
+                }
+
+                .sa-container {
+                    width: 100%;
+
+                    max-width:
+                        1420px;
+
+                    margin:
+                        0 auto;
+
+                    padding:
+                        28px
+                        28px
+                        45px;
+                }
+
+                /* =====================================================
+                   HEADER
+                ====================================================== */
+
+                .sa-topbar {
+                    display:
+                        flex;
+
+                    align-items:
+                        flex-start;
+
+                    justify-content:
+                        space-between;
+
+                    gap:
+                        18px;
+
+                    margin-bottom:
+                        20px;
+                }
+
+                .sa-header-left {
+                    min-width:
+                        0;
+                }
+
+                .sa-kicker {
+                    color:
+                        #2563eb;
+
+                    font-size:
+                        9px;
+
+                    font-weight:
+                        850;
+
+                    letter-spacing:
+                        .13em;
+                }
+
+                .sa-title {
+                    margin:
+                        5px 0 0;
+
+                    color:
+                        #0f2747;
+
+                    font-size:
+                        28px;
+
+                    line-height:
+                        1.15;
+
+                    font-weight:
+                        850;
+
+                    letter-spacing:
+                        -.4px;
+                }
+
+                .sa-subtitle {
+                    max-width:
+                        760px;
+
+                    margin:
+                        7px 0 0;
+
+                    color:
+                        #6d7c90;
+
+                    font-size:
+                        11px;
+
+                    line-height:
+                        1.7;
+                }
+
+                .sa-date-chip {
+                    flex-shrink:
+                        0;
+
+                    min-height:
+                        34px;
+
+                    display:
+                        inline-flex;
+
+                    align-items:
+                        center;
+
+                    padding:
+                        0 11px;
+
+                    border-radius:
+                        999px;
+
+                    background:
+                        #ffffff;
+
+                    border:
+                        1px solid
+                        #e1e8ef;
+
+                    color:
+                        #697a90;
+
+                    font-size:
+                        8px;
+
+                    font-weight:
+                        750;
+
+                    white-space:
+                        nowrap;
+                }
 
                 /* =====================================================
                    STATISTICS
@@ -1083,20 +862,28 @@ export default function SuperAdminDashboard({
                     grid-template-columns:
                         repeat(
                             4,
-                            minmax(0,1fr)
+                            minmax(0, 1fr)
                         );
 
                     gap:
-                        13px;
+                        12px;
 
                     margin-bottom:
-                        18px;
+                        17px;
                 }
 
-
                 .sa-stat-card {
+                    position:
+                        relative;
+
+                    min-width:
+                        0;
+
+                    overflow:
+                        hidden;
+
                     padding:
-                        17px;
+                        16px;
 
                     border:
                         1px solid
@@ -1109,12 +896,43 @@ export default function SuperAdminDashboard({
                         #ffffff;
 
                     box-shadow:
-                        0 6px 20px
-                        rgba(15,23,42,.022);
+                        0 7px 23px
+                        rgba(15,23,42,.025);
                 }
 
+                .sa-stat-card::after {
+                    content:
+                        "";
+
+                    position:
+                        absolute;
+
+                    width:
+                        74px;
+
+                    height:
+                        74px;
+
+                    right:
+                        -26px;
+
+                    bottom:
+                        -27px;
+
+                    border-radius:
+                        50%;
+
+                    background:
+                        #f7f9fc;
+                }
 
                 .sa-stat-top {
+                    position:
+                        relative;
+
+                    z-index:
+                        1;
+
                     display:
                         flex;
 
@@ -1122,12 +940,8 @@ export default function SuperAdminDashboard({
                         center;
 
                     justify-content:
-                        space-between;
-
-                    gap:
-                        10px;
+                        flex-start;
                 }
-
 
                 .sa-stat-icon {
                     width:
@@ -1149,10 +963,15 @@ export default function SuperAdminDashboard({
                         10px;
                 }
 
-
                 .sa-stat-label {
+                    position:
+                        relative;
+
+                    z-index:
+                        1;
+
                     margin-top:
-                        13px;
+                        12px;
 
                     color:
                         #94a3b8;
@@ -1170,8 +989,13 @@ export default function SuperAdminDashboard({
                         uppercase;
                 }
 
-
                 .sa-stat-value {
+                    position:
+                        relative;
+
+                    z-index:
+                        1;
+
                     margin-top:
                         4px;
 
@@ -1179,7 +1003,7 @@ export default function SuperAdminDashboard({
                         #0f2747;
 
                     font-size:
-                        25px;
+                        24px;
 
                     line-height:
                         1;
@@ -1188,21 +1012,28 @@ export default function SuperAdminDashboard({
                         850;
                 }
 
-
                 .sa-stat-note {
+                    position:
+                        relative;
+
+                    z-index:
+                        1;
+
                     margin-top:
-                        5px;
+                        6px;
 
                     color:
-                        #94a3b8;
+                        #9ba7b6;
 
                     font-size:
                         8px;
+
+                    line-height:
+                        1.4;
                 }
 
-
                 /* =====================================================
-                   CONTENT
+                   CONTENT GRID
                 ====================================================== */
 
                 .sa-content-grid {
@@ -1211,14 +1042,22 @@ export default function SuperAdminDashboard({
 
                     grid-template-columns:
                         minmax(0,1.45fr)
-                        minmax(290px,.75fr);
+                        minmax(300px,.75fr);
 
                     gap:
-                        18px;
+                        17px;
+
+                    align-items:
+                        start;
                 }
 
-
                 .sa-card {
+                    min-width:
+                        0;
+
+                    overflow:
+                        hidden;
+
                     background:
                         #ffffff;
 
@@ -1229,40 +1068,35 @@ export default function SuperAdminDashboard({
                     border-radius:
                         16px;
 
-                    overflow:
-                        hidden;
-
                     box-shadow:
-                        0 6px 20px
-                        rgba(15,23,42,.022);
+                        0 8px 25px
+                        rgba(15,23,42,.025);
                 }
 
-
                 .sa-card-header {
-                    padding:
-                        16px 18px;
-
-                    border-bottom:
-                        1px solid
-                        #edf1f5;
-
                     display:
                         flex;
 
                     align-items:
-                        center;
+                        flex-start;
 
                     justify-content:
                         space-between;
 
                     gap:
                         12px;
-                }
 
+                    padding:
+                        16px 17px;
+
+                    border-bottom:
+                        1px solid
+                        #edf1f5;
+                }
 
                 .sa-card-title {
                     color:
-                        #0f2747;
+                        #132740;
 
                     font-size:
                         13px;
@@ -1270,7 +1104,6 @@ export default function SuperAdminDashboard({
                     font-weight:
                         850;
                 }
-
 
                 .sa-card-description {
                     margin-top:
@@ -1280,40 +1113,42 @@ export default function SuperAdminDashboard({
                         #94a3b8;
 
                     font-size:
-                        9px;
+                        8px;
 
                     line-height:
-                        1.5;
+                        1.55;
                 }
-
 
                 .sa-card-body {
                     padding:
-                        18px;
+                        17px;
                 }
-
 
                 /* =====================================================
                    TABLE
                 ====================================================== */
 
                 .sa-table-wrap {
+                    width:
+                        100%;
+
                     overflow-x:
                         auto;
-                }
 
+                    -webkit-overflow-scrolling:
+                        touch;
+                }
 
                 .sa-table {
                     width:
                         100%;
 
+                    min-width:
+                        650px;
+
                     border-collapse:
                         collapse;
-
-                    min-width:
-                        620px;
                 }
-
 
                 .sa-table th {
                     padding:
@@ -1322,15 +1157,15 @@ export default function SuperAdminDashboard({
                     text-align:
                         left;
 
-                    color:
-                        #94a3b8;
-
                     background:
                         #f8fafc;
 
                     border-bottom:
                         1px solid
                         #e2e8f0;
+
+                    color:
+                        #94a3b8;
 
                     font-size:
                         8px;
@@ -1343,8 +1178,10 @@ export default function SuperAdminDashboard({
 
                     text-transform:
                         uppercase;
-                }
 
+                    white-space:
+                        nowrap;
+                }
 
                 .sa-table td {
                     padding:
@@ -1358,39 +1195,46 @@ export default function SuperAdminDashboard({
                         #475569;
 
                     font-size:
-                        10px;
+                        9px;
 
                     vertical-align:
                         middle;
                 }
 
-
-                .sa-table tr:last-child td {
+                .sa-table tbody tr:last-child td {
                     border-bottom:
                         0;
                 }
 
+                .sa-table tbody tr:hover td {
+                    background:
+                        #fcfdff;
+                }
 
                 .sa-name {
                     color:
-                        #0f2747;
+                        #17304e;
+
+                    font-size:
+                        9px;
 
                     font-weight:
                         800;
                 }
 
-
                 .sa-email {
                     margin-top:
-                        2px;
+                        3px;
 
                     color:
-                        #94a3b8;
+                        #97a3b2;
 
                     font-size:
                         8px;
-                }
 
+                    white-space:
+                        nowrap;
+                }
 
                 /* =====================================================
                    PILLS
@@ -1403,8 +1247,11 @@ export default function SuperAdminDashboard({
                     align-items:
                         center;
 
+                    min-height:
+                        23px;
+
                     padding:
-                        5px 7px;
+                        0 8px;
 
                     border-radius:
                         999px;
@@ -1414,50 +1261,49 @@ export default function SuperAdminDashboard({
 
                     font-weight:
                         800;
+
+                    white-space:
+                        nowrap;
                 }
 
-
                 .sa-pill-role {
+                    color:
+                        #1d4ed8;
+
                     background:
                         #eff6ff;
 
                     border:
                         1px solid
                         #dbeafe;
-
-                    color:
-                        #1d4ed8;
                 }
 
-
                 .sa-pill-active {
+                    color:
+                        #15803d;
+
                     background:
                         #f0fdf4;
 
                     border:
                         1px solid
                         #bbf7d0;
-
-                    color:
-                        #15803d;
                 }
 
-
                 .sa-pill-inactive {
+                    color:
+                        #dc2626;
+
                     background:
                         #fef2f2;
 
                     border:
                         1px solid
                         #fecaca;
-
-                    color:
-                        #dc2626;
                 }
 
-
                 /* =====================================================
-                   SIDE
+                   SIDE STACK
                 ====================================================== */
 
                 .sa-side-stack {
@@ -1468,9 +1314,8 @@ export default function SuperAdminDashboard({
                         column;
 
                     gap:
-                        18px;
+                        17px;
                 }
-
 
                 .sa-mini-list {
                     display:
@@ -1483,8 +1328,7 @@ export default function SuperAdminDashboard({
                         11px;
                 }
 
-
-                .sa-mini-item {
+                .sa-mini-link {
                     display:
                         flex;
 
@@ -1493,8 +1337,24 @@ export default function SuperAdminDashboard({
 
                     gap:
                         10px;
+
+                    margin:
+                        -2px;
+
+                    padding:
+                        2px;
+
+                    border-radius:
+                        10px;
+
+                    transition:
+                        background .18s ease;
                 }
 
+                .sa-mini-link:hover {
+                    background:
+                        #f8fafc;
+                }
 
                 .sa-mini-icon {
                     width:
@@ -1502,9 +1362,6 @@ export default function SuperAdminDashboard({
 
                     height:
                         34px;
-
-                    flex-shrink:
-                        0;
 
                     display:
                         flex;
@@ -1515,20 +1372,22 @@ export default function SuperAdminDashboard({
                     justify-content:
                         center;
 
+                    flex-shrink:
+                        0;
+
+                    border:
+                        1px solid
+                        #e2e8f0;
+
                     border-radius:
                         9px;
 
                     background:
                         #f8fafc;
 
-                    border:
-                        1px solid
-                        #e2e8f0;
-
                     color:
-                        #0f2747;
+                        #17304d;
                 }
-
 
                 .sa-mini-title {
                     color:
@@ -1541,10 +1400,9 @@ export default function SuperAdminDashboard({
                         800;
                 }
 
-
                 .sa-mini-text {
                     margin-top:
-                        2px;
+                        3px;
 
                     color:
                         #94a3b8;
@@ -1553,55 +1411,16 @@ export default function SuperAdminDashboard({
                         8px;
 
                     line-height:
-                        1.5;
+                        1.55;
                 }
 
-
                 /* =====================================================
-                   CLICKABLE SIDE ITEM
+                   EMPTY
                 ====================================================== */
 
-                .sa-mini-link {
-                    display:
-                        flex;
-
-                    align-items:
-                        flex-start;
-
-                    gap:
-                        10px;
-
-                    color:
-                        inherit;
-
-                    text-decoration:
-                        none;
-
-                    border-radius:
-                        10px;
-
+                .sa-empty {
                     padding:
-                        2px;
-
-                    margin:
-                        -2px;
-                }
-
-
-                .sa-mini-link:hover
-                .sa-mini-title {
-                    color:
-                        #0f2747;
-                }
-
-
-                /* =====================================================
-                   FOOTER
-                ====================================================== */
-
-                .sa-footer {
-                    padding-top:
-                        22px;
+                        38px 20px;
 
                     text-align:
                         center;
@@ -1610,30 +1429,266 @@ export default function SuperAdminDashboard({
                         #94a3b8;
 
                     font-size:
+                        9px;
+                }
+
+                /* =====================================================
+                   FOOTER
+                ====================================================== */
+
+                .sa-footer {
+                    margin-top:
+                        22px;
+
+                    text-align:
+                        center;
+
+                    color:
+                        #9aa6b5;
+
+                    font-size:
                         8px;
                 }
 
-
                 /* =====================================================
-                   RESPONSIVE
+                   LARGE TABLET
                 ====================================================== */
 
-                @media (max-width: 1080px) {
+                @media (max-width: 1180px) {
 
-                    .sa-shell {
-                        grid-template-columns:
-                            220px
-                            minmax(0,1fr);
+                    .sa-navbar-inner {
+                        gap:
+                            14px;
                     }
 
+                    .sa-brand-subtitle {
+                        display:
+                            none;
+                    }
+
+                    .sa-nav-item {
+                        padding:
+                            0 9px;
+                    }
+
+                    .sa-user-copy {
+                        max-width:
+                            100px;
+                    }
+
+                    .sa-content-grid {
+                        grid-template-columns:
+                            minmax(0,1fr)
+                            minmax(280px,.75fr);
+                    }
+                }
+
+                /* =====================================================
+                   TABLET
+                ====================================================== */
+
+                @media (max-width: 940px) {
+
+                    .sa-navbar-inner {
+                        min-height:
+                            64px;
+
+                        padding:
+                            0 18px;
+                    }
+
+                    .sa-nav {
+                        justify-content:
+                            flex-start;
+                    }
+
+                    .sa-nav-item {
+                        font-size:
+                            9px;
+
+                        padding:
+                            0 8px;
+                    }
+
+                    .sa-user-box {
+                        display:
+                            none;
+                    }
+
+                    .sa-content-grid {
+                        grid-template-columns:
+                            1fr;
+                    }
+
+                    .sa-side-stack {
+                        display:
+                            grid;
+
+                        grid-template-columns:
+                            repeat(
+                                2,
+                                minmax(0,1fr)
+                            );
+
+                        gap:
+                            12px;
+                    }
 
                     .sa-main {
+                        width:
+                            100%;
+                    }
+
+                    .sa-container {
                         padding:
                             24px
                             20px
-                            45px;
+                            42px;
+                    }
+                }
+
+                /* =====================================================
+                   MOBILE
+                ====================================================== */
+
+                @media (max-width: 760px) {
+
+                    .sa-navbar-inner {
+                        min-height:
+                            60px;
+
+                        padding:
+                            0 13px;
+
+                        gap:
+                            10px;
                     }
 
+                    .sa-brand {
+                        gap:
+                            8px;
+                    }
+
+                    .sa-brand-logo {
+                        width:
+                            36px;
+
+                        height:
+                            36px;
+
+                        border-radius:
+                            10px;
+                    }
+
+                    .sa-brand-logo img {
+                        width:
+                            25px;
+
+                        height:
+                            25px;
+                    }
+
+                    .sa-brand-title {
+                        font-size:
+                            13px;
+                    }
+
+                    .sa-brand-subtitle {
+                        display:
+                            block;
+
+                        margin-top:
+                            3px;
+
+                        font-size:
+                            7px;
+                    }
+
+                    .sa-nav {
+                        display:
+                            none;
+                    }
+
+                    .sa-nav-right {
+                        margin-left:
+                            auto;
+                    }
+
+                    .sa-user-box {
+                        display:
+                            none;
+                    }
+
+                    .sa-logout {
+                        width:
+                            38px;
+
+                        min-height:
+                            38px;
+
+                        padding:
+                            0;
+
+                        border-radius:
+                            10px;
+                    }
+
+                    .sa-logout-label {
+                        display:
+                            none;
+                    }
+
+                    .sa-mobile-nav {
+                        display:
+                            block;
+                    }
+
+                    .sa-container {
+                        padding:
+                            18px
+                            12px
+                            32px;
+                    }
+
+                    .sa-topbar {
+                        flex-direction:
+                            column;
+
+                        align-items:
+                            flex-start;
+
+                        gap:
+                            12px;
+
+                        margin-bottom:
+                            16px;
+                    }
+
+                    .sa-kicker {
+                        font-size:
+                            8px;
+                    }
+
+                    .sa-title {
+                        font-size:
+                            22px;
+                    }
+
+                    .sa-subtitle {
+                        font-size:
+                            9px;
+
+                        line-height:
+                            1.65;
+                    }
+
+                    .sa-date-chip {
+                        min-height:
+                            31px;
+
+                        font-size:
+                            8px;
+                    }
 
                     .sa-stat-grid {
                         grid-template-columns:
@@ -1641,143 +1696,294 @@ export default function SuperAdminDashboard({
                                 2,
                                 minmax(0,1fr)
                             );
-                    }
-                }
 
+                        gap:
+                            8px;
 
-                @media (max-width: 820px) {
-
-                    .sa-shell {
-                        display:
-                            block;
+                        margin-bottom:
+                            13px;
                     }
 
+                    .sa-stat-card {
+                        padding:
+                            12px;
 
-                    .sa-sidebar {
-                        position:
-                            relative;
+                        border-radius:
+                            13px;
+                    }
+
+                    .sa-stat-icon {
+                        width:
+                            32px;
 
                         height:
-                            auto;
+                            32px;
 
-                        padding:
-                            15px;
-                    }
-
-
-                    .sa-brand {
-                        padding-bottom:
-                            12px;
-                    }
-
-
-                    .sa-nav-label,
-                    .sa-sidebar-spacer {
-                        display:
-                            none;
-                    }
-
-
-                    .sa-nav {
-                        display:
-                            flex;
-
-                        flex-direction:
-                            row;
-
-                        gap:
-                            5px;
-
-                        overflow-x:
-                            auto;
-                    }
-
-
-                    .sa-nav-item {
-                        width:
-                            auto;
-
-                        min-width:
-                            max-content;
-
-                        margin:
-                            0;
-                    }
-
-
-                    .sa-profile-box {
-                        display:
-                            none;
-                    }
-
-
-                    .sa-content-grid {
-                        grid-template-columns:
-                            1fr;
-                    }
-                }
-
-
-                @media (max-width: 560px) {
-
-                    .sa-main {
-                        padding:
-                            20px
-                            14px
-                            36px;
-                    }
-
-
-                    .sa-topbar {
-                        align-items:
-                            flex-start;
-
-                        flex-direction:
-                            column;
-                    }
-
-
-                    .sa-date-chip {
-                        white-space:
-                            normal;
-                    }
-
-
-                    .sa-stat-grid {
-                        grid-template-columns:
-                            1fr 1fr;
-
-                        gap:
+                        border-radius:
                             9px;
                     }
 
+                    .sa-stat-label {
+                        margin-top:
+                            10px;
 
-                    .sa-stat-card {
+                        font-size:
+                            7px;
+                    }
+
+                    .sa-stat-value {
+                        font-size:
+                            20px;
+                    }
+
+                    .sa-stat-note {
+                        font-size:
+                            7px;
+                    }
+
+                    .sa-card {
+                        border-radius:
+                            14px;
+                    }
+
+                    .sa-card-header {
+                        padding:
+                            13px;
+
+                        flex-direction:
+                            row;
+                    }
+
+                    .sa-card-title {
+                        font-size:
+                            12px;
+                    }
+
+                    .sa-card-description {
+                        font-size:
+                            8px;
+                    }
+
+                    .sa-card-body {
                         padding:
                             13px;
                     }
 
+                    .sa-side-stack {
+                        grid-template-columns:
+                            1fr;
 
-                    .sa-stat-value {
+                        gap:
+                            12px;
+                    }
+
+                    .sa-table {
+                        min-width:
+                            640px;
+                    }
+
+                    .sa-footer {
+                        margin-top:
+                            17px;
+
                         font-size:
-                            21px;
+                            7px;
                     }
                 }
 
-            `}</style>
+                /* =====================================================
+                   SMALL PHONE
+                ====================================================== */
 
+                @media (max-width: 430px) {
+
+                    .sa-navbar-inner {
+                        min-height:
+                            57px;
+
+                        padding:
+                            0 10px;
+                    }
+
+                    .sa-brand-logo {
+                        width:
+                            33px;
+
+                        height:
+                            33px;
+                    }
+
+                    .sa-brand-title {
+                        font-size:
+                            12px;
+                    }
+
+                    .sa-brand-subtitle {
+                        font-size:
+                            6.5px;
+                    }
+
+                    .sa-logout {
+                        width:
+                            35px;
+
+                        min-height:
+                            35px;
+                    }
+
+                    .sa-mobile-nav-inner {
+                        padding:
+                            7px 9px;
+                    }
+
+                    .sa-mobile-item {
+                        min-height:
+                            32px;
+
+                        font-size:
+                            8px;
+
+                        padding:
+                            0 9px;
+                    }
+
+                    .sa-container {
+                        padding:
+                            15px
+                            8px
+                            27px;
+                    }
+
+                    .sa-title {
+                        font-size:
+                            20px;
+                    }
+
+                    .sa-subtitle {
+                        font-size:
+                            8.5px;
+                    }
+
+                    .sa-stat-grid {
+                        gap:
+                            6px;
+                    }
+
+                    .sa-stat-card {
+                        padding:
+                            10px;
+                    }
+
+                    .sa-stat-value {
+                        font-size:
+                            18px;
+                    }
+
+                    .sa-stat-note {
+                        display:
+                            none;
+                    }
+
+                    .sa-card-header {
+                        padding:
+                            12px;
+                    }
+
+                    .sa-card-body {
+                        padding:
+                            11px;
+                    }
+
+                    .sa-card-title {
+                        font-size:
+                            11px;
+                    }
+
+                    .sa-card-description {
+                        font-size:
+                            7.5px;
+                    }
+
+                    .sa-pill {
+                        min-height:
+                            21px;
+
+                        padding:
+                            0 7px;
+
+                        font-size:
+                            7px;
+                    }
+
+                    .sa-mini-icon {
+                        width:
+                            32px;
+
+                        height:
+                            32px;
+                    }
+
+                    .sa-mini-title {
+                        font-size:
+                            8.5px;
+                    }
+
+                    .sa-mini-text {
+                        font-size:
+                            7.5px;
+                    }
+
+                    .sa-table {
+                        min-width:
+                            620px;
+                    }
+                }
+
+                /* =====================================================
+                   VERY SMALL PHONE
+                ====================================================== */
+
+                @media (max-width: 350px) {
+
+                    .sa-brand-subtitle {
+                        display:
+                            none;
+                    }
+
+                    .sa-title {
+                        font-size:
+                            18px;
+                    }
+
+                    .sa-stat-label {
+                        font-size:
+                            6.5px;
+                    }
+
+                    .sa-stat-value {
+                        font-size:
+                            17px;
+                    }
+
+                    .sa-mobile-item {
+                        font-size:
+                            7.5px;
+
+                        padding:
+                            0 8px;
+                    }
+                }
+            `}</style>
 
             <div className="sa-page">
 
-                <div className="sa-shell">
+                {/* =====================================================
+                    TOP NAVIGATION
+                ====================================================== */}
 
+                <header className="sa-navbar">
 
-                    {/* =================================================
-                        SIDEBAR
-                    ================================================== */}
-
-                    <aside className="sa-sidebar">
-
+                    <div className="sa-navbar-inner">
 
                         {/* BRAND */}
 
@@ -1792,8 +1998,7 @@ export default function SuperAdminDashboard({
 
                             </div>
 
-
-                            <div>
+                            <div className="sa-brand-copy">
 
                                 <div className="sa-brand-title">
                                     SIMAP
@@ -1807,153 +2012,89 @@ export default function SuperAdminDashboard({
 
                         </div>
 
-
-                        {/* NAV LABEL */}
-
-                        <div className="sa-nav-label">
-                            MENU UTAMA
-                        </div>
-
-
-                        {/* NAV */}
+                        {/* DESKTOP MENU */}
 
                         <nav className="sa-nav">
 
-                            <a
+                            <DesktopNavItem
                                 href="/super-admin/dashboard"
-                                className="
-                                    sa-nav-item
-                                    sa-nav-item-active
-                                "
-                            >
-                                <span className="sa-nav-icon">
-                                    <Icon
-                                        name="shield"
-                                        size={15}
-                                    />
-                                </span>
+                                label="Dashboard"
+                                icon="shield"
+                                active
+                            />
 
-                                Dashboard
-                            </a>
-
-
-                            <a
+                            <DesktopNavItem
                                 href="/super-admin/pengguna"
-                                className="sa-nav-item"
-                            >
-                                <span className="sa-nav-icon">
-                                    <Icon
-                                        name="users"
-                                        size={15}
-                                    />
-                                </span>
+                                label="Pengguna"
+                                icon="users"
+                            />
 
-                                Pengguna
-                            </a>
-
-
-                            {/* UNIT SUDAH AKTIF */}
-
-                            <a
+                            <DesktopNavItem
                                 href="/super-admin/unit"
-                                className="sa-nav-item"
-                            >
-                                <span className="sa-nav-icon">
-                                    <Icon
-                                        name="building"
-                                        size={15}
-                                    />
-                                </span>
+                                label="Unit"
+                                icon="building"
+                            />
 
-                                Unit
-                            </a>
-
-
-                            {/* AKTIVITAS SISTEM */}
-
-                            <a
+                            <DesktopNavItem
                                 href="/super-admin/aktivitas"
-                                className="sa-nav-item"
-                            >
-                                <span className="sa-nav-icon">
-                                    <Icon
-                                        name="activity"
-                                        size={15}
-                                    />
-                                </span>
-
-                                Aktivitas Sistem
-                            </a>
+                                label="Aktivitas Sistem"
+                                icon="activity"
+                            />
 
                         </nav>
 
+                        {/* USER + LOGOUT */}
 
-                        <div
-                            className="
-                                sa-sidebar-spacer
-                            "
-                        />
+                        <div className="sa-nav-right">
 
+                            <div className="sa-user-box">
 
-                        {/* PROFILE */}
+                                <div className="sa-user-copy">
 
-                        <div className="sa-profile-box">
+                                    <div className="sa-user-name">
+                                        {userName}
+                                    </div>
 
-                            <div
-                                className="
-                                    sa-profile-name
-                                "
-                            >
-                                {
-                                    userName
-                                }
+                                    <div className="sa-user-role">
+                                        {userRole}
+                                    </div>
+
+                                </div>
+
+                                <div className="sa-avatar">
+                                    {userInitial}
+                                </div>
+
                             </div>
-
-
-                            <div
-                                className="
-                                    sa-profile-role
-                                "
-                            >
-                                Super Admin
-                            </div>
-
-
-                            {/* LOGOUT */}
 
                             <form
                                 method="POST"
                                 action="/logout"
-                                className="
-                                    sa-logout-form
-                                "
-                                onSubmit={
-                                    handleLogout
-                                }
+                                className="sa-logout-form"
+                                onSubmit={handleLogout}
                             >
 
                                 <input
                                     type="hidden"
                                     name="_token"
-                                    value={
-                                        csrfToken
-                                    }
+                                    value={csrfToken}
                                 />
-
 
                                 <button
                                     type="submit"
-                                    className="
-                                        sa-logout
-                                    "
+                                    className="sa-logout"
+                                    title="Keluar dari SIMAP"
+                                    aria-label="Keluar dari SIMAP"
                                 >
 
                                     <Icon
                                         name="logout"
-                                        size={12}
+                                        size={14}
                                     />
 
-                                    Keluar
+                                    <span className="sa-logout-label">
+                                        Keluar
+                                    </span>
 
                                 </button>
 
@@ -1961,117 +2102,314 @@ export default function SuperAdminDashboard({
 
                         </div>
 
-                    </aside>
+                    </div>
 
+                    {/* MOBILE MENU */}
 
-                    {/* =================================================
-                        MAIN
-                    ================================================== */}
+                    <div className="sa-mobile-nav">
 
-                    <main className="sa-main">
+                        <div className="sa-mobile-nav-inner">
 
-                        <div className="sa-container">
+                            <MobileNavItem
+                                href="/super-admin/dashboard"
+                                label="Dashboard"
+                                icon="shield"
+                                active
+                            />
 
+                            <MobileNavItem
+                                href="/super-admin/pengguna"
+                                label="Pengguna"
+                                icon="users"
+                            />
 
-                            {/* TOPBAR */}
+                            <MobileNavItem
+                                href="/super-admin/unit"
+                                label="Unit"
+                                icon="building"
+                            />
 
-                            <div className="sa-topbar">
+                            <MobileNavItem
+                                href="/super-admin/aktivitas"
+                                label="Aktivitas"
+                                icon="activity"
+                            />
 
-                                <div>
+                        </div>
 
-                                    <div className="sa-kicker">
-                                        ADMINISTRASI SISTEM
+                    </div>
+
+                </header>
+
+                {/* =====================================================
+                    MAIN
+                ====================================================== */}
+
+                <main className="sa-main">
+
+                    <div className="sa-container">
+
+                        {/* =================================================
+                            PAGE HEADER
+                        ================================================== */}
+
+                        <div className="sa-topbar">
+
+                            <div className="sa-header-left">
+
+                                <div className="sa-kicker">
+                                    ADMINISTRASI SISTEM
+                                </div>
+
+                                <h1 className="sa-title">
+                                    Dashboard Super Admin
+                                </h1>
+
+                                <p className="sa-subtitle">
+                                    Kelola pengguna dan konfigurasi dasar
+                                    Sistem Manajemen Administrasi
+                                    Poltekkes Maluku.
+                                </p>
+
+                            </div>
+
+                            <div className="sa-date-chip">
+                                {todayLabel ||
+                                    'Memuat tanggal...'}
+                                {' '}· WIT
+                            </div>
+
+                        </div>
+
+                        {/* =================================================
+                            STATISTICS
+                        ================================================== */}
+
+                        <div className="sa-stat-grid">
+
+                            <StatCard
+                                icon="users"
+                                label="Total Pengguna"
+                                value={
+                                    safeStats.totalUsers
+                                }
+                                note="Seluruh akun terdaftar"
+                                iconBackground="#eff6ff"
+                                iconColor="#2563eb"
+                            />
+
+                            <StatCard
+                                icon="check"
+                                label="Pengguna Aktif"
+                                value={
+                                    safeStats.activeUsers
+                                }
+                                note="Akun dapat digunakan"
+                                iconBackground="#f0fdf4"
+                                iconColor="#16a34a"
+                            />
+
+                            <StatCard
+                                icon="userX"
+                                label="Pengguna Nonaktif"
+                                value={
+                                    safeStats.inactiveUsers
+                                }
+                                note="Akun tidak dapat digunakan"
+                                iconBackground="#fef2f2"
+                                iconColor="#dc2626"
+                            />
+
+                            <StatCard
+                                icon="building"
+                                label="Total Unit"
+                                value={
+                                    safeStats.totalUnits
+                                }
+                                note={`${safeStats.activeUnits} unit aktif`}
+                                iconBackground="#f5f3ff"
+                                iconColor="#7c3aed"
+                            />
+
+                        </div>
+
+                        {/* =================================================
+                            CONTENT
+                        ================================================== */}
+
+                        <div className="sa-content-grid">
+
+                            {/* =================================================
+                                USERS
+                            ================================================== */}
+
+                            <section className="sa-card">
+
+                                <div className="sa-card-header">
+
+                                    <div>
+
+                                        <div className="sa-card-title">
+                                            Pengguna Terbaru
+                                        </div>
+
+                                        <div className="sa-card-description">
+                                            Ringkasan akun pengguna yang
+                                            terakhir ditambahkan.
+                                        </div>
+
                                     </div>
 
-
-                                    <h1 className="sa-title">
-                                        Dashboard Super Admin
-                                    </h1>
-
-
-                                    <p className="sa-subtitle">
-                                        Kelola pengguna dan konfigurasi
-                                        dasar Sistem Manajemen Administrasi
-                                        Poltekkes Maluku.
-                                    </p>
+                                    <div className="sa-pill sa-pill-role">
+                                        {safeUsers.length}
+                                        {' '}akun
+                                    </div>
 
                                 </div>
 
+                                <div className="sa-card-body">
 
-                                <div className="sa-date-chip">
-                                    {
-                                        todayLabel ||
-                                        'Memuat tanggal...'
-                                    }
-                                    {' '}· WIT
+                                    {safeUsers.length === 0 ? (
+
+                                        <div className="sa-empty">
+                                            Belum ada data pengguna.
+                                        </div>
+
+                                    ) : (
+
+                                        <div className="sa-table-wrap">
+
+                                            <table className="sa-table">
+
+                                                <thead>
+
+                                                    <tr>
+
+                                                        <th>
+                                                            Pengguna
+                                                        </th>
+
+                                                        <th>
+                                                            Role
+                                                        </th>
+
+                                                        <th>
+                                                            Unit
+                                                        </th>
+
+                                                        <th>
+                                                            Status
+                                                        </th>
+
+                                                    </tr>
+
+                                                </thead>
+
+                                                <tbody>
+
+                                                    {safeUsers.map(
+                                                        (
+                                                            item
+                                                        ) => {
+
+                                                            const role =
+                                                                item?.role?.slug;
+
+                                                            return (
+
+                                                                <tr
+                                                                    key={
+                                                                        item?.id ??
+                                                                        item?.email ??
+                                                                        `${item?.name ?? 'user'}-${item?.role?.slug ?? 'role'}`
+                                                                    }
+                                                                >
+
+                                                                    <td>
+
+                                                                        <div className="sa-name">
+                                                                            {
+                                                                                item?.name ||
+                                                                                '-'
+                                                                            }
+                                                                        </div>
+
+                                                                        <div className="sa-email">
+                                                                            {
+                                                                                item?.email ||
+                                                                                '-'
+                                                                            }
+                                                                        </div>
+
+                                                                    </td>
+
+                                                                    <td>
+
+                                                                        <span className="sa-pill sa-pill-role">
+
+                                                                            {
+                                                                                roleLabel(
+                                                                                    role
+                                                                                )
+                                                                            }
+
+                                                                        </span>
+
+                                                                    </td>
+
+                                                                    <td>
+                                                                        {
+                                                                            item?.unit?.name ||
+                                                                            '-'
+                                                                        }
+                                                                    </td>
+
+                                                                    <td>
+
+                                                                        <span
+                                                                            className={`sa-pill ${
+                                                                                item?.is_active
+                                                                                    ? 'sa-pill-active'
+                                                                                    : 'sa-pill-inactive'
+                                                                            }`}
+                                                                        >
+
+                                                                            {
+                                                                                formatStatus(
+                                                                                    item?.is_active
+                                                                                )
+                                                                            }
+
+                                                                        </span>
+
+                                                                    </td>
+
+                                                                </tr>
+
+                                                            );
+                                                        }
+                                                    )}
+
+                                                </tbody>
+
+                                            </table>
+
+                                        </div>
+
+                                    )}
+
                                 </div>
 
-                            </div>
+                            </section>
 
+                            {/* =================================================
+                                SIDE
+                            ================================================== */}
 
-                            {/* STATISTIK */}
-
-                            <div className="sa-stat-grid">
-
-                                <StatCard
-                                    icon="users"
-                                    label="Total Pengguna"
-                                    value={
-                                        safeStats.totalUsers
-                                    }
-                                    note="Seluruh akun terdaftar"
-                                    iconBackground="#eff6ff"
-                                    iconColor="#2563eb"
-                                />
-
-
-                                <StatCard
-                                    icon="check"
-                                    label="Pengguna Aktif"
-                                    value={
-                                        safeStats.activeUsers
-                                    }
-                                    note="Akun dapat digunakan"
-                                    iconBackground="#f0fdf4"
-                                    iconColor="#16a34a"
-                                />
-
-
-                                <StatCard
-                                    icon="userX"
-                                    label="Pengguna Nonaktif"
-                                    value={
-                                        safeStats.inactiveUsers
-                                    }
-                                    note="Akun tidak dapat digunakan"
-                                    iconBackground="#fef2f2"
-                                    iconColor="#dc2626"
-                                />
-
-
-                                <StatCard
-                                    icon="building"
-                                    label="Total Unit"
-                                    value={
-                                        safeStats.totalUnits
-                                    }
-                                    note={
-                                        `${safeStats.activeUnits} unit aktif`
-                                    }
-                                    iconBackground="#f5f3ff"
-                                    iconColor="#7c3aed"
-                                />
-
-                            </div>
-
-
-                            {/* CONTENT */}
-
-                            <div className="sa-content-grid">
-
+                            <div className="sa-side-stack">
 
                                 {/* =================================================
-                                    USERS
+                                    FUNGSI SUPER ADMIN
                                 ================================================== */}
 
                                 <section className="sa-card">
@@ -2081,516 +2419,199 @@ export default function SuperAdminDashboard({
                                         <div>
 
                                             <div className="sa-card-title">
-                                                Pengguna Terbaru
+                                                Fungsi Super Admin
                                             </div>
-
 
                                             <div className="sa-card-description">
-                                                Ringkasan akun pengguna yang
-                                                terakhir ditambahkan.
+                                                Ruang lingkup administrasi
+                                                sistem.
                                             </div>
 
-                                        </div>
-
-
-                                        <div
-                                            className="
-                                                sa-pill
-                                                sa-pill-role
-                                            "
-                                        >
-                                            {
-                                                safeUsers.length
-                                            } akun
                                         </div>
 
                                     </div>
 
+                                    <div className="sa-card-body">
 
-                                    <div
-                                        className="
-                                            sa-card-body
-                                            sa-table-wrap
-                                        "
-                                    >
+                                        <div className="sa-mini-list">
 
-                                        {
-                                            safeUsers.length === 0
+                                            {/* PENGGUNA */}
 
-                                                ? (
+                                            <a
+                                                href="/super-admin/pengguna"
+                                                className="sa-mini-link"
+                                            >
 
-                                                    <div
-                                                        style={{
-                                                            padding:
-                                                                '30px',
+                                                <div className="sa-mini-icon">
 
-                                                            textAlign:
-                                                                'center',
+                                                    <InlineIcon
+                                                        name="users"
+                                                        size={14}
+                                                    />
 
-                                                            color:
-                                                                '#94a3b8',
+                                                </div>
 
-                                                            fontSize:
-                                                                '10px',
-                                                        }}
-                                                    >
-                                                        Belum ada data
+                                                <div>
+
+                                                    <div className="sa-mini-title">
+                                                        Kelola Pengguna
+                                                    </div>
+
+                                                    <div className="sa-mini-text">
+                                                        Mengatur akun, role,
+                                                        unit, dan status
                                                         pengguna.
                                                     </div>
 
-                                                )
+                                                </div>
 
-                                                : (
+                                            </a>
 
-                                                    <table
-                                                        className="
-                                                            sa-table
-                                                        "
-                                                    >
+                                            {/* UNIT */}
 
-                                                        <thead>
+                                            <a
+                                                href="/super-admin/unit"
+                                                className="sa-mini-link"
+                                            >
 
-                                                            <tr>
+                                                <div className="sa-mini-icon">
 
-                                                                <th>
-                                                                    Pengguna
-                                                                </th>
+                                                    <InlineIcon
+                                                        name="building"
+                                                        size={14}
+                                                    />
 
-                                                                <th>
-                                                                    Role
-                                                                </th>
+                                                </div>
 
-                                                                <th>
-                                                                    Unit
-                                                                </th>
+                                                <div>
 
-                                                                <th>
-                                                                    Status
-                                                                </th>
+                                                    <div className="sa-mini-title">
+                                                        Kelola Unit
+                                                    </div>
 
-                                                            </tr>
+                                                    <div className="sa-mini-text">
+                                                        Mengatur daftar unit
+                                                        dan status unit.
+                                                    </div>
 
-                                                        </thead>
+                                                </div>
 
+                                            </a>
 
-                                                        <tbody>
+                                            {/* AKTIVITAS */}
 
-                                                            {
-                                                                safeUsers.map(
-                                                                    (
-                                                                        item
-                                                                    ) => {
+                                            <a
+                                                href="/super-admin/aktivitas"
+                                                className="sa-mini-link"
+                                            >
 
-                                                                        const role =
-                                                                            item?.role?.slug;
+                                                <div className="sa-mini-icon">
 
+                                                    <InlineIcon
+                                                        name="activity"
+                                                        size={14}
+                                                    />
 
-                                                                        return (
+                                                </div>
 
-                                                                            <tr
-                                                                                key={
-                                                                                    item?.id ??
-                                                                                    item?.email ??
-                                                                                    `${item?.name ?? 'user'}-${item?.role?.slug ?? 'role'}`
-                                                                                }
-                                                                            >
+                                                <div>
 
-                                                                                <td>
+                                                    <div className="sa-mini-title">
+                                                        Aktivitas Sistem
+                                                    </div>
 
-                                                                                    <div
-                                                                                        className="
-                                                                                            sa-name
-                                                                                        "
-                                                                                    >
-                                                                                        {
-                                                                                            item?.name ||
-                                                                                            '-'
-                                                                                        }
-                                                                                    </div>
+                                                    <div className="sa-mini-text">
+                                                        Melihat riwayat
+                                                        tindakan penting
+                                                        di sistem.
+                                                    </div>
 
+                                                </div>
 
-                                                                                    <div
-                                                                                        className="
-                                                                                            sa-email
-                                                                                        "
-                                                                                    >
-                                                                                        {
-                                                                                            item?.email ||
-                                                                                            '-'
-                                                                                        }
-                                                                                    </div>
+                                            </a>
 
-                                                                                </td>
-
-
-                                                                                <td>
-
-                                                                                    <span
-                                                                                        className="
-                                                                                            sa-pill
-                                                                                            sa-pill-role
-                                                                                        "
-                                                                                    >
-                                                                                        {
-                                                                                            roleLabel(
-                                                                                                role
-                                                                                            )
-                                                                                        }
-                                                                                    </span>
-
-                                                                                </td>
-
-
-                                                                                <td>
-
-                                                                                    {
-                                                                                        item?.unit?.name ||
-                                                                                        '-'
-                                                                                    }
-
-                                                                                </td>
-
-
-                                                                                <td>
-
-                                                                                    <span
-                                                                                        className={`sa-pill ${
-                                                                                            item?.is_active
-                                                                                                ? 'sa-pill-active'
-                                                                                                : 'sa-pill-inactive'
-                                                                                        }`}
-                                                                                    >
-
-                                                                                        {
-                                                                                            formatStatus(
-                                                                                                item?.is_active
-                                                                                            )
-                                                                                        }
-
-                                                                                    </span>
-
-                                                                                </td>
-
-                                                                            </tr>
-
-                                                                        );
-                                                                    }
-                                                                )
-                                                            }
-
-                                                        </tbody>
-
-                                                    </table>
-                                                )
-                                        }
+                                        </div>
 
                                     </div>
 
                                 </section>
 
-
                                 {/* =================================================
-                                    SIDE
+                                    ADMINISTRASI TERPUSAT
                                 ================================================== */}
 
-                                <div className="sa-side-stack">
+                                <section className="sa-card">
 
-
-                                    {/* FUNGSI */}
-
-                                    <section className="sa-card">
+                                    <div className="sa-card-body">
 
                                         <div
-                                            className="
-                                                sa-card-header
-                                            "
+                                            style={{
+                                                display:
+                                                    'flex',
+
+                                                alignItems:
+                                                    'flex-start',
+
+                                                gap:
+                                                    '10px',
+                                            }}
                                         >
+
+                                            <div className="sa-mini-icon">
+
+                                                <InlineIcon
+                                                    name="settings"
+                                                    size={14}
+                                                />
+
+                                            </div>
 
                                             <div>
 
-                                                <div
-                                                    className="
-                                                        sa-card-title
-                                                    "
-                                                >
-                                                    Fungsi Super Admin
+                                                <div className="sa-mini-title">
+                                                    Administrasi Terpusat
                                                 </div>
 
-
-                                                <div
-                                                    className="
-                                                        sa-card-description
-                                                    "
-                                                >
-                                                    Ruang lingkup
-                                                    administrasi sistem.
+                                                <div className="sa-mini-text">
+                                                    Super Admin menangani
+                                                    konfigurasi dasar sistem,
+                                                    sedangkan pekerjaan surat
+                                                    dan disposisi tetap mengikuti
+                                                    hak akses masing-masing role.
                                                 </div>
 
                                             </div>
 
                                         </div>
 
+                                    </div>
 
-                                        <div
-                                            className="
-                                                sa-card-body
-                                            "
-                                        >
+                                </section>
 
-                                            <div
-                                                className="
-                                                    sa-mini-list
-                                                "
-                                            >
-
-                                                <a
-                                                    href="/super-admin/pengguna"
-                                                    className="
-                                                        sa-mini-link
-                                                    "
-                                                >
-
-                                                    <div
-                                                        className="
-                                                            sa-mini-icon
-                                                        "
-                                                    >
-
-                                                        <InlineIcon
-                                                            name="users"
-                                                            size={14}
-                                                        />
-
-                                                    </div>
-
-
-                                                    <div>
-
-                                                        <div
-                                                            className="
-                                                                sa-mini-title
-                                                            "
-                                                        >
-                                                            Kelola Pengguna
-                                                        </div>
-
-
-                                                        <div
-                                                            className="
-                                                                sa-mini-text
-                                                            "
-                                                        >
-                                                            Mengatur akun,
-                                                            role, unit,
-                                                            dan status
-                                                            pengguna.
-                                                        </div>
-
-                                                    </div>
-
-                                                </a>
-
-
-                                                <a
-                                                    href="/super-admin/unit"
-                                                    className="
-                                                        sa-mini-link
-                                                    "
-                                                >
-
-                                                    <div
-                                                        className="
-                                                            sa-mini-icon
-                                                        "
-                                                    >
-
-                                                        <InlineIcon
-                                                            name="building"
-                                                            size={14}
-                                                        />
-
-                                                    </div>
-
-
-                                                    <div>
-
-                                                        <div
-                                                            className="
-                                                                sa-mini-title
-                                                            "
-                                                        >
-                                                            Kelola Unit
-                                                        </div>
-
-
-                                                        <div
-                                                            className="
-                                                                sa-mini-text
-                                                            "
-                                                        >
-                                                            Mengatur daftar
-                                                            unit dan status
-                                                            unit.
-                                                        </div>
-
-                                                    </div>
-
-                                                </a>
-
-
-                                                <a
-                                                    href="/super-admin/aktivitas"
-                                                    className="
-                                                        sa-mini-link
-                                                    "
-                                                >
-
-                                                    <div
-                                                        className="
-                                                            sa-mini-icon
-                                                        "
-                                                    >
-
-                                                        <InlineIcon
-                                                            name="activity"
-                                                            size={14}
-                                                        />
-
-                                                    </div>
-
-
-                                                    <div>
-
-                                                        <div
-                                                            className="
-                                                                sa-mini-title
-                                                            "
-                                                        >
-                                                            Aktivitas Sistem
-                                                        </div>
-
-
-                                                        <div
-                                                            className="
-                                                                sa-mini-text
-                                                            "
-                                                        >
-                                                            Melihat riwayat
-                                                            tindakan penting
-                                                            di sistem.
-                                                        </div>
-
-                                                    </div>
-
-                                                </a>
-
-                                            </div>
-
-                                        </div>
-
-                                    </section>
-
-
-                                    {/* ADMINISTRASI TERPUSAT */}
-
-                                    <section className="sa-card">
-
-                                        <div
-                                            className="
-                                                sa-card-body
-                                            "
-                                        >
-
-                                            <div
-                                                style={{
-                                                    display:
-                                                        'flex',
-
-                                                    alignItems:
-                                                        'flex-start',
-
-                                                    gap:
-                                                        '10px',
-                                                }}
-                                            >
-
-                                                <div
-                                                    className="
-                                                        sa-mini-icon
-                                                    "
-                                                >
-
-                                                    <Icon
-                                                        name="settings"
-                                                        size={15}
-                                                    />
-
-                                                </div>
-
-
-                                                <div>
-
-                                                    <div
-                                                        className="
-                                                            sa-mini-title
-                                                        "
-                                                    >
-                                                        Administrasi Terpusat
-                                                    </div>
-
-
-                                                    <div
-                                                        className="
-                                                            sa-mini-text
-                                                        "
-                                                    >
-
-                                                        Super Admin menangani
-                                                        konfigurasi dasar sistem,
-                                                        sedangkan pekerjaan surat
-                                                        dan disposisi tetap mengikuti
-                                                        hak akses masing-masing role.
-
-                                                    </div>
-
-                                                </div>
-
-                                            </div>
-
-                                        </div>
-
-                                    </section>
-
-                                </div>
-
-                            </div>
-
-
-                            {/* FOOTER */}
-
-                            <div
-                                className="
-                                    sa-footer
-                                "
-                            >
-                                SIMAP Poltekkes Maluku
                             </div>
 
                         </div>
 
-                    </main>
+                        {/* =================================================
+                            FOOTER
+                        ================================================== */}
 
-                </div>
+                        <div className="sa-footer">
+                            SIMAP Poltekkes Maluku
+                        </div>
+
+                    </div>
+
+                </main>
 
             </div>
         </>
     );
 }
 
-
-// =====================================================
-// STAT CARD
-// =====================================================
+/* =========================================================
+   STAT CARD
+========================================================= */
 
 function StatCard({
     icon,
@@ -2600,9 +2621,7 @@ function StatCard({
     iconBackground,
     iconColor,
 }) {
-
     return (
-
         <div className="sa-stat-card">
 
             <div className="sa-stat-top">
@@ -2627,16 +2646,13 @@ function StatCard({
 
             </div>
 
-
             <div className="sa-stat-label">
                 {label}
             </div>
 
-
             <div className="sa-stat-value">
                 {value}
             </div>
-
 
             <div className="sa-stat-note">
                 {note}
@@ -2646,16 +2662,84 @@ function StatCard({
     );
 }
 
+/* =========================================================
+   DESKTOP NAV ITEM
+========================================================= */
 
-// =====================================================
-// INLINE ICON
-// =====================================================
+function DesktopNavItem({
+    href,
+    label,
+    icon,
+    active = false,
+}) {
+    return (
+        <a
+            href={href}
+            className={`sa-nav-item ${
+                active
+                    ? 'sa-nav-item-active'
+                    : ''
+            }`}
+        >
 
-function InlineIcon({
+            <span className="sa-nav-icon">
+
+                <InlineIcon
+                    name={icon}
+                    size={13}
+                />
+
+            </span>
+
+            <span>
+                {label}
+            </span>
+
+        </a>
+    );
+}
+
+/* =========================================================
+   MOBILE NAV ITEM
+========================================================= */
+
+function MobileNavItem({
+    href,
+    label,
+    icon,
+    active = false,
+}) {
+    return (
+        <a
+            href={href}
+            className={`sa-mobile-item ${
+                active
+                    ? 'active'
+                    : ''
+            }`}
+        >
+
+            <InlineIcon
+                name={icon}
+                size={12}
+            />
+
+            <span>
+                {label}
+            </span>
+
+        </a>
+    );
+}
+
+/* =========================================================
+   ICON
+========================================================= */
+
+function Icon({
     name,
     size = 16,
 }) {
-
     const common = {
         width:
             size,
@@ -2685,13 +2769,132 @@ function InlineIcon({
             'true',
     };
 
+    const icons = {
+
+        logout: (
+            <>
+                <path
+                    d="
+                        M10 5
+                        H6
+                        a2 2 0
+                        0 0-2 2
+                        v10
+                        a2 2 0
+                        0 0 2 2
+                        h4
+                    "
+                />
+
+                <path
+                    d="
+                        m14 8
+                        4 4
+                        -4 4
+                    "
+                />
+
+                <path
+                    d="
+                        M9 12
+                        h9
+                    "
+                />
+            </>
+        ),
+
+    };
+
+    return (
+        <svg {...common}>
+            {icons[name] || null}
+        </svg>
+    );
+}
+
+/* =========================================================
+   INLINE ICON
+========================================================= */
+
+function InlineIcon({
+    name,
+    size = 16,
+}) {
+    const common = {
+        width:
+            size,
+
+        height:
+            size,
+
+        viewBox:
+            '0 0 24 24',
+
+        fill:
+            'none',
+
+        stroke:
+            'currentColor',
+
+        strokeWidth:
+            1.8,
+
+        strokeLinecap:
+            'round',
+
+        strokeLinejoin:
+            'round',
+
+        'aria-hidden':
+            'true',
+    };
+
+    /* =====================================================
+       SHIELD
+    ===================================================== */
+
+    if (
+        name === 'shield'
+    ) {
+        return (
+            <svg {...common}>
+
+                <path
+                    d="
+                        M12 3
+                        20 6
+                        v5
+                        c0 5.2
+                        -3.2 8.6
+                        -8 10
+                        -4.8-1.4
+                        -8-4.8
+                        -8-10
+                        V6
+                        l8-3Z
+                    "
+                />
+
+                <path
+                    d="
+                        m9 12
+                        2 2
+                        4-4
+                    "
+                />
+
+            </svg>
+        );
+    }
+
+    /* =====================================================
+       USERS
+    ===================================================== */
 
     if (
         name === 'users'
     ) {
-
         return (
-
             <svg {...common}>
 
                 <circle
@@ -2730,16 +2933,16 @@ function InlineIcon({
 
             </svg>
         );
-
     }
 
+    /* =====================================================
+       CHECK
+    ===================================================== */
 
     if (
         name === 'check'
     ) {
-
         return (
-
             <svg {...common}>
 
                 <circle
@@ -2758,16 +2961,16 @@ function InlineIcon({
 
             </svg>
         );
-
     }
 
+    /* =====================================================
+       USER X
+    ===================================================== */
 
     if (
         name === 'userX'
     ) {
-
         return (
-
             <svg {...common}>
 
                 <circle
@@ -2803,16 +3006,16 @@ function InlineIcon({
 
             </svg>
         );
-
     }
 
+    /* =====================================================
+       BUILDING
+    ===================================================== */
 
     if (
         name === 'building'
     ) {
-
         return (
-
             <svg {...common}>
 
                 <path
@@ -2848,16 +3051,16 @@ function InlineIcon({
 
             </svg>
         );
-
     }
 
+    /* =====================================================
+       ACTIVITY
+    ===================================================== */
 
     if (
         name === 'activity'
     ) {
-
         return (
-
             <svg {...common}>
 
                 <path
@@ -2873,9 +3076,40 @@ function InlineIcon({
 
             </svg>
         );
-
     }
 
+    /* =====================================================
+       SETTINGS
+    ===================================================== */
+
+    if (
+        name === 'settings'
+    ) {
+        return (
+            <svg {...common}>
+
+                <path
+                    d="
+                        M12 3v2
+                        M12 19v2
+                        M3 12h2
+                        M19 12h2
+                        M5.6 5.6l1.4 1.4
+                        M17 17l1.4 1.4
+                        M18.4 5.6L17 7
+                        M7 17l-1.4 1.4
+                    "
+                />
+
+                <circle
+                    cx="12"
+                    cy="12"
+                    r="3.5"
+                />
+
+            </svg>
+        );
+    }
 
     return null;
 }

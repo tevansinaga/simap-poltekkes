@@ -729,13 +729,26 @@ export default function SuperAdminPengguna({
                     box-sizing: border-box;
                 }
 
+                html {
+                    width: 100%;
+                    overflow-x: hidden;
+                }
+
                 body {
                     margin: 0;
                     background: #f5f7fb;
+                    overflow-x: hidden;
+                }
+
+                button,
+                input,
+                select {
+                    font: inherit;
                 }
 
                 .sap-page {
                     min-height: 100vh;
+                    width: 100%;
                     background:
                         radial-gradient(
                             circle at top left,
@@ -757,11 +770,9 @@ export default function SuperAdminPengguna({
                 .sap-shell {
                     min-height: 100vh;
                     display: grid;
-                    grid-template-columns:
-                        248px
-                        minmax(0,1fr);
+                    grid-template-columns: 248px minmax(0, 1fr);
+                    width: 100%;
                 }
-
 
                 /* =====================================================
                    SIDEBAR
@@ -771,52 +782,40 @@ export default function SuperAdminPengguna({
                     position: sticky;
                     top: 0;
                     height: 100vh;
-
-                    padding:
-                        22px 16px;
-
+                    min-width: 0;
+                    padding: 22px 16px;
                     background: #0f2747;
                     color: #fff;
-
                     display: flex;
                     flex-direction: column;
-
-                    border-right:
-                        1px solid
-                        rgba(255,255,255,.07);
+                    border-right: 1px solid rgba(255,255,255,.07);
+                    z-index: 40;
                 }
 
                 .sap-brand {
                     display: flex;
                     align-items: center;
-
                     gap: 11px;
-
-                    padding:
-                        5px 8px 22px;
+                    min-width: 0;
+                    padding: 5px 8px 22px;
                 }
 
                 .sap-brand-logo {
                     width: 40px;
                     height: 40px;
-
                     padding: 5px;
-
+                    flex: 0 0 40px;
                     border-radius: 11px;
-
                     background: #fff;
-
                     display: flex;
                     align-items: center;
                     justify-content: center;
-
                     overflow: hidden;
                 }
 
                 .sap-brand-logo img {
                     width: 100%;
                     height: 100%;
-
                     object-fit: contain;
                 }
 
@@ -828,105 +827,71 @@ export default function SuperAdminPengguna({
 
                 .sap-brand-subtitle {
                     margin-top: 5px;
-
-                    color:
-                        rgba(255,255,255,.62);
-
+                    color: rgba(255,255,255,.62);
                     font-size: 9px;
                 }
 
                 .sap-nav-label {
-                    padding:
-                        14px 10px 8px;
-
-                    color:
-                        rgba(255,255,255,.43);
-
+                    padding: 14px 10px 8px;
+                    color: rgba(255,255,255,.43);
                     font-size: 9px;
                     font-weight: 850;
-
                     letter-spacing: .8px;
-
-                    text-transform:
-                        uppercase;
+                    text-transform: uppercase;
                 }
 
                 .sap-nav {
                     display: flex;
                     flex-direction: column;
+                    min-width: 0;
                 }
 
                 .sap-nav-item {
                     display: flex;
                     align-items: center;
-
                     gap: 10px;
-
                     width: 100%;
-
+                    min-width: max-content;
                     margin-bottom: 4px;
-
-                    padding:
-                        11px 10px;
-
+                    padding: 11px 10px;
                     border-radius: 10px;
-
-                    color:
-                        rgba(255,255,255,.78);
-
-                    background:
-                        transparent;
-
+                    color: rgba(255,255,255,.78);
+                    background: transparent;
                     text-decoration: none;
-
                     font-size: 11px;
                     font-weight: 700;
-
-                    transition:
-                        background .18s ease,
-                        color .18s ease;
+                    transition: background .18s ease, color .18s ease;
                 }
 
                 .sap-nav-item:hover {
-                    background:
-                        rgba(255,255,255,.07);
-
+                    background: rgba(255,255,255,.07);
                     color: #fff;
                 }
 
                 .sap-nav-item-active {
-                    background:
-                        rgba(255,255,255,.105);
-
+                    background: rgba(255,255,255,.105);
                     color: #fff;
                 }
 
                 .sap-nav-icon {
                     width: 26px;
                     height: 26px;
-
                     display: flex;
                     align-items: center;
                     justify-content: center;
-
-                    flex-shrink: 0;
-
+                    flex: 0 0 26px;
                     border-radius: 8px;
-
-                    background:
-                        rgba(255,255,255,.07);
+                    background: rgba(255,255,255,.07);
                 }
 
-                .sap-nav-item-active
-                .sap-nav-icon {
-                    background:
-                        rgba(255,255,255,.13);
+                .sap-nav-item-active .sap-nav-icon {
+                    background: rgba(255,255,255,.13);
                 }
 
                 .sap-sidebar-spacer {
                     flex: 1;
+                    min-height: 18px;
                 }
-
 
                 /* =====================================================
                    PROFILE
@@ -934,23 +899,15 @@ export default function SuperAdminPengguna({
 
                 .sap-profile-box {
                     padding: 12px;
-
-                    border:
-                        1px solid
-                        rgba(255,255,255,.09);
-
+                    border: 1px solid rgba(255,255,255,.09);
                     border-radius: 13px;
-
-                    background:
-                        rgba(255,255,255,.045);
+                    background: rgba(255,255,255,.045);
                 }
 
                 .sap-profile-name {
                     color: #fff;
-
                     font-size: 10px;
                     font-weight: 800;
-
                     overflow: hidden;
                     text-overflow: ellipsis;
                     white-space: nowrap;
@@ -958,10 +915,7 @@ export default function SuperAdminPengguna({
 
                 .sap-profile-role {
                     margin-top: 4px;
-
-                    color:
-                        rgba(255,255,255,.58);
-
+                    color: rgba(255,255,255,.58);
                     font-size: 8px;
                 }
 
@@ -972,48 +926,27 @@ export default function SuperAdminPengguna({
 
                 .sap-logout {
                     width: 100%;
-
                     margin-top: 9px;
-
-                    padding:
-                        9px 10px;
-
+                    padding: 9px 10px;
                     display: inline-flex;
                     align-items: center;
                     justify-content: center;
-
                     gap: 7px;
-
-                    border:
-                        1px solid
-                        rgba(255,255,255,.12);
-
+                    border: 1px solid rgba(255,255,255,.12);
                     border-radius: 9px;
-
-                    background:
-                        transparent;
-
-                    color:
-                        rgba(255,255,255,.82);
-
+                    background: transparent;
+                    color: rgba(255,255,255,.82);
                     font-family: inherit;
                     font-size: 9px;
                     font-weight: 800;
-
                     cursor: pointer;
-
-                    transition:
-                        background .18s ease,
-                        color .18s ease;
+                    transition: background .18s ease, color .18s ease;
                 }
 
                 .sap-logout:hover {
-                    background:
-                        rgba(255,255,255,.08);
-
+                    background: rgba(255,255,255,.08);
                     color: #fff;
                 }
-
 
                 /* =====================================================
                    MAIN
@@ -1021,21 +954,16 @@ export default function SuperAdminPengguna({
 
                 .sap-main {
                     min-width: 0;
-
-                    padding:
-                        28px
-                        30px
-                        50px;
+                    width: 100%;
+                    padding: 28px 30px 50px;
+                    overflow: hidden;
                 }
 
                 .sap-container {
                     width: 100%;
                     max-width: 1320px;
-
-                    margin:
-                        0 auto;
+                    margin: 0 auto;
                 }
-
 
                 /* =====================================================
                    TOPBAR
@@ -1043,67 +971,43 @@ export default function SuperAdminPengguna({
 
                 .sap-topbar {
                     display: flex;
-
-                    align-items:
-                        flex-end;
-
-                    justify-content:
-                        space-between;
-
+                    align-items: flex-end;
+                    justify-content: space-between;
                     gap: 20px;
-
-                    margin-bottom:
-                        20px;
+                    margin-bottom: 20px;
                 }
 
                 .sap-kicker {
                     color: #2563eb;
-
                     font-size: 10px;
                     font-weight: 850;
-
                     letter-spacing: .8px;
                 }
 
                 .sap-title {
-                    margin:
-                        6px 0 0;
-
+                    margin: 6px 0 0;
                     color: #0f2747;
-
-                    font-size: 30px;
+                    font-size: clamp(24px, 3vw, 30px);
                     line-height: 1.12;
-
                     font-weight: 850;
-
-                    letter-spacing:
-                        -.5px;
+                    letter-spacing: -.5px;
                 }
 
                 .sap-subtitle {
-                    margin:
-                        7px 0 0;
-
+                    max-width: 680px;
+                    margin: 7px 0 0;
                     color: #64748b;
-
                     font-size: 12px;
                     line-height: 1.6;
                 }
 
                 .sap-actions {
                     display: flex;
-
-                    align-items:
-                        center;
-
+                    align-items: center;
                     gap: 9px;
-
                     flex-wrap: wrap;
-
-                    justify-content:
-                        flex-end;
+                    justify-content: flex-end;
                 }
-
 
                 /* =====================================================
                    BUTTON
@@ -1111,41 +1015,22 @@ export default function SuperAdminPengguna({
 
                 .sap-button {
                     display: inline-flex;
-
-                    align-items:
-                        center;
-
-                    justify-content:
-                        center;
-
+                    align-items: center;
+                    justify-content: center;
                     gap: 7px;
-
-                    padding:
-                        10px 13px;
-
-                    border:
-                        1px solid
-                        #dbe3ec;
-
+                    min-height: 40px;
+                    padding: 10px 13px;
+                    border: 1px solid #dbe3ec;
                     border-radius: 10px;
-
                     background: #fff;
-
                     color: #334155;
-
                     text-decoration: none;
-
                     font-family: inherit;
-
                     font-size: 10px;
                     font-weight: 800;
-
                     cursor: pointer;
-
-                    transition:
-                        background .18s ease,
-                        border-color .18s ease,
-                        transform .18s ease;
+                    transition: background .18s ease, border-color .18s ease, transform .18s ease;
+                    white-space: nowrap;
                 }
 
                 .sap-button:hover {
@@ -1153,25 +1038,18 @@ export default function SuperAdminPengguna({
                 }
 
                 .sap-button:active {
-                    transform:
-                        translateY(1px);
+                    transform: translateY(1px);
                 }
 
                 .sap-button-primary {
-                    border-color:
-                        #0f2747;
-
-                    background:
-                        #0f2747;
-
+                    border-color: #0f2747;
+                    background: #0f2747;
                     color: #fff;
                 }
 
                 .sap-button-primary:hover {
-                    background:
-                        #173e66;
+                    background: #173e66;
                 }
-
 
                 /* =====================================================
                    ALERT
@@ -1179,17 +1057,11 @@ export default function SuperAdminPengguna({
 
                 .sap-alert {
                     margin-bottom: 16px;
-
-                    padding:
-                        12px 14px;
-
+                    padding: 12px 14px;
                     border-radius: 11px;
-
                     font-size: 10px;
                     line-height: 1.55;
-
-                    border:
-                        1px solid;
+                    border: 1px solid;
                 }
 
                 .sap-alert-success {
@@ -1204,27 +1076,17 @@ export default function SuperAdminPengguna({
                     color: #991b1b;
                 }
 
-
                 /* =====================================================
                    CARD
                 ====================================================== */
 
                 .sap-card {
+                    width: 100%;
                     overflow: hidden;
-
-                    background:
-                        #fff;
-
-                    border:
-                        1px solid
-                        #e2e8f0;
-
-                    border-radius:
-                        16px;
-
-                    box-shadow:
-                        0 6px 20px
-                        rgba(15,23,42,.022);
+                    background: #fff;
+                    border: 1px solid #e2e8f0;
+                    border-radius: 16px;
+                    box-shadow: 0 6px 20px rgba(15,23,42,.022);
                 }
 
                 .sap-filter-card {
@@ -1232,53 +1094,33 @@ export default function SuperAdminPengguna({
                 }
 
                 .sap-filter-header {
-                    padding:
-                        16px 18px;
-
-                    border-bottom:
-                        1px solid
-                        #edf1f5;
+                    padding: 16px 18px;
+                    border-bottom: 1px solid #edf1f5;
                 }
 
                 .sap-card-title {
                     color: #0f2747;
-
                     font-size: 13px;
                     font-weight: 850;
                 }
 
                 .sap-card-description {
                     margin-top: 4px;
-
                     color: #94a3b8;
-
                     font-size: 9px;
                     line-height: 1.5;
                 }
-
 
                 /* =====================================================
                    FILTER
                 ====================================================== */
 
                 .sap-filter-body {
-                    padding:
-                        16px 18px;
-
+                    padding: 16px 18px;
                     display: grid;
-
-                    grid-template-columns:
-                        minmax(200px,1.6fr)
-                        repeat(
-                            3,
-                            minmax(150px,.75fr)
-                        )
-                        auto;
-
+                    grid-template-columns: minmax(220px, 1.7fr) repeat(3, minmax(140px, .8fr)) auto;
                     gap: 10px;
-
-                    align-items:
-                        end;
+                    align-items: end;
                 }
 
                 .sap-field {
@@ -1287,11 +1129,8 @@ export default function SuperAdminPengguna({
 
                 .sap-label {
                     display: block;
-
                     margin-bottom: 6px;
-
                     color: #64748b;
-
                     font-size: 9px;
                     font-weight: 800;
                 }
@@ -1299,107 +1138,65 @@ export default function SuperAdminPengguna({
                 .sap-input,
                 .sap-select {
                     width: 100%;
+                    max-width: 100%;
                     height: 40px;
-
-                    padding:
-                        0 11px;
-
-                    border:
-                        1px solid
-                        #dbe3ec;
-
-                    border-radius:
-                        10px;
-
+                    padding: 0 11px;
+                    border: 1px solid #dbe3ec;
+                    border-radius: 10px;
                     outline: none;
-
-                    background:
-                        #fff;
-
+                    background: #fff;
                     color: #334155;
-
-                    font-family:
-                        inherit;
-
+                    font-family: inherit;
                     font-size: 10px;
                 }
 
                 .sap-input:focus,
                 .sap-select:focus {
-                    border-color:
-                        #93c5fd;
-
-                    box-shadow:
-                        0 0 0 3px
-                        rgba(59,130,246,.10);
+                    border-color: #93c5fd;
+                    box-shadow: 0 0 0 3px rgba(59,130,246,.10);
                 }
 
                 .sap-filter-actions {
                     display: flex;
                     gap: 8px;
+                    flex-wrap: wrap;
                 }
-
 
                 /* =====================================================
                    TABLE
                 ====================================================== */
 
                 .sap-table-wrap {
+                    width: 100%;
                     overflow-x: auto;
+                    -webkit-overflow-scrolling: touch;
                 }
 
                 .sap-table {
                     width: 100%;
-
-                    min-width:
-                        1020px;
-
-                    border-collapse:
-                        collapse;
+                    min-width: 900px;
+                    border-collapse: collapse;
                 }
 
                 .sap-table th {
-                    padding:
-                        11px 12px;
-
-                    text-align:
-                        left;
-
+                    padding: 11px 12px;
+                    text-align: left;
                     color: #94a3b8;
-
-                    background:
-                        #f8fafc;
-
-                    border-bottom:
-                        1px solid
-                        #e2e8f0;
-
+                    background: #f8fafc;
+                    border-bottom: 1px solid #e2e8f0;
                     font-size: 8px;
-
-                    font-weight:
-                        850;
-
-                    letter-spacing:
-                        .55px;
-
-                    text-transform:
-                        uppercase;
+                    font-weight: 850;
+                    letter-spacing: .55px;
+                    text-transform: uppercase;
+                    white-space: nowrap;
                 }
 
                 .sap-table td {
-                    padding:
-                        12px;
-
+                    padding: 12px;
                     color: #475569;
-
-                    border-bottom:
-                        1px solid
-                        #edf1f5;
-
+                    border-bottom: 1px solid #edf1f5;
                     font-size: 10px;
-
-                    vertical-align:
-                        middle;
+                    vertical-align: middle;
                 }
 
                 .sap-table tr:last-child td {
@@ -1408,20 +1205,16 @@ export default function SuperAdminPengguna({
 
                 .sap-name {
                     color: #0f2747;
-
-                    font-weight:
-                        800;
+                    font-weight: 800;
+                    overflow-wrap: anywhere;
                 }
 
                 .sap-email {
                     margin-top: 2px;
-
-                    color:
-                        #94a3b8;
-
+                    color: #94a3b8;
                     font-size: 8px;
+                    overflow-wrap: anywhere;
                 }
-
 
                 /* =====================================================
                    BADGES
@@ -1429,73 +1222,38 @@ export default function SuperAdminPengguna({
 
                 .sap-pill {
                     display: inline-flex;
-
-                    align-items:
-                        center;
-
-                    padding:
-                        5px 7px;
-
-                    border-radius:
-                        999px;
-
+                    align-items: center;
+                    padding: 5px 7px;
+                    border-radius: 999px;
                     font-size: 8px;
-
-                    font-weight:
-                        800;
+                    font-weight: 800;
+                    white-space: nowrap;
                 }
 
                 .sap-pill-role {
-                    background:
-                        #eff6ff;
-
-                    border:
-                        1px solid
-                        #dbeafe;
-
-                    color:
-                        #1d4ed8;
+                    background: #eff6ff;
+                    border: 1px solid #dbeafe;
+                    color: #1d4ed8;
                 }
 
                 .sap-pill-active {
-                    background:
-                        #f0fdf4;
-
-                    border:
-                        1px solid
-                        #bbf7d0;
-
-                    color:
-                        #15803d;
+                    background: #f0fdf4;
+                    border: 1px solid #bbf7d0;
+                    color: #15803d;
                 }
 
                 .sap-pill-inactive {
-                    background:
-                        #fef2f2;
-
-                    border:
-                        1px solid
-                        #fecaca;
-
-                    color:
-                        #dc2626;
+                    background: #fef2f2;
+                    border: 1px solid #fecaca;
+                    color: #dc2626;
                 }
 
                 .sap-pill-self {
-                    margin-left:
-                        5px;
-
-                    background:
-                        #f8fafc;
-
-                    border:
-                        1px solid
-                        #e2e8f0;
-
-                    color:
-                        #64748b;
+                    margin-left: 5px;
+                    background: #f8fafc;
+                    border: 1px solid #e2e8f0;
+                    color: #64748b;
                 }
-
 
                 /* =====================================================
                    ACTION
@@ -1503,655 +1261,587 @@ export default function SuperAdminPengguna({
 
                 .sap-actions-cell {
                     display: flex;
-
                     gap: 6px;
-
                     flex-wrap: wrap;
                 }
 
                 .sap-small-button {
-                    border:
-                        1px solid
-                        #dbe3ec;
-
-                    background:
-                        #fff;
-
-                    color:
-                        #475569;
-
-                    border-radius:
-                        8px;
-
-                    padding:
-                        7px 9px;
-
-                    font-family:
-                        inherit;
-
-                    font-size:
-                        8px;
-
-                    font-weight:
-                        800;
-
-                    cursor:
-                        pointer;
-
-                    transition:
-                        background .18s ease,
-                        border-color .18s ease,
-                        color .18s ease;
+                    min-height: 32px;
+                    border: 1px solid #dbe3ec;
+                    background: #fff;
+                    color: #475569;
+                    border-radius: 8px;
+                    padding: 7px 9px;
+                    font-family: inherit;
+                    font-size: 8px;
+                    font-weight: 800;
+                    cursor: pointer;
+                    transition: background .18s ease, border-color .18s ease, color .18s ease;
+                    white-space: nowrap;
                 }
 
                 .sap-small-button:hover {
-                    background:
-                        #f8fafc;
+                    background: #f8fafc;
                 }
 
                 .sap-small-button:disabled {
                     opacity: .45;
-
-                    cursor:
-                        not-allowed;
+                    cursor: not-allowed;
                 }
 
                 .sap-small-button-success {
-                    color:
-                        #166534;
-
-                    border-color:
-                        #bbf7d0;
+                    color: #166534;
+                    border-color: #bbf7d0;
                 }
 
                 .sap-small-button-danger {
-                    color:
-                        #b91c1c;
-
-                    border-color:
-                        #fecaca;
-
-                    background:
-                        #fff;
+                    color: #b91c1c;
+                    border-color: #fecaca;
+                    background: #fff;
                 }
 
                 .sap-small-button-danger:hover {
-                    background:
-                        #fef2f2;
-
-                    border-color:
-                        #fca5a5;
-
-                    color:
-                        #991b1b;
+                    background: #fef2f2;
+                    border-color: #fca5a5;
+                    color: #991b1b;
                 }
-
 
                 /* =====================================================
                    EMPTY
                 ====================================================== */
 
                 .sap-empty {
-                    padding:
-                        50px 20px;
-
-                    text-align:
-                        center;
-
-                    color:
-                        #94a3b8;
-
-                    font-size:
-                        10px;
+                    padding: 50px 20px;
+                    text-align: center;
+                    color: #94a3b8;
+                    font-size: 10px;
                 }
-
 
                 /* =====================================================
                    PAGINATION
                 ====================================================== */
 
                 .sap-pagination {
-                    padding:
-                        14px 18px;
-
-                    border-top:
-                        1px solid
-                        #edf1f5;
-
-                    display:
-                        flex;
-
-                    align-items:
-                        center;
-
-                    justify-content:
-                        space-between;
-
-                    gap:
-                        12px;
-
-                    flex-wrap:
-                        wrap;
+                    padding: 14px 18px;
+                    border-top: 1px solid #edf1f5;
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    gap: 12px;
+                    flex-wrap: wrap;
                 }
 
                 .sap-pagination-info {
-                    color:
-                        #94a3b8;
-
-                    font-size:
-                        9px;
+                    color: #94a3b8;
+                    font-size: 9px;
                 }
 
                 .sap-pagination-nav {
-                    display:
-                        flex;
-
-                    gap:
-                        5px;
-
-                    flex-wrap:
-                        wrap;
+                    display: flex;
+                    gap: 5px;
+                    flex-wrap: wrap;
+                    justify-content: flex-end;
                 }
 
                 .sap-page-link {
-                    min-width:
-                        31px;
-
-                    height:
-                        31px;
-
-                    padding:
-                        0 9px;
-
-                    display:
-                        inline-flex;
-
-                    align-items:
-                        center;
-
-                    justify-content:
-                        center;
-
-                    border:
-                        1px solid
-                        #dbe3ec;
-
-                    border-radius:
-                        8px;
-
-                    background:
-                        #fff;
-
-                    color:
-                        #475569;
-
-                    text-decoration:
-                        none;
-
-                    font-size:
-                        8px;
-
-                    font-weight:
-                        800;
+                    min-width: 31px;
+                    min-height: 31px;
+                    height: 31px;
+                    padding: 0 9px;
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    border: 1px solid #dbe3ec;
+                    border-radius: 8px;
+                    background: #fff;
+                    color: #475569;
+                    text-decoration: none;
+                    font-size: 8px;
+                    font-weight: 800;
                 }
 
                 .sap-page-link:hover {
-                    background:
-                        #f8fafc;
+                    background: #f8fafc;
                 }
 
                 .sap-page-link-active {
-                    background:
-                        #0f2747;
-
-                    border-color:
-                        #0f2747;
-
-                    color:
-                        #fff;
+                    background: #0f2747;
+                    border-color: #0f2747;
+                    color: #fff;
                 }
 
                 .sap-page-link-disabled {
-                    opacity:
-                        .45;
-
-                    pointer-events:
-                        none;
+                    opacity: .45;
+                    pointer-events: none;
                 }
-
 
                 /* =====================================================
                    MODAL
                 ====================================================== */
 
                 .sap-overlay {
-                    position:
-                        fixed;
-
-                    inset:
-                        0;
-
-                    z-index:
-                        100;
-
-                    display:
-                        flex;
-
-                    align-items:
-                        center;
-
-                    justify-content:
-                        center;
-
-                    padding:
-                        20px;
-
-                    background:
-                        rgba(15,23,42,.48);
-
-                    backdrop-filter:
-                        blur(4px);
+                    position: fixed;
+                    inset: 0;
+                    z-index: 100;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    padding: 20px;
+                    background: rgba(15,23,42,.48);
+                    backdrop-filter: blur(4px);
+                    overflow-y: auto;
                 }
 
                 .sap-modal {
-                    width:
-                        min(620px,100%);
-
-                    max-height:
-                        min(88vh,760px);
-
-                    overflow-y:
-                        auto;
-
-                    border-radius:
-                        17px;
-
-                    background:
-                        #fff;
-
-                    border:
-                        1px solid
-                        #e2e8f0;
-
-                    box-shadow:
-                        0 25px 70px
-                        rgba(15,23,42,.20);
+                    width: min(620px, 100%);
+                    max-height: min(88vh, 760px);
+                    overflow-y: auto;
+                    border-radius: 17px;
+                    background: #fff;
+                    border: 1px solid #e2e8f0;
+                    box-shadow: 0 25px 70px rgba(15,23,42,.20);
                 }
 
                 .sap-modal-header {
-                    padding:
-                        17px 19px;
-
-                    display:
-                        flex;
-
-                    align-items:
-                        center;
-
-                    justify-content:
-                        space-between;
-
-                    gap:
-                        12px;
-
-                    border-bottom:
-                        1px solid
-                        #edf1f5;
+                    padding: 17px 19px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    gap: 12px;
+                    border-bottom: 1px solid #edf1f5;
                 }
 
                 .sap-modal-close {
-                    width:
-                        31px;
-
-                    height:
-                        31px;
-
-                    border:
-                        1px solid
-                        #e2e8f0;
-
-                    border-radius:
-                        8px;
-
-                    background:
-                        #fff;
-
-                    color:
-                        #64748b;
-
-                    cursor:
-                        pointer;
-
-                    font-size:
-                        17px;
-
-                    line-height:
-                        1;
+                    width: 31px;
+                    height: 31px;
+                    flex: 0 0 31px;
+                    border: 1px solid #e2e8f0;
+                    border-radius: 8px;
+                    background: #fff;
+                    color: #64748b;
+                    cursor: pointer;
+                    font-size: 17px;
+                    line-height: 1;
                 }
 
                 .sap-modal-close:hover {
-                    background:
-                        #f8fafc;
+                    background: #f8fafc;
                 }
 
                 .sap-modal-body {
-                    padding:
-                        19px;
+                    padding: 19px;
                 }
-
 
                 /* =====================================================
                    FORM
                 ====================================================== */
 
                 .sap-form-grid {
-                    display:
-                        grid;
-
-                    grid-template-columns:
-                        repeat(
-                            2,
-                            minmax(0,1fr)
-                        );
-
-                    gap:
-                        13px;
+                    display: grid;
+                    grid-template-columns: repeat(2, minmax(0, 1fr));
+                    gap: 13px;
                 }
 
                 .sap-form-full {
-                    grid-column:
-                        1 / -1;
+                    grid-column: 1 / -1;
                 }
 
                 .sap-required {
-                    color:
-                        #dc2626;
+                    color: #dc2626;
                 }
 
                 .sap-checkbox-wrap {
-                    display:
-                        flex;
-
-                    align-items:
-                        center;
-
-                    gap:
-                        8px;
-
-                    min-height:
-                        40px;
-
-                    padding:
-                        0 2px;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    min-height: 40px;
+                    padding: 0 2px;
                 }
 
                 .sap-checkbox {
-                    width:
-                        15px;
-
-                    height:
-                        15px;
-
-                    accent-color:
-                        #0f2747;
+                    width: 15px;
+                    height: 15px;
+                    accent-color: #0f2747;
+                    flex: 0 0 auto;
                 }
 
                 .sap-checkbox-label {
-                    color:
-                        #475569;
-
-                    font-size:
-                        10px;
-
-                    font-weight:
-                        700;
+                    color: #475569;
+                    font-size: 10px;
+                    font-weight: 700;
                 }
 
                 .sap-password-wrap {
-                    position:
-                        relative;
+                    position: relative;
                 }
 
-                .sap-password-wrap
-                .sap-input {
-                    padding-right:
-                        75px;
+                .sap-password-wrap .sap-input {
+                    padding-right: 85px;
                 }
 
                 .sap-password-toggle {
-                    position:
-                        absolute;
-
-                    top:
-                        50%;
-
-                    right:
-                        8px;
-
-                    transform:
-                        translateY(-50%);
-
-                    border:
-                        0;
-
-                    background:
-                        transparent;
-
-                    color:
-                        #64748b;
-
-                    font-family:
-                        inherit;
-
-                    font-size:
-                        8px;
-
-                    font-weight:
-                        800;
-
-                    cursor:
-                        pointer;
+                    position: absolute;
+                    top: 50%;
+                    right: 8px;
+                    transform: translateY(-50%);
+                    border: 0;
+                    background: transparent;
+                    color: #64748b;
+                    font-family: inherit;
+                    font-size: 8px;
+                    font-weight: 800;
+                    cursor: pointer;
                 }
 
                 .sap-password-toggle:hover {
-                    color:
-                        #0f2747;
+                    color: #0f2747;
                 }
 
                 .sap-help {
-                    margin-top:
-                        5px;
-
-                    color:
-                        #94a3b8;
-
-                    font-size:
-                        8px;
-
-                    line-height:
-                        1.5;
+                    margin-top: 5px;
+                    color: #94a3b8;
+                    font-size: 8px;
+                    line-height: 1.5;
                 }
-
 
                 /* =====================================================
                    MODAL FOOTER
                 ====================================================== */
 
                 .sap-modal-footer {
-                    padding:
-                        14px 19px 18px;
-
-                    display:
-                        flex;
-
-                    align-items:
-                        center;
-
-                    justify-content:
-                        flex-end;
-
-                    gap:
-                        8px;
-
-                    border-top:
-                        1px solid
-                        #edf1f5;
+                    padding: 14px 19px 18px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: flex-end;
+                    gap: 8px;
+                    border-top: 1px solid #edf1f5;
                 }
-
 
                 /* =====================================================
                    FOOTER
                 ====================================================== */
 
                 .sap-footer {
-                    padding-top:
-                        22px;
-
-                    text-align:
-                        center;
-
-                    color:
-                        #94a3b8;
-
-                    font-size:
-                        8px;
+                    padding-top: 22px;
+                    text-align: center;
+                    color: #94a3b8;
+                    font-size: 8px;
                 }
 
-
                 /* =====================================================
-                   RESPONSIVE
+                   TABLET / SMALL LAPTOP
                 ====================================================== */
 
-                @media (max-width: 1120px) {
+                @media (max-width: 1180px) {
+                    .sap-shell {
+                        grid-template-columns: 220px minmax(0, 1fr);
+                    }
+
+                    .sap-main {
+                        padding-left: 22px;
+                        padding-right: 22px;
+                    }
 
                     .sap-filter-body {
-                        grid-template-columns:
-                            repeat(
-                                2,
-                                minmax(0,1fr)
-                            );
+                        grid-template-columns: repeat(2, minmax(0, 1fr));
                     }
 
                     .sap-filter-actions {
-                        grid-column:
-                            1 / -1;
-
-                        justify-content:
-                            flex-end;
+                        grid-column: 1 / -1;
+                        justify-content: flex-end;
                     }
-
                 }
 
-
-                @media (max-width: 900px) {
-
+                @media (max-width: 920px) {
                     .sap-shell {
-                        display:
-                            block;
+                        display: block;
                     }
 
                     .sap-sidebar {
-                        position:
-                            relative;
-
-                        height:
-                            auto;
-
-                        padding:
-                            15px;
+                        position: sticky;
+                        top: 0;
+                        height: auto;
+                        min-height: 0;
+                        padding: 12px 14px;
+                        border-right: 0;
+                        border-bottom: 1px solid rgba(255,255,255,.08);
                     }
 
                     .sap-brand {
-                        padding-bottom:
-                            12px;
+                        padding: 3px 4px 10px;
                     }
 
                     .sap-nav-label,
                     .sap-sidebar-spacer,
                     .sap-profile-box {
-                        display:
-                            none;
+                        display: none;
                     }
 
                     .sap-nav {
-                        flex-direction:
-                            row;
-
-                        gap:
-                            5px;
-
-                        overflow-x:
-                            auto;
+                        flex-direction: row;
+                        gap: 6px;
+                        overflow-x: auto;
+                        overflow-y: hidden;
+                        padding: 2px 0 4px;
+                        scrollbar-width: thin;
                     }
 
                     .sap-nav-item {
-                        width:
-                            auto;
-
-                        min-width:
-                            max-content;
-
-                        margin:
-                            0;
+                        width: auto;
+                        min-width: max-content;
+                        margin: 0;
+                        padding: 9px 10px;
                     }
 
                     .sap-main {
-                        padding:
-                            22px
-                            18px
-                            40px;
+                        padding: 22px 18px 40px;
                     }
 
                     .sap-topbar {
-                        align-items:
-                            flex-start;
-
-                        flex-direction:
-                            column;
+                        align-items: flex-start;
+                        flex-direction: column;
                     }
 
                     .sap-actions {
-                        justify-content:
-                            flex-start;
+                        width: 100%;
+                        justify-content: flex-start;
                     }
-
                 }
 
+                /* =====================================================
+                   MOBILE
+                ====================================================== */
 
-                @media (max-width: 620px) {
+                @media (max-width: 680px) {
+                    .sap-sidebar {
+                        padding: 10px 10px 8px;
+                    }
+
+                    .sap-brand {
+                        padding: 2px 4px 9px;
+                    }
+
+                    .sap-brand-logo {
+                        width: 36px;
+                        height: 36px;
+                        flex-basis: 36px;
+                        border-radius: 10px;
+                    }
+
+                    .sap-brand-title {
+                        font-size: 15px;
+                    }
+
+                    .sap-brand-subtitle {
+                        font-size: 8px;
+                    }
+
+                    .sap-nav {
+                        gap: 4px;
+                    }
+
+                    .sap-nav-item {
+                        padding: 8px 9px;
+                        border-radius: 9px;
+                        font-size: 10px;
+                    }
+
+                    .sap-nav-icon {
+                        width: 24px;
+                        height: 24px;
+                        flex-basis: 24px;
+                    }
 
                     .sap-main {
-                        padding:
-                            18px
-                            12px
-                            34px;
+                        padding: 18px 12px 32px;
                     }
 
-                    .sap-filter-body {
-                        grid-template-columns:
-                            1fr;
+                    .sap-topbar {
+                        gap: 14px;
+                        margin-bottom: 16px;
                     }
 
-                    .sap-filter-actions {
-                        grid-column:
-                            auto;
-                    }
-
-                    .sap-form-grid {
-                        grid-template-columns:
-                            1fr;
-                    }
-
-                    .sap-form-full {
-                        grid-column:
-                            auto;
+                    .sap-kicker {
+                        font-size: 8px;
                     }
 
                     .sap-title {
-                        font-size:
-                            24px;
+                        font-size: 24px;
                     }
 
+                    .sap-subtitle {
+                        font-size: 10px;
+                        line-height: 1.55;
+                    }
+
+                    .sap-actions {
+                        display: grid;
+                        grid-template-columns: 1fr 1fr;
+                        width: 100%;
+                        gap: 7px;
+                    }
+
+                    .sap-actions .sap-button {
+                        width: 100%;
+                        min-width: 0;
+                        padding-left: 8px;
+                        padding-right: 8px;
+                        white-space: normal;
+                        text-align: center;
+                    }
+
+                    .sap-filter-header,
+                    .sap-modal-header {
+                        padding: 14px;
+                    }
+
+                    .sap-filter-body {
+                        grid-template-columns: 1fr;
+                        padding: 14px;
+                        gap: 11px;
+                    }
+
+                    .sap-filter-actions {
+                        grid-column: auto;
+                        display: grid;
+                        grid-template-columns: 1fr 1fr;
+                        width: 100%;
+                    }
+
+                    .sap-filter-actions .sap-button {
+                        width: 100%;
+                    }
+
+                    .sap-card-title {
+                        font-size: 12px;
+                    }
+
+                    .sap-card-description {
+                        font-size: 8px;
+                    }
+
+                    /* Tabel tetap bisa di-scroll pada layar kecil. */
+                    .sap-table-wrap {
+                        overflow-x: auto;
+                    }
+
+                    .sap-table {
+                        min-width: 760px;
+                    }
+
+                    .sap-table th,
+                    .sap-table td {
+                        padding: 10px 9px;
+                    }
+
+                    .sap-actions-cell {
+                        flex-wrap: nowrap;
+                    }
+
+                    .sap-small-button {
+                        min-height: 34px;
+                        padding: 7px 8px;
+                    }
+
+                    .sap-pagination {
+                        padding: 12px 14px;
+                        align-items: stretch;
+                    }
+
+                    .sap-pagination-info {
+                        width: 100%;
+                    }
+
+                    .sap-pagination-nav {
+                        width: 100%;
+                        justify-content: flex-start;
+                    }
+
+                    .sap-page-link {
+                        min-width: 34px;
+                        height: 34px;
+                    }
+
+                    .sap-overlay {
+                        align-items: flex-start;
+                        padding: 10px;
+                    }
+
+                    .sap-modal {
+                        width: 100%;
+                        max-height: calc(100vh - 20px);
+                        border-radius: 14px;
+                    }
+
+                    .sap-modal-body {
+                        padding: 14px;
+                    }
+
+                    .sap-form-grid {
+                        grid-template-columns: 1fr;
+                        gap: 11px;
+                    }
+
+                    .sap-form-full {
+                        grid-column: auto;
+                    }
+
+                    .sap-modal-footer {
+                        padding: 12px 14px 14px;
+                        display: grid;
+                        grid-template-columns: 1fr 1fr;
+                    }
+
+                    .sap-modal-footer .sap-button {
+                        width: 100%;
+                    }
+                }
+
+                /* =====================================================
+                   VERY SMALL PHONE
+                ====================================================== */
+
+                @media (max-width: 400px) {
+                    .sap-main {
+                        padding-left: 9px;
+                        padding-right: 9px;
+                    }
+
+                    .sap-actions {
+                        grid-template-columns: 1fr;
+                    }
+
+                    .sap-filter-actions {
+                        grid-template-columns: 1fr;
+                    }
+
+                    .sap-nav-item {
+                        font-size: 9px;
+                    }
+
+                    .sap-nav-icon {
+                        display: none;
+                    }
+
+                    .sap-title {
+                        font-size: 22px;
+                    }
+
+                    .sap-overlay {
+                        padding: 6px;
+                    }
+
+                    .sap-modal {
+                        max-height: calc(100vh - 12px);
+                    }
+
+                    .sap-modal-footer {
+                        grid-template-columns: 1fr;
+                    }
+
+                    .sap-password-wrap .sap-input {
+                        padding-right: 75px;
+                    }
                 }
 
             `}</style>
